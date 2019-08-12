@@ -1,0 +1,73 @@
+service: melvin-alexa-intent-handlers
+
+frameworkVersion: ">=1.4.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: eu-west-1
+  timeout: 30
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+        - "s3:PutObject"
+        - "s3:GetObject"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - Ref: S3MelvinCache
+            - /*
+    - Effect: "Allow"
+      Action: 
+        - "ssm:GetParameters"
+      Resource:
+        - Fn::Join:
+          - ""
+          - - "arn:aws:ssm:*:*:parameter/"
+            - ${self:service}
+            - /*
+
+functions:
+  alexa-skill:
+    handler: src/alexa-skill.handler
+    events:
+      - alexaSkill:
+          appId: "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
+          enabled: true
+    environment:
+      MELVIN_CACHE_BUCKET_NAME: ${self:custom.melvinExplorerRestBaseUrl}
+
+  test-alexa-skill:
+    handler: src/alexa-skill.testHandler
+    events:
+      - http: get /testintent
+        request: 
+          parameters: 
+            paths: 
+              name: true
+
+
+plugins:
+  - serverless-plugin-aws-alerts
+  - serverless-plugin-include-dependencies
+
+package:
+  exclude:
+    - .vscode/**
+  excludeDevDependencies: false
+
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  melvinExplorerRestBaseUrl: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
+  melvinCacheBucketName: ${self:service}-${self:custom.stage}
+
+resources:
+  Resources:
+    S3MelvinCache:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.melvinCacheBucketName}

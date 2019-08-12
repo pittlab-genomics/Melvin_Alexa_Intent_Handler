@@ -1,0 +1,17 @@
+{
+  "name": "aws-alexa-skill",
+  "version": "1.0.0",
+  "description": "This example demonstrates how to use an AWS Lambdas for your custom Alexa skill.",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.18.0",
+    "request": "^2.88.0",
+    "serverless-plugin-aws-alerts": "^1.4.0",
+    "ssml-builder": "^0.4.3"
+  },
+  "devDependencies": {
+    "serverless-plugin-include-dependencies": "^3.2.1"
+  }
+}

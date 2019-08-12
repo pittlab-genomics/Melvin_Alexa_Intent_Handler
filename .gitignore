@@ -1,0 +1,9 @@
+# Serverless project configuration folder
+.serverless
+
+# Visual Studio Code project files
+.vscode
+
+# npm package files
+node_modules
+package-lock.json
