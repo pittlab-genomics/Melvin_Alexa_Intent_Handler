@@ -1,21 +1,27 @@
 'use strict';
 
 const Alexa = require('ask-sdk-core');
-const Speech = require('ssml-builder');
-
+const _ = require('lodash');
 const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
-
 const { SearchGeneIntentHandler } = require('./skill_handlers/gene_handler.js');
-const { CNVAmplificationGeneIntentHandler,
+const { NavigateStartIntentHandler } = require('./skill_handlers/navigation_handler.js');
+const {
+    CNVAmplificationGeneIntentHandler,
     CNVDeletionGeneIntent,
-    CNVAlterationGeneIntent } = require('./skill_handlers/cnv_handler.js');
+    CNVAlterationGeneIntent
+} = require('./skill_handlers/cnv_handler.js');
+const {
+    MutationCountIntentHandler,
+    MutationPercentageIntentHandler,
+    NavigateMutationsIntentHandler
+} = require('./skill_handlers/mutations_handler.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speechText = 'Welcome to Melvin. Please choose a functionality you would like to use.'
+        const speechText = 'Welcome to Melvin.'
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -100,6 +106,37 @@ const ErrorHandler = {
     }
 };
 
+
+const TestIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'TestIntent';
+    },
+    handle(handlerInput) {
+        let speechText = 'This is a test handler response.';
+
+        let gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.gene.value');
+        let study_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
+        let study_id = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.resolutions.resolutionsPerAuthority[0].values[0].value.id');
+
+        let params = { gene_name, study_name, study_id };
+        console.log(`TestIntentHandler params = ${JSON.stringify(params)}`);
+
+        if (!_.isNil(gene_name)) {
+            speechText += `Gene name is ${gene_name}.`
+        }
+
+        if (!_.isNil(study_name)) {
+            speechText += `Study name is ${study_name} and study id is ${study_id}.`
+        }
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+};
+
 // This handler acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
@@ -109,59 +146,21 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SearchGeneIntentHandler,
+        TestIntentHandler,
         CNVAmplificationGeneIntentHandler,
         CNVDeletionGeneIntent,
         CNVAlterationGeneIntent,
+        MutationCountIntentHandler,
+        MutationPercentageIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
+
+        // Navigation handlers
+        NavigateStartIntentHandler,
+        NavigateMutationsIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)
     .addErrorHandlers(ErrorHandler)
     .lambda();
-
-exports.testHandler = (event, context, callback) => {
-    console.log('testHandler event: ' + JSON.stringify(event));
-
-    let handlerInput = {
-        "requestEnvelope": {
-            "request": {
-                "type": "IntentRequest",
-                "intent": {
-                    "name": "CNVAmplificationGeneIntent"
-                },
-                "intent": {
-                    "slots": {
-                        "gene": {
-                            "value": "TP53"
-                        },
-                        "study": {
-                            "value": "breast",
-                            "resolutions": {
-                                "resolutionsPerAuthority": [
-                                    {
-                                        "values": [
-                                            {
-                                                "value": {
-                                                    "id": "BRCA"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
-
-    let response = CNVAmplificationGeneIntentHandler.handle(handlerInput);
-    return {
-        "statusCode": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": response
-    };
-};

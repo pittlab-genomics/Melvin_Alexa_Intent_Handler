@@ -1,11 +1,8 @@
-const { baseUrl } = require('../common.js');
+const { GENOMIC_EXPLORER_API_BASE_URL: baseUrl } = require('../common.js');
 const https = require('request');
 
-module.exports.get_cnv_change_percent = function (params) {
-    var url = baseUrl + '/analysis/cnvs/percent_patients?' +
-        'cnv_change=' + params.cnv_change +
-        '&gene=' + params.gene_name +
-        '&study=' + params.study_id;
+module.exports.get_gene_by_name = function (params) {
+    var url = baseUrl + '/genes/' + params.gene_name;
     var options = { json: true };
 
     return new Promise(function (resolve, reject) {
@@ -19,3 +16,4 @@ module.exports.get_cnv_change_percent = function (params) {
         });
     });
 };
+

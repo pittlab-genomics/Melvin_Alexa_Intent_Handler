@@ -40,20 +40,11 @@ functions:
     environment:
       MELVIN_CACHE_BUCKET_NAME: ${self:custom.melvinExplorerRestBaseUrl}
 
-  test-alexa-skill:
-    handler: src/alexa-skill.testHandler
-    events:
-      - http: get /testintent
-        request: 
-          parameters: 
-            paths: 
-              name: true
-
 
 plugins:
   - serverless-plugin-aws-alerts
   - serverless-plugin-include-dependencies
-
+  - serverless-prune-plugin
 package:
   exclude:
     - .vscode/**
@@ -65,6 +56,13 @@ custom:
   melvinExplorerRestBaseUrl: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
   melvinCacheBucketName: ${self:service}-${self:custom.stage}
 
+  # This will delete all but the n-most recent versions of each function deployed.
+  prune:
+    automatic: true
+    includeLayers: true
+    number: 3
+
+    
 resources:
   Resources:
     S3MelvinCache:

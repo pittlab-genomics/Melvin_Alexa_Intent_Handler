@@ -9,9 +9,11 @@
     "ask-sdk-model": "^1.18.0",
     "request": "^2.88.0",
     "serverless-plugin-aws-alerts": "^1.4.0",
-    "ssml-builder": "^0.4.3"
+    "ssml-builder": "^0.4.3",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "serverless-plugin-include-dependencies": "^3.2.1"
+    "serverless-plugin-include-dependencies": "^3.2.1",
+    "serverless-prune-plugin": "^1.4.0"
   }
 }
