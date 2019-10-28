@@ -1,0 +1,146 @@
+{
+    "version": "1.0",
+    "session": {
+        "new": false,
+        "sessionId": "xxx",
+        "application": {
+            "applicationId": "xxx"
+        },
+        "user": {
+            "userId": "xxx"
+        }
+    },
+    "context": {
+        "AudioPlayer": {
+            "playerActivity": "IDLE"
+        },
+        "Display": {
+            "token": ""
+        },
+        "Alexa.Presentation.APL": {
+            "token": "",
+            "version": "APL_WEB_RENDERER_GANDALF",
+            "componentsVisibleOnScreen": [
+                {
+                    "uid": ":1054",
+                    "position": "1024x600+0+0:0",
+                    "type": "mixed",
+                    "tags": {
+                        "viewport": {}
+                    },
+                    "entities": []
+                }
+            ]
+        },
+        "System": {
+            "application": {
+                "applicationId": "xxx"
+            },
+            "user": {
+                "userId": "xxx"
+            },
+            "device": {
+                "deviceId": "xxx",
+                "supportedInterfaces": {
+                    "AudioPlayer": {},
+                    "Display": {
+                        "templateVersion": "1.0",
+                        "markupVersion": "1.0"
+                    },
+                    "Alexa.Presentation.APL": {
+                        "runtime": {
+                            "maxVersion": "1.0"
+                        }
+                    }
+                }
+            },
+            "apiEndpoint": "https://api.amazonalexa.com",
+            "apiAccessToken": "xxx"
+        },
+        "Viewport": {
+            "experiences": [
+                {
+                    "arcMinuteWidth": 246,
+                    "arcMinuteHeight": 144,
+                    "canRotate": false,
+                    "canResize": false
+                }
+            ],
+            "shape": "RECTANGLE",
+            "pixelWidth": 1024,
+            "pixelHeight": 600,
+            "dpi": 160,
+            "currentPixelWidth": 1024,
+            "currentPixelHeight": 600,
+            "touch": [
+                "SINGLE"
+            ],
+            "video": {
+                "codecs": [
+                    "H_264_42",
+                    "H_264_41"
+                ]
+            }
+        }
+    },
+    "request": {
+        "type": "IntentRequest",
+        "requestId": "xxx",
+        "timestamp": "2019-08-13T09:10:18Z",
+        "locale": "en-US",
+        "intent": {
+            "name": "CNVAmplificationGeneIntent",
+            "confirmationStatus": "NONE",
+            "slots": {
+                "gene": {
+                    "name": "gene",
+                    "value": "cdh17",
+                    "resolutions": {
+                        "resolutionsPerAuthority": [
+                            {
+                                "authority": "xxx.GENE",
+                                "status": {
+                                    "code": "ER_SUCCESS_MATCH"
+                                },
+                                "values": [
+                                    {
+                                        "value": {
+                                            "name": "CDH17",
+                                            "id": "CDH17"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "confirmationStatus": "NONE",
+                    "source": "USER"
+                },
+                "study": {
+                    "name": "study",
+                    "value": "breast",
+                    "resolutions": {
+                        "resolutionsPerAuthority": [
+                            {
+                                "authority": "xxx.STUDY",
+                                "status": {
+                                    "code": "ER_SUCCESS_MATCH"
+                                },
+                                "values": [
+                                    {
+                                        "value": {
+                                            "name": "breast",
+                                            "id": "BRCA"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "confirmationStatus": "NONE",
+                    "source": "USER"
+                }
+            }
+        }
+    }
+}

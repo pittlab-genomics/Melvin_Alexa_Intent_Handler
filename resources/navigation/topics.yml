@@ -1,0 +1,25 @@
+data_types:
+  mutations:
+    intents:
+      - "NavigateMutationsIntent"
+
+    subtopics:
+      domains:
+        intents:
+          - "NavigateMutationsDomainIntent"
+  cnv:
+    intents:
+      - "NavigateCNVIntent"
+
+    subtopics:
+      amplifications:
+        intents:
+          - "NavigateCNVAmplifications"
+
+      deletions:
+        intents:
+          - "NavigateCNVDeletions"
+
+      alterations:
+        intents:
+          - "NavigateCNVAlterations"

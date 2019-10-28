@@ -17,4 +17,14 @@ serverless deploy
 
 ## Test Locally
 
-serverless invoke local --function test-alexa-skill --data '{"pathParameters":{"name":"ACTG1"}}'
+serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_query_payload.json
+serverless invoke local --function alexa-skill -p ./examples/CNVAmplificationGeneIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateMutationsIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateMutationDomains_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateCNVIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
+
+serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
