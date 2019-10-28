@@ -1,7 +1,8 @@
 const Speech = require('ssml-builder');
-const { MelvinErrors } = require('../common.js');
+const _ = require('lodash');
+
+const { MelvinExplorerErrors } = require('../common.js');
 const { get_gene_by_name } = require('../http_clients/gene_client.js');
-var _ = require('lodash');
 
 const SearchGeneIntentHandler = {
     canHandle(handlerInput) {
@@ -12,7 +13,7 @@ const SearchGeneIntentHandler = {
 
         let gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.gene.value');
         if (_.isNil(gene_name)) {
-            gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value').replace(/\s/g, '');;
+            gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value').replace(/\s/g, '');
         }
 
         let speechText = '';
@@ -28,7 +29,7 @@ const SearchGeneIntentHandler = {
                 speech.say(sentence_sum);
                 speechText = speech.ssml();
 
-            } else if (response['error'] && response['error'] === MelvinErrors.UNIDENTIFIED_GENE) {
+            } else if (response['error'] && response['error'] === MelvinExplorerErrors.UNIDENTIFIED_GENE) {
                 speech.say(`Sorry, I could not find a gene called ${gene_name}`);
                 speechText = speech.ssml();
 

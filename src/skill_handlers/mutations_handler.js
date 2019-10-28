@@ -1,7 +1,24 @@
 const Speech = require('ssml-builder');
-const { quickQueryRepromptText } = require('../common.js');
-const { get_mutated_patient_stats } = require('../http_clients/mutations_client.js');
-var _ = require('lodash');
+const URL = require('url').URL;
+const _ = require('lodash');
+
+const {
+    DataTypes,
+    DEFAULT_ERROR_SPEECH_TEXT
+} = require('../common.js');
+
+const {
+    get_mutated_patient_stats
+} = require('../http_clients/mutations_client.js');
+
+const {
+    validate_action_intent_state,
+    update_melvin_state
+} = require('./navigation_helper.js');
+
+const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
+const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
+
 
 const MutationCountIntentHandler = {
     canHandle(handlerInput) {
@@ -46,15 +63,18 @@ const MutationCountIntentHandler = {
             }
 
         } catch (error) {
-            speech.say(`Sorry, something went wrong while processing the request. Please try again later.`);
-            speechText = speech.ssml();
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+            }
             console.error(`MutationCountIntentHandler: message: ${error.message}`, error);
         }
 
         console.log("SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(quickQueryRepromptText)
+            .reprompt(speechText)
             .getResponse();
     }
 };
@@ -106,27 +126,15 @@ const MutationPercentageIntentHandler = {
             }
 
         } catch (error) {
-            speech.say(`Sorry, something went wrong while processing the request. Please try again later.`);
-            speechText = speech.ssml();
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+            }
             console.error(`MutationCountIntentHandler: message: ${error.message}`, error);
         }
 
         console.log("SPEECH TEXT = " + speechText);
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(quickQueryRepromptText)
-            .getResponse();
-    }
-};
-
-const NavigateMutationsIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateMutationsIntent';
-    },
-    handle(handlerInput) {
-        const gene_name = handlerInput.requestEnvelope.request.intent.slots.gene.value;
-
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -134,8 +142,74 @@ const NavigateMutationsIntentHandler = {
     }
 };
 
+
+
+const NavigateMutationsIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateMutationsIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+
+        try {
+            const state_change = await update_melvin_state(handlerInput);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATIONS);
+            const response = await build_mutations_response(melvin_state);
+            add_to_APL_image_pager(handlerInput, response['image_list']);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+            }
+            console.error(`NavigateMutationsIntentHandler: message: ${error.message}`, error);
+        }
+
+        console.log("SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+};
+
+const NavigateMutationsDomainIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateMutationsDomainIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+        try {
+            const state_change = await update_melvin_state(handlerInput);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATION_DOMAINS);
+            const domain_response = await build_mutations_domain_response(melvin_state);
+            add_to_APL_image_pager(handlerInput, domain_response['image_list']);
+            speechText = domain_response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+            }
+            console.error(`Error in NavigateMutationsDomainIntentHandler`, error);
+        }
+
+        console.log("SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+}
+
 module.exports = {
     MutationCountIntentHandler,
     MutationPercentageIntentHandler,
-    NavigateMutationsIntentHandler
+    NavigateMutationsIntentHandler,
+    NavigateMutationsDomainIntentHandler
 }

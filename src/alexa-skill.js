@@ -4,16 +4,22 @@ const Alexa = require('ask-sdk-core');
 const _ = require('lodash');
 const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
 const { SearchGeneIntentHandler } = require('./skill_handlers/gene_handler.js');
-const { NavigateStartIntentHandler } = require('./skill_handlers/navigation_handler.js');
+const {
+    NavigateStartIntentHandler,
+    NavigateResetIntentHandler,
+    NavigateJoinFilterIntentHandler
+} = require('./skill_handlers/navigation_handler.js');
 const {
     CNVAmplificationGeneIntentHandler,
     CNVDeletionGeneIntent,
-    CNVAlterationGeneIntent
+    CNVAlterationGeneIntent,
+    NavigateCNVIntentHandler
 } = require('./skill_handlers/cnv_handler.js');
 const {
     MutationCountIntentHandler,
     MutationPercentageIntentHandler,
-    NavigateMutationsIntentHandler
+    NavigateMutationsIntentHandler,
+    NavigateMutationsDomainIntentHandler
 } = require('./skill_handlers/mutations_handler.js');
 
 const LaunchRequestHandler = {
@@ -22,10 +28,11 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         const speechText = 'Welcome to Melvin.'
+        const reprompt_text = 'What would you like to know? You can ask me about a gene or a cancer type.'
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(reprompt_text)
             .getResponse();
     }
 };
@@ -158,7 +165,11 @@ exports.handler = Alexa.SkillBuilders.custom()
 
         // Navigation handlers
         NavigateStartIntentHandler,
+        NavigateResetIntentHandler,
+        NavigateJoinFilterIntentHandler,
         NavigateMutationsIntentHandler,
+        NavigateMutationsDomainIntentHandler,
+        NavigateCNVIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

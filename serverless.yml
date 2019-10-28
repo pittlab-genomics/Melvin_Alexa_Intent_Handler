@@ -4,68 +4,61 @@ frameworkVersion: ">=1.4.0 <2.0.0"
 
 provider:
   name: aws
-  runtime: nodejs8.10
-  stage: dev
+  runtime: nodejs10.x
+  stage: ${self:custom.stage}
   region: eu-west-1
+  memorySize: 2048
+  tracing:
+    lambda: true
+    apiGateway: true
+  environment: ${self:custom.config.environment}
   timeout: 30
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "s3:ListBucket"
-        - "s3:PutObject"
-        - "s3:GetObject"
-      Resource:
-        Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - Ref: S3MelvinCache
-            - /*
-    - Effect: "Allow"
-      Action: 
-        - "ssm:GetParameters"
-      Resource:
-        - Fn::Join:
-          - ""
-          - - "arn:aws:ssm:*:*:parameter/"
-            - ${self:service}
-            - /*
+        - ssm:GetParameter
+      Resource: "arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:service}/{self:provider.stage}/*"
+
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_ENTITY_QUERIES}"
 
 functions:
   alexa-skill:
     handler: src/alexa-skill.handler
     events:
       - alexaSkill:
-          appId: "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
+          appId: ${self:custom.config.alexa.appId}
           enabled: true
-    environment:
-      MELVIN_CACHE_BUCKET_NAME: ${self:custom.melvinExplorerRestBaseUrl}
-
 
 plugins:
   - serverless-plugin-aws-alerts
   - serverless-plugin-include-dependencies
   - serverless-prune-plugin
+  - serverless-pseudo-parameters
+
 package:
   exclude:
     - .vscode/**
   excludeDevDependencies: false
 
-
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  melvinExplorerRestBaseUrl: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
-  melvinCacheBucketName: ${self:service}-${self:custom.stage}
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or fallsback to what we have set in the provider section.
+  stage: ${opt:stage, 'dev'}
+
+  # Load our configuration file specific to the environment based on the stage parameter
+  config: ${file(config/${self:custom.stage}.yml)}
 
   # This will delete all but the n-most recent versions of each function deployed.
   prune:
     automatic: true
     includeLayers: true
     number: 3
-
-    
-resources:
-  Resources:
-    S3MelvinCache:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:custom.melvinCacheBucketName}
