@@ -1,17 +1,29 @@
 const Speech = require('ssml-builder');
 const _ = require('lodash');
 
-const { DataTypes, CNVTypes, MelvinIntentErrors, melvin_error } = require('../common.js');
+const {
+    DataTypes,
+    CNVTypes,
+    MelvinIntentErrors,
+    melvin_error,
+    MELVIN_WELCOME_GREETING,
+    GeneSpeechResponses
+} = require('../common.js');
+
 const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
 const { update_melvin_state, validate_navigation_intent_state } = require('./navigation_helper.js');
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
-const { build_cnv_response } = require('./cnv_helper.js');
+const { build_navigate_cnv_response } = require('./cnv_helper.js');
 
 function ack_attribute_change(handlerInput, oov_data) {
     let speechText = '';
     if (oov_data['entity_type'] === 'GENE') {
         const gene_name = oov_data['entity_data']['gene_name'];
-        speechText = `Ok, ${gene_name}. What would you like to know?`
+        let gene_speech_text = gene_name;
+        if (GeneSpeechResponses[gene_name]) {
+            gene_speech_text = GeneSpeechResponses[gene_name];
+        }
+        speechText = `Ok, ${gene_speech_text}. What would you like to know?`
         handlerInput.responseBuilder.withSimpleCard('Melvin', gene_name);
 
     } else if (oov_data['entity_type'] === 'STUDY') {
@@ -90,7 +102,7 @@ const NavigateJoinFilterIntentHandler = {
                         ...melvin_state,
                         cnv_change: CNVTypes.APLIFICATIONS
                     };
-                    response = await build_cnv_response(params);
+                    response = await build_navigate_cnv_response(params);
 
                 } else if (melvin_state['data_type'] === 'deletion'
                     || melvin_state['data_type'] === DataTypes.CNV_DELETIONS) {
@@ -98,7 +110,7 @@ const NavigateJoinFilterIntentHandler = {
                         ...melvin_state,
                         cnv_change: CNVTypes.DELETIONS
                     };
-                    response = await build_cnv_response(params);
+                    response = await build_navigate_cnv_response(params);
 
                 } else if (melvin_state['data_type'] === 'copy number change'
                     || melvin_state['data_type'] === 'copy number variation'
@@ -108,7 +120,7 @@ const NavigateJoinFilterIntentHandler = {
                         ...melvin_state,
                         cnv_change: CNVTypes.ALTERATIONS
                     };
-                    response = await build_cnv_response(params);
+                    response = await build_navigate_cnv_response(params);
 
                 } else {
                     throw melvin_error(`Unknown data_type found in melvin_state: ${JSON.stringify(melvin_state)}`,
@@ -144,7 +156,7 @@ const NavigateResetIntentHandler = {
     },
     async handle(handlerInput) {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const speechText = 'Ok. Welcome to Melvin.'
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
         const reprompt_text = 'What would you like to know? You can ask me about a gene or a cancer type.'
         const melvin_state = {};
         sessionAttributes['MELVIN.STATE'] = melvin_state;

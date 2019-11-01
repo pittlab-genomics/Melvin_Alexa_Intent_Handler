@@ -1,48 +1,84 @@
 const Speech = require('ssml-builder');
-const URL = require('url').URL;
 const _ = require('lodash');
 
 const {
-    MELVIN_EXPLORER_ENDPOINT
+    add_mutations_stats_plot,
+    add_mutations_profile_plot,
+    add_mutations_treemap_plot,
+    add_domain_pie_plot,
+    add_domain_stack_plot
+} = require('../utils/response_builder_utils.js');
+
+const {
+    MelvinAttributes,
+    MelvinIntentErrors,
+    melvin_error
 } = require('../common.js');
 
 const {
     get_mutated_patient_stats,
-    get_mutations_top_list,
     get_mutations_domain_percent
 } = require('../http_clients/mutations_client.js');
 
 async function build_mutations_response(params) {
     const speech = new Speech();
     const image_list = [];
-    console.info(`[get_mutations_response] params: ${JSON.stringify(params)}`);
+    console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
+    const response = await get_mutated_patient_stats(params);
 
-    if (_.isEmpty(params['study_name'])) {
-        console.log(`study_name is empty`);
-    }
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        const mutated_cancer_type_count = response['data']['cancer_types_with_mutated_gene'];
+        const total_cancer_types = response['data']['total_cancer_types'];
+        const records_list = response['data']['records'];
 
-    if (!_.isEmpty(params['gene_name']) && _.isEmpty(params['study_name'])) {
-        const response = await get_mutations_top_list(params);
-        const gene_list_str = response['data'].toString();
-        speech.say(`${params['gene_name']} mutations are most found in ${gene_list_str}`);
+        if (Array.isArray(records_list)) {
+            add_mutations_stats_plot(image_list, params);
+            add_mutations_treemap_plot(image_list, params);
 
-        const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/count_plot`);
-        count_plot_url.searchParams.set('gene', params.gene_name);
-        image_list.push(count_plot_url);
+            speech.say(`${params[MelvinAttributes.GENE_NAME]} mutations are found in ${mutated_cancer_type_count}`
+                + ` out of ${total_cancer_types} cancer types.`);
 
-    } else if (_.isEmpty(params['gene_name']) && !_.isEmpty(params['study_name'])) {
-        speech.say(`${params['study_name']} cancer mutations`);
+            if (records_list.length >= 2) {
+                speech
+                    .say(`It is most mutated in ${records_list[0][MelvinAttributes.STUDY_NAME]} at `)
+                    .say(records_list[0]['percent_cancer_patients_with_mutgene'].toFixed(1))
+                    .say(`percent, followed by ${records_list[1][MelvinAttributes.STUDY_NAME]} at `)
+                    .say(records_list[1]['percent_cancer_patients_with_mutgene'].toFixed(1))
+                    .say('percent.')
 
-    } else if (!_.isEmpty(params['gene_name']) && !_.isEmpty(params['study_name'])) {
-        const response = await get_mutated_patient_stats(params);
+            } else if (records_list.length >= 1) {
+                speech
+                    .say(`${params[MelvinAttributes.GENE_NAME]} mutations are found in ${mutated_cancer_type_count}`
+                        + ` out of ${total_cancer_types} cancer types.`)
+                    .say(`It is most mutated in ${records_list[0][MelvinAttributes.STUDY_NAME]} at `)
+                    .say(`${records_list[0]['percent_cancer_patients_with_mutgene'].toFixed(1)} percent.`)
+
+            } else {
+                speech.say(`There were no mutations found for ${params[MelvinAttributes.GENE_NAME]}`);
+            }
+
+        } else {
+            throw melvin_error(
+                `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+                MelvinIntentErrors.INVALID_API_RESPOSE,
+                `Sorry, I'm having trouble accessing mutations records for ${params[MelvinAttributes.GENE_NAME]}`
+            );
+        }
+
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        add_mutations_profile_plot(image_list, params);
         speech
-            .sayAs({ word: response['data']['patient_percentage'], interpret: 'digits' })
-            .say(`percentage of ${params['study_name']} cancer patients have ${params['gene_name']} mutation`);
+            .say(response['data']['patient_percentage'].toFixed(1))
+            .say(`percent of ${params[MelvinAttributes.STUDY_NAME]} patients have `
+                + `${params[MelvinAttributes.GENE_NAME]} mutations with` +
+                ` ${response['data']['recurrent_positions']} amino acid residues recurrently mutated.`);
 
-        const profile_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/profile_plot`);
-        profile_plot_url.searchParams.set('gene', params.gene_name);
-        profile_plot_url.searchParams.set('study', params.study_id);
-        image_list.push(profile_plot_url);
+    } else {
+        throw melvin_error(
+            `[build_mutations_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            `Sorry, I got lost during the conversation. Please start over.`
+        );
     }
 
     return {
@@ -52,47 +88,68 @@ async function build_mutations_response(params) {
 }
 
 
+function build_mutations_domain_response_helper(params, records_list, speech) {
+    // remove 'none' domain from the list since it should not be considered for speech response
+    records_list = records_list.filter(item => item['domain'] !== 'none');
+
+    if (records_list.length > 2) {
+        speech
+            .say(`${records_list[0]['domain']} and ${records_list[1]['domain']}`
+                + ` are the most affected domains containing`)
+            .say(records_list[0]['percentage'].toFixed(1))
+            .say('percent and')
+            .say(records_list[1]['percentage'].toFixed(1))
+            .say(`percent of all ${params[MelvinAttributes.GENE_NAME]} mutations respectively.`);
+
+    } else if (records_list.length > 1) {
+        speech
+            .say(`${records_list[0]['domain']} is the most affected domain containing`)
+            .say(records_list[0]['percentage'].toFixed(1))
+            .say(`percent of all ${params[MelvinAttributes.GENE_NAME]} mutations.`);
+
+    } else if (records_list.length == 1) {
+        speech
+            .say(`${records_list[0]['domain']} is the only affected domain containing`)
+            .say(records_list[0]['percentage'].toFixed(1))
+            .say(`percent of all ${params[MelvinAttributes.GENE_NAME]} mutations.`);
+
+    } else {
+        speech.say('There were no mutation domains found.');
+    }
+}
+
+
 async function build_mutations_domain_response(params) {
+    console.log(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
     const speech = new Speech();
     const image_list = [];
-    console.log(`[get_mutations_domain_response] params: ${JSON.stringify(params)}`);
+    const response = await get_mutations_domain_percent(params);
+    const records_list = response['data']['records'];
 
-    if (!_.isEmpty(params['gene_name']) && _.isEmpty(params['study_name'])) {
-        const response = await get_mutations_domain_percent(params);
-        speech
-            .say(`The ${response['data']['domain_name']} is the most mutated region containing`)
-            .sayAs({ word: response['data']['mutated_percentage'], interpret: 'digits' })
-            .say(`percent of all ${params['gene_name']} mutations.`);
+    if (
+        (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME]))
+        || (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME]))
+    ) {
+        if (Array.isArray(records_list)) {
+            add_domain_pie_plot(image_list, params);
+            add_domain_stack_plot(image_list, params);
+            build_mutations_domain_response_helper(params, records_list, speech);
 
-        const domain_pie_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/domain_pie_plot`);
-        domain_pie_plot_url.searchParams.set('gene', params.gene_name);
-        image_list.push(domain_pie_plot_url);
+        } else {
+            throw melvin_error(
+                `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+                MelvinIntentErrors.INVALID_API_RESPOSE,
+                `Sorry, I'm having trouble accessing mutation domains records`
+                + ` for ${params[MelvinAttributes.GENE_NAME]} in ${params[MelvinAttributes.STUDY_NAME]}`
+            );
+        }
 
-        const domain_stack_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/domain_stack_plot`);
-        domain_stack_plot_url.searchParams.set('gene', params.gene_name);
-        image_list.push(domain_stack_plot_url);
-
-    } else if (_.isEmpty(params['gene_name']) && !_.isEmpty(params['study_name'])) {
-        speech.say(`${params['study_name']} cancer mutations domain`);
-
-    } else if (!_.isEmpty(params['gene_name']) && !_.isEmpty(params['study_name'])) {
-        const response = await get_mutations_domain_percent(params);
-        speech
-            .say(`The ${response['data']['domain_name']} is the most mutated region containing`)
-            .sayAs({ word: response['data']['mutated_percentage'], interpret: 'digits' })
-            .say(`percent of all ${params['gene_name']} mutations in ${params['study_name']}.`);
-
-        const domain_pie_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/domain_pie_plot`);
-        domain_pie_plot_url.searchParams.set('gene', params.gene_name);
-        domain_pie_plot_url.searchParams.set('study', params.study_id);
-        image_list.push(domain_pie_plot_url);
-
-        const domain_stack_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/domain_stack_plot`);
-        domain_stack_plot_url.searchParams.set('gene', params.gene_name);
-        domain_stack_plot_url.searchParams.set('study', params.study_id);
-        image_list.push(domain_stack_plot_url);
     } else {
-        console.log(`[get_mutations_domain_response] invalid state`);
+        throw melvin_error(
+            `[build_mutations_domain_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            `Sorry, I got lost during the conversation. Please start over.`
+        );
     }
 
     return {

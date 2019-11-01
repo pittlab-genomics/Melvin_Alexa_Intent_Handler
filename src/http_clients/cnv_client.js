@@ -1,23 +1,38 @@
-const { MELVIN_EXPLORER_ENDPOINT } = require('../common.js');
 const https = require('request');
 const URL = require('url').URL;
 
+const {
+    MELVIN_EXPLORER_ENDPOINT,
+    MelvinIntentErrors,
+    melvin_error
+} = require('../common.js');
+
+const { add_query_params } = require('../utils/response_builder_utils.js');
+
+
 module.exports.get_cnv_change_percent = function (params) {
     const cnv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/percent_patients`);
-    cnv_url.searchParams.set('gene', params.gene_name);
-    cnv_url.searchParams.set('study', params.study_id);
+    add_query_params(cnv_url, params);
     var options = { json: true };
 
     return new Promise(function (resolve, reject) {
         https(cnv_url.href, options, function (error, response, body) {
-            // in addition to parsing the value, deal with possible errors
-            if (error) return reject(new Error("Error retrieving data from Melvin Explorer service", error));
-
-            if (response.statusCode < 200 || response.statusCode > 299) {
-                return reject(new Error("get_cnv_change_percent | error retrieving data from Melvin Explorer service"));
+            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${cnv_url.href},`
+                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            if (error) {
+                return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
 
-            console.log('API RESPONSE = [url] ' + cnv_url.href + ', [body] ' + JSON.stringify(body));
+            if (response.statusCode < 200 || response.statusCode > 299) {
+                return reject(new Error(`Error retrieving data from Melvin Explorer service.`
+                    + ` Invalid response.statusCode: ${response.statusCode}`));
+            }
+
+            if (!body['data']) {
+                reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+                    MelvinIntentErrors.INVALID_API_RESPOSE,
+                    "Sorry, I'm having trouble accessing mutations data."));
+            }
             resolve(body);
         });
     });

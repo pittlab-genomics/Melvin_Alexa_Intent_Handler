@@ -4,6 +4,7 @@ const yaml = require('js-yaml');
 
 const { get_oov_mapping_by_query } = require('../http_clients/oov_mapper_client.js');
 const {
+    MelvinAttributes,
     MelvinIntentErrors,
     OOVEntityTypes,
     RequiredAttributes,
@@ -28,23 +29,21 @@ const update_melvin_state = async function (handlerInput) {
         try {
             const params = { query };
             const query_response = await get_oov_mapping_by_query(params);
-
-            if (query_response['data']['entity_type'] === OOVEntityTypes.GENE) {
-                const gene_name = _.get(query_response, "data.entity_data.gene_name");
-                new_melvin_state['gene_name'] = gene_name;
-
-            } else if (query_response['data']['entity_type'] === OOVEntityTypes.STUDY) {
-                const study_name = _.get(query_response, "data.entity_data.study_name");
-                const study_id = _.get(query_response, "data.entity_data.study_id");
-                new_melvin_state['study_name'] = study_name;
-                new_melvin_state['study_id'] = study_id;
-
-            } else if (query_response['data']['entity_type'] === OOVEntityTypes.DTYPE) {
-                const dtype = _.get(query_response, "data.entity_data.dtype");
-                new_melvin_state['data_type'] = dtype;
-            }
             oov_data = query_response['data'];
 
+            if (query_response['data']['entity_type'] === OOVEntityTypes.GENE) {
+                new_melvin_state[MelvinAttributes.GENE_NAME] = _.get(
+                    query_response, "data.entity_data.gene_name");
+
+            } else if (query_response['data']['entity_type'] === OOVEntityTypes.STUDY) {
+                new_melvin_state[MelvinAttributes.STUDY_NAME] = _.get(
+                    query_response, "data.entity_data.study_name");
+                new_melvin_state[MelvinAttributes.STUDY_ABBRV] = _.get(
+                    query_response, "data.entity_data.study_abbreviation");
+
+            } else if (query_response['data']['entity_type'] === OOVEntityTypes.DTYPE) {
+                new_melvin_state[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.dtype");
+            }
             console.log(`[update_melvin_state] prev_melvin_state: ${JSON.stringify(prev_melvin_state)},` +
                 `new_melvin_state: ${JSON.stringify(new_melvin_state)}`);
 
@@ -63,8 +62,16 @@ const update_melvin_state = async function (handlerInput) {
 }
 
 function validate_required_attributes(melvin_state) {
+    console.log(`[validate_required_attributes] | melvin_state: ${JSON.stringify(melvin_state)}`);
+    if (_.isEmpty(melvin_state['data_type'])) {
+        return;
+    }
+
     let key = '';
-    if (melvin_state['data_type'] === 'mutation'
+    if (melvin_state['data_type'] === DataTypes.GENE_DEFINITION) {
+        key = DataTypes.GENE_DEFINITION;
+
+    } else if (melvin_state['data_type'] === 'mutation'
         || melvin_state['data_type'] === DataTypes.MUTATIONS) {
         key = DataTypes.MUTATIONS;
 
@@ -86,18 +93,27 @@ function validate_required_attributes(melvin_state) {
         || melvin_state['data_type'] === DataTypes.CNV_ALTERATIONS) {
         key = DataTypes.CNV_ALTERATIONS;
     }
+    const allowed_list = RequiredAttributes[key];
+    const has_gene = !_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]);
+    const has_study = !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV]);
 
-    const has_gene = RequiredAttributes[key]['has_gene'];
-    const has_study = RequiredAttributes[key]['has_study'];
+    let code = 0;
+    if (has_gene) {
+        code += 2;
+    }
+    if (has_study) {
+        code += 1;
+    }
+    const is_valid = allowed_list.includes(code);
 
-    if (has_gene && _.isEmpty(melvin_state['gene_name'])) {
+    if (!is_valid && !has_gene) {
         let error = new Error('Error while validating required attributes in melvin_state', melvin_state);
         error.type = MelvinIntentErrors.MISSING_GENE;
         error.speech = "I need to know a gene name first. What gene are you interested in?";
         throw error;
     }
 
-    if (has_study && _.isEmpty(melvin_state['study_id'])) {
+    if (!is_valid && !has_study) {
         let error = new Error('Error while validating required attributes in melvin_state', melvin_state);
         error.type = MelvinIntentErrors.MISSING_STUDY;
         error.speech = "I need to know a cancer type first. What cancer type are you interested in?";
@@ -106,7 +122,7 @@ function validate_required_attributes(melvin_state) {
 }
 
 const validate_navigation_intent_state = function (handlerInput, state_change) {
-    console.log(`validate_navigation_intent_state | state_change: ${JSON.stringify(state_change)}`);
+    console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (_.isEmpty(state_change['oov_data']['entity_data'])) {
@@ -116,22 +132,17 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
         throw error;
     }
 
-    // merge the previous state and new state. Overwrite with the latest
+    // Merge the previous state and new state. Overwrite with the latest.
     const melvin_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
 
     sessionAttributes['MELVIN.STATE'] = melvin_state;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    console.log(`validate_navigation_intent_state | melvin_state: ${JSON.stringify(melvin_state)}`);
-
-    if (!_.isEmpty(melvin_state['data_type'])) {
-        validate_required_attributes(melvin_state);
-    }
-
+    validate_required_attributes(melvin_state);
     return melvin_state;
 }
 
 const validate_action_intent_state = function (handlerInput, state_change, intent_data_type) {
-    console.log(`validate_action_intent_state | state_change: ${JSON.stringify(state_change)}`);
+    console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (state_change['oov_data']['entity_type'] === OOVEntityTypes.DTYPE) {
@@ -147,7 +158,6 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
     sessionAttributes['MELVIN.STATE'] = melvin_state;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     validate_required_attributes(melvin_state);
-    console.log(`validate_action_intent_state | melvin_state: ${JSON.stringify(melvin_state)}`);
     return melvin_state;
 }
 

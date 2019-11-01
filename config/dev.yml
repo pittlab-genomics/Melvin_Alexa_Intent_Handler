@@ -1,4 +1,5 @@
 environment:
+  MELVIN_WELCOME_GREETING: "Welcome to Melvin development version."
   DYNAMODB_TABLE_ENTITY_QUERIES: ${self:service}-entity-queries-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
   OOV_MAPPER_ENDPOINT: "https://api.dev.oovm.pittlabgenomics.com/v0.1"

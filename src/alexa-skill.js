@@ -2,8 +2,13 @@
 
 const Alexa = require('ask-sdk-core');
 const _ = require('lodash');
+
+const { MELVIN_WELCOME_GREETING } = require('./common.js');
 const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
-const { SearchGeneIntentHandler } = require('./skill_handlers/gene_handler.js');
+const {
+    SearchGeneIntentHandler,
+    NavigateGeneDefinitionIntentHandler
+} = require('./skill_handlers/gene_handler.js');
 const {
     NavigateStartIntentHandler,
     NavigateResetIntentHandler,
@@ -22,16 +27,17 @@ const {
     NavigateMutationsDomainIntentHandler
 } = require('./skill_handlers/mutations_handler.js');
 
+const { NavigateEmailIntentHandler } = require('./skill_handlers/email_handler.js');
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speechText = 'Welcome to Melvin.'
         const reprompt_text = 'What would you like to know? You can ask me about a gene or a cancer type.'
 
         return handlerInput.responseBuilder
-            .speak(speechText)
+            .speak(MELVIN_WELCOME_GREETING)
             .reprompt(reprompt_text)
             .getResponse();
     }
@@ -113,37 +119,6 @@ const ErrorHandler = {
     }
 };
 
-
-const TestIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'TestIntent';
-    },
-    handle(handlerInput) {
-        let speechText = 'This is a test handler response.';
-
-        let gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.gene.value');
-        let study_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
-        let study_id = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.resolutions.resolutionsPerAuthority[0].values[0].value.id');
-
-        let params = { gene_name, study_name, study_id };
-        console.log(`TestIntentHandler params = ${JSON.stringify(params)}`);
-
-        if (!_.isNil(gene_name)) {
-            speechText += `Gene name is ${gene_name}.`
-        }
-
-        if (!_.isNil(study_name)) {
-            speechText += `Study name is ${study_name} and study id is ${study_id}.`
-        }
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
-
 // This handler acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
@@ -153,7 +128,6 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SearchGeneIntentHandler,
-        TestIntentHandler,
         CNVAmplificationGeneIntentHandler,
         CNVDeletionGeneIntent,
         CNVAlterationGeneIntent,
@@ -166,10 +140,12 @@ exports.handler = Alexa.SkillBuilders.custom()
         // Navigation handlers
         NavigateStartIntentHandler,
         NavigateResetIntentHandler,
+        NavigateGeneDefinitionIntentHandler,
         NavigateJoinFilterIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
         NavigateCNVIntentHandler,
+        NavigateEmailIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

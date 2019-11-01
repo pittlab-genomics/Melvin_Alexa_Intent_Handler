@@ -1,23 +1,34 @@
-const URL = require('url').URL;
 const https = require('request');
+const URL = require('url').URL;
 
-const { MELVIN_EXPLORER_ENDPOINT } = require('../common.js');
+const { MELVIN_EXPLORER_ENDPOINT,
+    MelvinIntentErrors,
+    melvin_error
+} = require('../common.js');
 
 
 module.exports.get_gene_by_name = function (params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
+    const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
     var options = { json: true };
 
     return new Promise(function (resolve, reject) {
-        https(mutations_url.href, options, function (error, response, body) {
-            // in addition to parsing the value, deal with possible errors
-            if (error) return reject(new Error("Error retrieving data from Melvin Explorer service", error));
-
-            if (response.statusCode < 200 || response.statusCode > 299) {
-                return reject(new Error("Error retrieving data from Melvin Explorer service"));
+        https(gene_url.href, options, function (error, response, body) {
+            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${gene_url.href},`
+                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            if (error) {
+                return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
 
-            console.log('MELVIN_EXPLORER RESPONSE = [url] ' + mutations_url.href + ', [body] ' + JSON.stringify(body));
+            if (response.statusCode < 200 || response.statusCode > 299) {
+                return reject(new Error(`Error retrieving data from Melvin Explorer service.`
+                    + ` Invalid response.statusCode: ${response.statusCode}`));
+            }
+
+            if (!body['data']) {
+                reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+                    MelvinIntentErrors.INVALID_API_RESPOSE,
+                    "Sorry, I'm having trouble accessing mutations data."));
+            }
             resolve(body);
         });
     });
