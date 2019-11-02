@@ -7,7 +7,7 @@ const {
     MelvinIntentErrors,
     melvin_error,
     MELVIN_WELCOME_GREETING,
-    GeneSpeechResponses
+    get_gene_speech_text
 } = require('../common.js');
 
 const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
@@ -19,10 +19,7 @@ function ack_attribute_change(handlerInput, oov_data) {
     let speechText = '';
     if (oov_data['entity_type'] === 'GENE') {
         const gene_name = oov_data['entity_data']['gene_name'];
-        let gene_speech_text = gene_name;
-        if (GeneSpeechResponses[gene_name]) {
-            gene_speech_text = GeneSpeechResponses[gene_name];
-        }
+        const gene_speech_text = get_gene_speech_text(gene_name);
         speechText = `Ok, ${gene_speech_text}. What would you like to know?`
         handlerInput.responseBuilder.withSimpleCard('Melvin', gene_name);
 

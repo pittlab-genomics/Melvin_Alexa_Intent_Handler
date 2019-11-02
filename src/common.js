@@ -46,8 +46,13 @@ const CNVTypes = {
 
 const GeneSpeechResponses = {
     "PIK3CA": "Pik 3 CA",
-    "BRAF": "B raff"
+    "BRAF": "B raff",
+    "CTNNB1": "Catenin Beta 1"
 };
+
+const get_gene_speech_text = function (gene_name) {
+    return (GeneSpeechResponses[gene_name] ? GeneSpeechResponses[gene_name] : gene_name);
+}
 
 /*
  * G (Gene) | C (CancerType)
@@ -79,7 +84,7 @@ module.exports = {
     OOV_MAPPER_ENDPOINT: process.env.OOV_MAPPER_ENDPOINT,
     MelvinAttributes,
     DEFAULT_ERROR_SPEECH_TEXT,
-    GeneSpeechResponses,
+    get_gene_speech_text,
     OOVEntityTypes,
     DataTypes,
     CNVTypes,

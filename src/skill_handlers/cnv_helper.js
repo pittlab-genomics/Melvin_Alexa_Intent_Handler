@@ -74,20 +74,20 @@ async function build_navigate_cnv_response(params) {
             if (records_list.length > 2) {
                 speech
                     .say(`${records_list[0]['gene']} and ${records_list[1]['gene']} have the greatest number of`
-                        + ` copy number of alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
                         + ` ${records_list[0]['cna_percentage'].toFixed(1)} percent and`
                         + ` ${records_list[0]['cna_percentage'].toFixed(1)} percent respectively`);
 
             } else if (records_list.length > 1) {
                 speech
                     .say(`${records_list[0]['gene']} has the greatest number of`
-                        + ` copy number of alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
                         + ` ${records_list[0]['cna_percentage']} percent`);
 
             } else if (records_list.length == 1) {
                 speech
                     .say(`${records_list[0]['gene']} is the only gene that contains`
-                        + ` copy number of alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
                         + ` ${records_list[0]['cna_percentage']} percent`);
 
             } else {
