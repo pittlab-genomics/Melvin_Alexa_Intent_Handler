@@ -4,7 +4,9 @@ const _ = require('lodash');
 const {
     MelvinAttributes,
     MelvinIntentErrors,
-    melvin_error
+    melvin_error,
+    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    CNVTypes
 } = require('../common.js');
 
 const { get_cnv_change_percent } = require('../http_clients/cnv_client.js');
@@ -59,6 +61,45 @@ async function build_cnv_response(params) {
     }
 };
 
+function build_cnv_alterations_response(params, response, speech) {
+    if (params.cnv_change == CNVTypes.ALTERATIONS
+        && response['data']['amplifications_percentage']
+        && response['data']['deletions_percentage']) {
+        const amplifications = response['data']['amplifications_percentage'].toFixed(1);
+        const deletions = response['data']['deletions_percentage'].toFixed(1);
+        speech
+            .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+                + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
+                + ` ${deletions} percent have deletions.`);
+
+    } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
+        && response['data']['amplifications_percentage']) {
+        build_cnv_amplifications_response(params, response, speech)
+
+    } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.DELETIONS)
+        && response['data']['deletions_percentage']) {
+        build_cnv_deletions_response(params, response, speech)
+
+    } else {
+        speech.say(`Sorry, I could not find copy number alterations data for`
+            + ` ${params[MelvinAttributes.STUDY_NAME]} in ${params[MelvinAttributes.GENE_NAME]}`);
+    }
+}
+
+function build_cnv_deletions_response(params, response, speech) {
+    const deletions = response['data']['deletions_percentage'].toFixed(1);
+    speech
+        .say(`${deletions} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+            + ` patients have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
+
+}
+
+function build_cnv_amplifications_response(params, response, speech) {
+    const amplifications = response['data']['amplifications_percentage'].toFixed(1);
+    speech
+        .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+            + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]}`);
+}
 
 async function build_navigate_cnv_response(params) {
     const speech = new Speech();
@@ -105,38 +146,13 @@ async function build_navigate_cnv_response(params) {
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         add_cnv_plot(image_list, params);
-
-        if (response['data']['amplifications_percentage'] && response['data']['deletions_percentage']) {
-            const amplifications = response['data']['amplifications_percentage'].toFixed(1);
-            const deletions = response['data']['deletions_percentage'].toFixed(1);
-
-            speech
-                .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                    + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
-                    + ` ${deletions} percent have deletions.`);
-
-        } else if (response['data']['amplifications_percentage']) {
-            const amplifications = response['data']['amplifications_percentage'].toFixed(1);
-            speech
-                .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                    + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]}`);
-
-        } else if (response['data']['deletions_percentage']) {
-            const deletions = response['data']['deletions_percentage'].toFixed(1);
-            speech
-                .say(`${deletions} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                    + ` patients have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
-
-        } else {
-            speech.say(`Sorry, I could not find copy number alterations data for ${params[MelvinAttributes.STUDY_NAME]}`
-                + ` in ${params[MelvinAttributes.GENE_NAME]}`);
-        }
+        build_cnv_alterations_response(params, response, speech);
 
     } else {
         throw melvin_error(
-            `[build_mutations_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_navigate_cnv_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            'Sorry, I got lost during the conversation. Please start over.'
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
         );
     }
 

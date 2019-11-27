@@ -5,7 +5,7 @@ const {
     MelvinAttributes,
     MelvinExplorerErrors,
     DataTypes,
-    DEFAULT_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const {
@@ -32,7 +32,7 @@ const NavigateEmailIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateEmailIntent`, error);
         }

@@ -41,7 +41,7 @@ const DataTypes = {
 };
 
 const CNVTypes = {
-    APLIFICATIONS: "amplifications",
+    AMPLIFICATIONS: "amplifications",
     DELETIONS: "deletions",
     ALTERATIONS: "alterations"
 };
@@ -68,7 +68,9 @@ RequiredAttributes[DataTypes.CNV_ALTERATIONS] = [3, 1]; // ['GC', 'C'];
 RequiredAttributes[DataTypes.CNV_AMPLIFICATIONS] = [3, 1]; // ['GC', 'C'];
 RequiredAttributes[DataTypes.CNV_DELETIONS] = [3, 1]; // ['GC', 'C'];
 
-const DEFAULT_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request. Please try again later."
+const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request. Please try again later."
+
+const DEFAULT_MELVIN_ERROR_SPEECH_TEXT = "Sorry, I got lost during the conversation. Please start over."
 
 const melvin_error = function (message, type, speech = null) {
     let error = new Error(message);
@@ -86,7 +88,8 @@ module.exports = {
     OOV_MAPPER_ENDPOINT: process.env.OOV_MAPPER_ENDPOINT,
     MELVIN_APP_NAME: process.env.MELVIN_APP_NAME,
     MelvinAttributes,
-    DEFAULT_ERROR_SPEECH_TEXT,
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
+    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     get_gene_speech_text,
     OOVEntityTypes,
     DataTypes,

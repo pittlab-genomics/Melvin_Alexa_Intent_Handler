@@ -4,7 +4,7 @@ const {
     MelvinAttributes,
     DataTypes,
     CNVTypes,
-    DEFAULT_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
@@ -110,7 +110,7 @@ const NavigateCNVIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateCNVIntentHandler`, error);
         }
@@ -145,7 +145,7 @@ const NavigateCNVAmplificationsIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateCNVAmplificationsIntent`, error);
         }
@@ -180,7 +180,7 @@ const NavigateCNVDeletionsIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateCNVDeletionsIntent`, error);
         }

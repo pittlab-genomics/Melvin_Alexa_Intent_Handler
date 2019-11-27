@@ -13,6 +13,7 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
+    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     get_gene_speech_text
 } = require('../common.js');
 
@@ -79,7 +80,7 @@ async function build_mutations_response(params) {
         throw melvin_error(
             `[build_mutations_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            `Sorry, I got lost during the conversation. Please start over.`
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
         );
     }
 
@@ -151,7 +152,7 @@ async function build_mutations_domain_response(params) {
         throw melvin_error(
             `[build_mutations_domain_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            `Sorry, I got lost during the conversation. Please start over.`
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
         );
     }
 

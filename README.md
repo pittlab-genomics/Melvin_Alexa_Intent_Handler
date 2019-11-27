@@ -28,6 +28,7 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateGeneDefinit
 serverless invoke local --function alexa-skill -p ./examples/NavigateMutationsIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateMutationDomains_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateCNVIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateCNVDeletionsIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateCNVCancerIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json

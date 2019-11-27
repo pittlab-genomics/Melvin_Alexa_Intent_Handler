@@ -9,7 +9,7 @@ const { add_query_list_params } = require('../utils/response_builder_utils.js');
 const {
     MELVIN_EXPLORER_ENDPOINT,
     MelvinExplorerErrors,
-    DEFAULT_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const ClinicalTrialsNearbyIntentHandler = {
@@ -74,7 +74,7 @@ const ClinicalTrialsNearbyIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in ClinicalTrialsNearbyIntentHandler`, error);
         }

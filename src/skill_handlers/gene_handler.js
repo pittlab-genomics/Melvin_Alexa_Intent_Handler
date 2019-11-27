@@ -6,7 +6,7 @@ const { get_gene_by_name } = require('../http_clients/gene_client.js');
 const {
     MelvinExplorerErrors,
     DataTypes,
-    DEFAULT_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const { build_gene_definition_response } = require('./gene_helper.js');
@@ -83,7 +83,7 @@ const NavigateGeneDefinitionIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateGeneDefinitionIntent`, error);
         }
