@@ -3,7 +3,7 @@
 const Alexa = require('ask-sdk-core');
 const _ = require('lodash');
 
-const { MELVIN_WELCOME_GREETING } = require('./common.js');
+const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME } = require('./common.js');
 const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
 const {
     SearchGeneIntentHandler,
@@ -18,7 +18,9 @@ const {
     CNVAmplificationGeneIntentHandler,
     CNVDeletionGeneIntent,
     CNVAlterationGeneIntent,
-    NavigateCNVIntentHandler
+    NavigateCNVIntentHandler,
+    NavigateCNVAmplificationsIntentHandler,
+    NavigateCNVDeletionsIntentHandler
 } = require('./skill_handlers/cnv_handler.js');
 const {
     MutationCountIntentHandler,
@@ -29,15 +31,18 @@ const {
 
 const { NavigateEmailIntentHandler } = require('./skill_handlers/email_handler.js');
 
+const { ClinicalTrialsNearbyIntentHandler } = require('./skill_handlers/clinical_trials_handler.js');
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const reprompt_text = 'What would you like to know? You can ask me about a gene or a cancer type.'
+        const reprompt_text = 'What would you like to know? You can ask me about a gene or cancer type.'
 
         return handlerInput.responseBuilder
             .speak(MELVIN_WELCOME_GREETING)
+            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
             .reprompt(reprompt_text)
             .getResponse();
     }
@@ -92,11 +97,13 @@ const IntentReflectorHandler = {
     },
     handle(handlerInput) {
         const intentName = handlerInput.requestEnvelope.request.intent.name;
-        const speechText = `You just triggered ${intentName}`;
+        console.info(`[IntentReflectorHandler] intentName: ${intentName}`);
+        const speechText = "Sorry, I couldn't pick it up. Would you like to try again?";
+        const repromptText = "Would you like to try again?";
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt('Would you like to try again?')
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -145,7 +152,11 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
         NavigateCNVIntentHandler,
+        NavigateCNVAmplificationsIntentHandler,
+        NavigateCNVDeletionsIntentHandler,
         NavigateEmailIntentHandler,
+
+        ClinicalTrialsNearbyIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

@@ -4,7 +4,6 @@ const _ = require('lodash');
 const { get_gene_by_name } = require('../http_clients/gene_client.js');
 
 const {
-    MelvinAttributes,
     MelvinExplorerErrors,
     DataTypes,
     DEFAULT_ERROR_SPEECH_TEXT

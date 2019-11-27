@@ -1,9 +1,9 @@
 environment:
   MELVIN_WELCOME_GREETING: "Welcome to Melvin development version."
+  MELVIN_APP_NAME: "Melvin develop"
   DYNAMODB_TABLE_ENTITY_QUERIES: ${self:service}-entity-queries-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
   OOV_MAPPER_ENDPOINT: "https://api.dev.oovm.pittlabgenomics.com/v0.1"
 
 alexa:
   appId: amzn1.ask.skill.76bde827-301f-478d-af1a-c7241f046388
-  appName: "Develop Melvin"

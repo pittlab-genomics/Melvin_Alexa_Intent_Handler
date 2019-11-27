@@ -7,6 +7,7 @@ const {
     MelvinIntentErrors,
     melvin_error,
     MELVIN_WELCOME_GREETING,
+    MELVIN_APP_NAME,
     get_gene_speech_text
 } = require('../common.js');
 
@@ -21,17 +22,17 @@ function ack_attribute_change(handlerInput, oov_data) {
         const gene_name = oov_data['entity_data']['gene_name'];
         const gene_speech_text = get_gene_speech_text(gene_name);
         speechText = `Ok, ${gene_speech_text}. What would you like to know?`
-        handlerInput.responseBuilder.withSimpleCard('Melvin', gene_name);
+        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
 
     } else if (oov_data['entity_type'] === 'STUDY') {
         const study_name = oov_data['entity_data']['study_name'];
         speechText = `Ok, ${study_name}. What would you like to know?`;
-        handlerInput.responseBuilder.withSimpleCard('Melvin', `${study_name}`);
+        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${study_name}`);
 
     } else if (oov_data['entity_type'] === 'DTYPE') {
         const dtype = oov_data['entity_data']['dtype'];
         speechText = `Ok, ${dtype}. What would you like to know?`;
-        handlerInput.responseBuilder.withSimpleCard('Melvin', `${dtype}`);
+        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dtype}`);
     }
 
     return {
@@ -162,6 +163,7 @@ const NavigateResetIntentHandler = {
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(reprompt_text)
+            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
             .getResponse();
     }
 };

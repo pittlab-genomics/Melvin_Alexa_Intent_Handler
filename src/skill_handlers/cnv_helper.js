@@ -105,13 +105,32 @@ async function build_navigate_cnv_response(params) {
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         add_cnv_plot(image_list, params);
-        const amplifications = response['data']['amplifications_percentage'].toFixed(1);
-        const deletions = response['data']['deletions_percentage'].toFixed(1);
 
-        speech
-            .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
-                + ` ${deletions} percent have deletions.`)
+        if (response['data']['amplifications_percentage'] && response['data']['deletions_percentage']) {
+            const amplifications = response['data']['amplifications_percentage'].toFixed(1);
+            const deletions = response['data']['deletions_percentage'].toFixed(1);
+
+            speech
+                .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+                    + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
+                    + ` ${deletions} percent have deletions.`);
+
+        } else if (response['data']['amplifications_percentage']) {
+            const amplifications = response['data']['amplifications_percentage'].toFixed(1);
+            speech
+                .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+                    + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]}`);
+
+        } else if (response['data']['deletions_percentage']) {
+            const deletions = response['data']['deletions_percentage'].toFixed(1);
+            speech
+                .say(`${deletions} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+                    + ` patients have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
+
+        } else {
+            speech.say(`Sorry, I could not find copy number alterations data for ${params[MelvinAttributes.STUDY_NAME]}`
+                + ` in ${params[MelvinAttributes.GENE_NAME]}`);
+        }
 
     } else {
         throw melvin_error(
