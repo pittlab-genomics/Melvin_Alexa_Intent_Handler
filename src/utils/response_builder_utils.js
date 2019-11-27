@@ -7,6 +7,14 @@ const {
 } = require('../common.js');
 
 
+const add_query_list_params = function (url, params, list) {
+    list.forEach(function (item) {
+        if (item in params) {
+            url.searchParams.set(item, params[item]);
+        }
+    });
+}
+
 const add_query_params = function (url, params) {
     if (params[MelvinAttributes.GENE_NAME]) {
         url.searchParams.set('gene', params[MelvinAttributes.GENE_NAME]);
@@ -56,6 +64,7 @@ const add_cnv_plot = function (image_list, params) {
 
 module.exports = {
     add_query_params,
+    add_query_list_params,
     add_mutations_stats_plot,
     add_mutations_treemap_plot,
     add_mutations_profile_plot,
