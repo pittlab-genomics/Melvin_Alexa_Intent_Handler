@@ -5,8 +5,10 @@ const URL = require('url').URL;
 const { get_clinical_trials } = require('../http_clients/clinical_trials_client.js');
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 const { add_query_list_params } = require('../utils/response_builder_utils.js');
+const { get_melvin_state } = require('./navigation_helper.js');
 
 const {
+    MelvinAttributes,
     MELVIN_EXPLORER_ENDPOINT,
     MelvinExplorerErrors,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
@@ -30,16 +32,25 @@ const ClinicalTrialsNearbyIntentHandler = {
         let params = { location };
 
         let distance = _.get(handlerInput, 'requestEnvelope.request.intent.slots.distance.value');
-        if (_.isNil(distance)) {
-            distance = 50;
+        if (!_.isNil(distance)) {
+            params['distance'] = distance
         }
-        params['distance'] = distance
+
+        const melvin_state = get_melvin_state(handlerInput);
+        if (!_.isNil(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+            params['study'] = melvin_state[MelvinAttributes.STUDY_ABBRV]
+        }
 
         try {
             const response = await get_clinical_trials(params);
             if (response['data'] && Array.isArray(response['data'])) {
                 if (response['data'].length > 0) {
-                    speech.say(`There are ${response['data'].length} clinical trials near ${location}.`);
+                    if (params['study']) {
+                        speech.say(`There are ${response['data'].length} clinical trials near` +
+                            ` ${location} for ${melvin_state[MelvinAttributes.STUDY_NAME]}.`);
+                    } else {
+                        speech.say(`There are ${response['data'].length} clinical trials near ${location}.`);
+                    }
                     speech.say(`The closest one is at ${response['data'][0]['facility_name']}`);
 
                     let image_list = [];
@@ -54,7 +65,7 @@ const ClinicalTrialsNearbyIntentHandler = {
                 speechText = speech.ssml();
 
             } else if (response['error'] && response['error'] === MelvinExplorerErrors.UNIDENTIFIED_STUDY) {
-                speech.say(`Sorry, I could not find a cancer type named `);
+                speech.say(`Sorry, I could not find that cancer type.`);
                 speechText = speech.ssml();
 
             } else if (response['error'] && response['error'] === MelvinExplorerErrors.UNIDENTIFIED_LOCATION) {

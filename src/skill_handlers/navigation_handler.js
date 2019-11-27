@@ -156,8 +156,7 @@ const NavigateResetIntentHandler = {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
         const reprompt_text = 'What would you like to know? You can ask me about a gene or a cancer type.'
-        const melvin_state = {};
-        sessionAttributes['MELVIN.STATE'] = melvin_state;
+        sessionAttributes['MELVIN.STATE'] = {};
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
         return handlerInput.responseBuilder

@@ -14,6 +14,14 @@ const {
 
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
 
+const get_melvin_state = function (handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let melvin_state = {};
+    if (sessionAttributes['MELVIN.STATE']) {
+        melvin_state = sessionAttributes['MELVIN.STATE'];
+    }
+    return melvin_state;
+}
 
 const update_melvin_state = async function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -163,6 +171,7 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
 
 module.exports = {
     NAVIGATION_TOPICS,
+    get_melvin_state,
     update_melvin_state,
     validate_navigation_intent_state,
     validate_action_intent_state,

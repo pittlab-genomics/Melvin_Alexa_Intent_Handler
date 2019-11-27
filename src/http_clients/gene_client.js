@@ -19,12 +19,12 @@ module.exports.get_gene_by_name = function (params) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
 
-            if (response.statusCode < 200 || response.statusCode > 299) {
+            if (response.statusCode >= 500 && response.statusCode <= 599) {
                 return reject(new Error(`Error retrieving data from Melvin Explorer service.`
                     + ` Invalid response.statusCode: ${response.statusCode}`));
             }
 
-            if (!body['data']) {
+            if (!body['data'] && !body['error']) {
                 reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPOSE,
                     "Sorry, I'm having trouble accessing mutations data."));
