@@ -4,7 +4,8 @@ const _ = require('lodash');
 
 const {
     DataTypes,
-    DEFAULT_ERROR_SPEECH_TEXT
+    MelvinAttributes,
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const {
@@ -27,21 +28,18 @@ const MutationCountIntentHandler = {
                 handlerInput.requestEnvelope.request.intent.name === 'MutationStudyGeneCountIntent');
     },
     async handle(handlerInput) {
-
         let speechText = '';
         let speech = new Speech();
 
         try {
             let gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.gene.value');
-            let params = { gene_name };
+            let params = { [MelvinAttributes.GENE_NAME]: gene_name };
 
             let study = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
             if (!_.isNil(study)) {
-                let study_name = handlerInput.requestEnvelope.request.intent.slots.study.value;
-                let study_id = handlerInput.requestEnvelope.request.intent.slots
+                params[MelvinAttributes.STUDY_NAME] = study;
+                params[MelvinAttributes.STUDY_ABBRV] = handlerInput.requestEnvelope.request.intent.slots
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
-                params['study_name'] = study_name;
-                params['study_id'] = study_id;
             }
 
             let response = await get_mutated_patient_stats(params);
@@ -66,7 +64,7 @@ const MutationCountIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`MutationCountIntentHandler: message: ${error.message}`, error);
         }
@@ -92,15 +90,13 @@ const MutationPercentageIntentHandler = {
 
         try {
             let gene_name = _.get(handlerInput, 'requestEnvelope.request.intent.slots.gene.value');
-            let params = { gene_name };
+            let params = { [MelvinAttributes.GENE_NAME]: gene_name };
 
             let study = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
             if (!_.isNil(study)) {
-                let study_name = handlerInput.requestEnvelope.request.intent.slots.study.value;
-                let study_id = handlerInput.requestEnvelope.request.intent.slots
+                params[MelvinAttributes.STUDY_NAME] = study;
+                params[MelvinAttributes.STUDY_ABBRV] = handlerInput.requestEnvelope.request.intent.slots
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
-                params['study_name'] = study_name;
-                params['study_id'] = study_id;
             }
 
             let response = await get_mutated_patient_stats(params);
@@ -129,7 +125,7 @@ const MutationPercentageIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`MutationCountIntentHandler: message: ${error.message}`, error);
         }
@@ -163,7 +159,7 @@ const NavigateMutationsIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`NavigateMutationsIntentHandler: message: ${error.message}`, error);
         }
@@ -194,7 +190,7 @@ const NavigateMutationsDomainIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = DEFAULT_ERROR_SPEECH_TEXT;
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateMutationsDomainIntentHandler`, error);
         }

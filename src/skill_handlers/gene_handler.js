@@ -1,8 +1,19 @@
 const Speech = require('ssml-builder');
 const _ = require('lodash');
 
-const { MelvinExplorerErrors } = require('../common.js');
 const { get_gene_by_name } = require('../http_clients/gene_client.js');
+
+const {
+    MelvinExplorerErrors,
+    DataTypes,
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
+} = require('../common.js');
+
+const { build_gene_definition_response } = require('./gene_helper.js');
+const {
+    validate_action_intent_state,
+    update_melvin_state
+} = require('./navigation_helper.js');
 
 const SearchGeneIntentHandler = {
     canHandle(handlerInput) {
@@ -21,7 +32,7 @@ const SearchGeneIntentHandler = {
         let params = { gene_name };
 
         try {
-            let response = await get_gene_by_name(params);
+            const response = await get_gene_by_name(params);
             if (response['data'] && response['data']['location'] && response['data']['summary']) {
                 speech.say(`${gene_name} is at ${response.data.location}`);
                 speech.pause('100ms');
@@ -51,6 +62,40 @@ const SearchGeneIntentHandler = {
     }
 };
 
+const NavigateGeneDefinitionIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateGeneDefinitionIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+
+        try {
+            const state_change = await update_melvin_state(handlerInput);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_DEFINITION);
+            const params = {
+                ...melvin_state
+            };
+            const response = await build_gene_definition_response(params);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
+            }
+            console.error(`Error in NavigateGeneDefinitionIntent`, error);
+        }
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+};
+
 module.exports = {
-    SearchGeneIntentHandler
+    SearchGeneIntentHandler,
+    NavigateGeneDefinitionIntentHandler
 }

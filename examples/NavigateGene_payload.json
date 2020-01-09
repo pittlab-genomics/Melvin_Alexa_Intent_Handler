@@ -6,14 +6,7 @@
         "application": {
             "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
         },
-        "attributes": {
-            "MELVIN.STATE": {
-                "gene_name": "TP53",
-                "study_abbreviation": "BRCA",
-                "study_name": "Breast invasive carcinoma",
-                "data_type": "MUTATIONS"
-            }
-        },
+        "attributes": {},
         "user": {
             "userId": "xxx"
         }
@@ -82,12 +75,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateJoinFilterIntent",
+            "name": "NavigateStartIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "ovarian cancer",
+                    "value": "Hif one alpha",
                     "confirmationStatus": "NONE"
                 }
             }

@@ -8,10 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53",
-                "study_abbreviation": "BRCA",
-                "study_name": "Breast invasive carcinoma",
-                "data_type": "MUTATIONS"
+                "gene_name": "TP53"
             }
         },
         "user": {
@@ -82,12 +79,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateJoinFilterIntent",
+            "name": "NavigateCNVDeletionsIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "ovarian cancer",
+                    "value": "breast cancer",
                     "confirmationStatus": "NONE"
                 }
             }

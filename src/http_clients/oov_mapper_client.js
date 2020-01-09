@@ -1,8 +1,10 @@
 const https = require('request');
 const URL = require('url').URL;
 
-const { OOV_MAPPER_ENDPOINT } = require('../common.js');
-
+const { OOV_MAPPER_ENDPOINT,
+    MelvinIntentErrors,
+    melvin_error
+} = require('../common.js');
 
 module.exports.get_oov_mapping_by_query = function (params) {
     const oov_url = new URL(`${OOV_MAPPER_ENDPOINT}/entity_mappings`);
@@ -11,15 +13,21 @@ module.exports.get_oov_mapping_by_query = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(oov_url.href, options, function (error, response, body) {
-            // in addition to parsing the value, deal with possible errors
+            console.info(`OOV_MAPPER RESPONSE | [url]: ${oov_url.href},`
+                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+
             if (error) return reject(new Error("Error retrieving data from OOVM service", error));
 
-            if (response.statusCode < 200 || response.statusCode > 299) {
-                return reject(new Error("Error retrieving data from OOVM service. Invalid response status code",
-                    response.statusCode));
+            if (response.statusCode >= 500 && response.statusCode <= 599) {
+                return reject(new Error(`Error retrieving data from Melvin Explorer service.`
+                    + ` Invalid response.statusCode: ${response.statusCode}`));
             }
 
-            console.log('OOV API RESPONSE = [url] ' + oov_url.href + ', [body] ' + JSON.stringify(body));
+            if (!body['data'] && !body['error']) {
+                reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+                    MelvinIntentErrors.INVALID_API_RESPOSE,
+                    "Sorry, I'm having trouble understading the query. Please try again."));
+            }
             resolve(body);
         });
     });

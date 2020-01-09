@@ -8,7 +8,6 @@ const RequestLogInterceptor = {
 
 const ResponseLogInterceptor = {
     process(handlerInput) {
-        console.log(`ASP RESPONSE BUILDER = ${JSON.stringify(handlerInput)}`);
         console.log(`ASP RESPONSE = ${JSON.stringify(handlerInput.responseBuilder.getResponse())}`);
     },
 };
