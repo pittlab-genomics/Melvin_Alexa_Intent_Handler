@@ -31,7 +31,11 @@ const {
 
 const { NavigateEmailIntentHandler } = require('./skill_handlers/email_handler.js');
 
-const { ClinicalTrialsNearbyIntentHandler } = require('./skill_handlers/clinical_trials_handler.js');
+const {
+    ClinicalTrialsNearbyIntentHandler,
+    ClinicalTrialsWithinIntentHandler,
+    ClinicalTrialClosestIntentHandler
+} = require('./skill_handlers/clinical_trials_handler.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -157,6 +161,8 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateEmailIntentHandler,
 
         ClinicalTrialsNearbyIntentHandler,
+        ClinicalTrialsWithinIntentHandler,
+        ClinicalTrialClosestIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

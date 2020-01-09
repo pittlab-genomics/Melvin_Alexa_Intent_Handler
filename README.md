@@ -38,3 +38,5 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent
 
 ### Clinical Trials
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsNearbyIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsWithinIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialClosestIntent_payload.json
