@@ -61,6 +61,10 @@ const add_cnv_plot = function (image_list, params) {
     image_list.push(cnv_url);
 }
 
+const round = function (value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
 
 module.exports = {
     add_query_params,
@@ -70,5 +74,6 @@ module.exports = {
     add_mutations_profile_plot,
     add_domain_pie_plot,
     add_domain_stack_plot,
-    add_cnv_plot
+    add_cnv_plot,
+    round
 }
