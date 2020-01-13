@@ -62,8 +62,8 @@ const get_gene_speech_text = function (gene_name) {
 */
 const RequiredAttributes = {};
 RequiredAttributes[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
-RequiredAttributes[DataTypes.MUTATIONS] = [3, 2]; // ['GC', 'G'];
-RequiredAttributes[DataTypes.MUTATION_DOMAINS] = [3, 2]; // ['GC', 'G'];
+RequiredAttributes[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributes[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributes[DataTypes.CNV_ALTERATIONS] = [3, 1]; // ['GC', 'C'];
 RequiredAttributes[DataTypes.CNV_AMPLIFICATIONS] = [3, 1]; // ['GC', 'C'];
 RequiredAttributes[DataTypes.CNV_DELETIONS] = [3, 1]; // ['GC', 'C'];
