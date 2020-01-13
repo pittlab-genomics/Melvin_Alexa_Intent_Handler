@@ -6,7 +6,8 @@ const {
     add_mutations_profile_plot,
     add_mutations_treemap_plot,
     add_domain_pie_plot,
-    add_domain_stack_plot
+    add_domain_stack_plot,
+    round
 } = require('../utils/response_builder_utils.js');
 
 const {
@@ -43,9 +44,9 @@ async function build_mutations_response(params) {
             if (records_list.length >= 2) {
                 speech
                     .say(`It is most mutated in ${records_list[0][MelvinAttributes.STUDY_NAME]} at `)
-                    .say(records_list[0]['percent_cancer_patients_with_mutgene'].toFixed(1))
+                    .say(round(records_list[0]['percent_cancer_patients_with_mutgene'], 1))
                     .say(`percent, followed by ${records_list[1][MelvinAttributes.STUDY_NAME]} at `)
-                    .say(records_list[1]['percent_cancer_patients_with_mutgene'].toFixed(1))
+                    .say(round(records_list[1]['percent_cancer_patients_with_mutgene'], 1))
                     .say('percent.')
 
             } else if (records_list.length >= 1) {
@@ -53,7 +54,7 @@ async function build_mutations_response(params) {
                     .say(`${gene_speech_text} mutations are found in ${mutated_cancer_type_count}`
                         + ` out of ${total_cancer_types} cancer types.`)
                     .say(`It is most mutated in ${records_list[0][MelvinAttributes.STUDY_NAME]} at `)
-                    .say(`${records_list[0]['percent_cancer_patients_with_mutgene'].toFixed(1)} percent.`)
+                    .say(`${round(records_list[0]['percent_cancer_patients_with_mutgene'], 1)} percent.`)
 
             } else {
                 speech.say(`There were no mutations found for ${gene_speech_text}`);
@@ -71,10 +72,13 @@ async function build_mutations_response(params) {
         add_mutations_profile_plot(image_list, params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
         speech
-            .say(response['data']['patient_percentage'].toFixed(1))
+            .say(round(response['data']['patient_percentage'], 1))
             .say(`percent of ${params[MelvinAttributes.STUDY_NAME]} patients have `
                 + `${gene_speech_text} mutations with` +
                 ` ${response['data']['recurrent_positions']} amino acid residues recurrently mutated.`);
+
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        speech.say("I'm still working on this analysis. Please try again later.");
 
     } else {
         throw melvin_error(
@@ -99,21 +103,21 @@ function build_mutations_domain_response_helper(params, records_list, speech, ge
         speech
             .say(`${records_list[0]['domain']} and ${records_list[1]['domain']}`
                 + ` are the most affected domains containing`)
-            .say(records_list[0]['percentage'].toFixed(1))
+            .say(round(records_list[0]['percentage'], 1))
             .say('percent and')
-            .say(records_list[1]['percentage'].toFixed(1))
+            .say(round(records_list[1]['percentage'], 1))
             .say(`percent of all ${gene_speech_text} mutations respectively.`);
 
     } else if (records_list.length > 1) {
         speech
             .say(`${records_list[0]['domain']} is the most affected domain containing`)
-            .say(records_list[0]['percentage'].toFixed(1))
+            .say(round(records_list[0]['percentage'], 1))
             .say(`percent of all ${gene_speech_text} mutations.`);
 
     } else if (records_list.length == 1) {
         speech
             .say(`${records_list[0]['domain']} is the only affected domain containing`)
-            .say(records_list[0]['percentage'].toFixed(1))
+            .say(round(records_list[0]['percentage'], 1))
             .say(`percent of all ${gene_speech_text} mutations.`);
 
     } else {

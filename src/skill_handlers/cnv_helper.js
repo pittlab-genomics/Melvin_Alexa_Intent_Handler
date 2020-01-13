@@ -10,7 +10,7 @@ const {
 } = require('../common.js');
 
 const { get_cnv_change_percent } = require('../http_clients/cnv_client.js');
-const { add_cnv_plot } = require('../utils/response_builder_utils.js');
+const { add_cnv_plot, round } = require('../utils/response_builder_utils.js');
 
 async function build_cnv_response(params) {
     const speech = new Speech();
@@ -65,8 +65,8 @@ function build_cnv_alterations_response(params, response, speech) {
     if (params.cnv_change == CNVTypes.ALTERATIONS
         && response['data']['amplifications_percentage']
         && response['data']['deletions_percentage']) {
-        const amplifications = response['data']['amplifications_percentage'].toFixed(1);
-        const deletions = response['data']['deletions_percentage'].toFixed(1);
+        const amplifications = round(response['data']['amplifications_percentage'], 1);
+        const deletions = round(response['data']['deletions_percentage'], 1);
         speech
             .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
                 + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
@@ -87,7 +87,7 @@ function build_cnv_alterations_response(params, response, speech) {
 }
 
 function build_cnv_deletions_response(params, response, speech) {
-    const deletions = response['data']['deletions_percentage'].toFixed(1);
+    const deletions = round(response['data']['deletions_percentage'], 1);
     speech
         .say(`${deletions} percent of ${params[MelvinAttributes.STUDY_NAME]}`
             + ` patients have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
@@ -95,7 +95,7 @@ function build_cnv_deletions_response(params, response, speech) {
 }
 
 function build_cnv_amplifications_response(params, response, speech) {
-    const amplifications = response['data']['amplifications_percentage'].toFixed(1);
+    const amplifications = round(response['data']['amplifications_percentage'], 1);
     speech
         .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
             + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]}`);
@@ -116,8 +116,8 @@ async function build_navigate_cnv_response(params) {
                 speech
                     .say(`${records_list[0]['gene']} and ${records_list[1]['gene']} have the greatest number of`
                         + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                        + ` ${records_list[0]['cna_percentage'].toFixed(1)} percent and`
-                        + ` ${records_list[0]['cna_percentage'].toFixed(1)} percent respectively`);
+                        + ` ${round(records_list[0]['cna_percentage'], 1)} percent and`
+                        + ` ${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
 
             } else if (records_list.length > 1) {
                 speech
