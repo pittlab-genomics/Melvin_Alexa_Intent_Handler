@@ -68,9 +68,9 @@ function build_cnv_alterations_response(params, response, speech) {
         const amplifications = round(response['data']['amplifications_percentage'], 1);
         const deletions = round(response['data']['deletions_percentage'], 1);
         speech
-            .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]} while`
-                + ` ${deletions} percent have deletions.`);
+            .say(`${params[MelvinAttributes.GENE_NAME]} is amplified in`
+                + ` ${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
+                + ` patients while deleted in ${deletions} percent`);
 
     } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
         && response['data']['amplifications_percentage']) {
@@ -89,16 +89,52 @@ function build_cnv_alterations_response(params, response, speech) {
 function build_cnv_deletions_response(params, response, speech) {
     const deletions = round(response['data']['deletions_percentage'], 1);
     speech
-        .say(`${deletions} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-            + ` patients have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
+        .say(`${params[MelvinAttributes.GENE_NAME]} is deleted in ${deletions} percent of`
+            + ` ${params[MelvinAttributes.STUDY_NAME]} patients`);
 
 }
 
 function build_cnv_amplifications_response(params, response, speech) {
     const amplifications = round(response['data']['amplifications_percentage'], 1);
     speech
-        .say(`${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-            + ` patients have amplifications at ${params[MelvinAttributes.GENE_NAME]}`);
+        .say(`${params[MelvinAttributes.GENE_NAME]} is amplified in ${amplifications} percent of`
+            + ` ${params[MelvinAttributes.STUDY_NAME]} patients.`);
+}
+
+function build_cnv_by_study_response(params, response, speech) {
+    const records_list = response['data']['records'];
+    if (Array.isArray(records_list)) {
+        if (records_list.length > 2) {
+            speech
+                .say(`${records_list[0]['gene']} and ${records_list[1]['gene']} have the greatest number of`
+                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent and`
+                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
+
+        } else if (records_list.length > 1) {
+            speech
+                .say(`${records_list[0]['gene']} has the greatest number of`
+                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent`);
+
+        } else if (records_list.length == 1) {
+            speech
+                .say(`${records_list[0]['gene']} is the only gene that contains`
+                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
+                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent`);
+
+        } else {
+            speech.say('There were no copy number alterations found.');
+        }
+
+    } else {
+        throw melvin_error(
+            `[build_cnv_by_study_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+            MelvinIntentErrors.INVALID_API_RESPOSE,
+            `Sorry, I'm having trouble accessing copy number alteration records for `
+            + params[MelvinAttributes.GENE_NAME]
+        );
+    }
 }
 
 async function build_navigate_cnv_response(params) {
@@ -108,41 +144,8 @@ async function build_navigate_cnv_response(params) {
     const response = await get_cnv_change_percent(params);
 
     if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
-        const records_list = response['data']['records'];
-
-        if (Array.isArray(records_list)) {
-            add_cnv_plot(image_list, params);
-            if (records_list.length > 2) {
-                speech
-                    .say(`${records_list[0]['gene']} and ${records_list[1]['gene']} have the greatest number of`
-                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                        + ` ${round(records_list[0]['cna_percentage'], 1)} percent and`
-                        + ` ${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
-
-            } else if (records_list.length > 1) {
-                speech
-                    .say(`${records_list[0]['gene']} has the greatest number of`
-                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                        + ` ${records_list[0]['cna_percentage']} percent`);
-
-            } else if (records_list.length == 1) {
-                speech
-                    .say(`${records_list[0]['gene']} is the only gene that contains`
-                        + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                        + ` ${records_list[0]['cna_percentage']} percent`);
-
-            } else {
-                speech.say('There were no copy number alterations found.');
-            }
-
-        } else {
-            throw melvin_error(
-                `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
-                MelvinIntentErrors.INVALID_API_RESPOSE,
-                `Sorry, I'm having trouble accessing copy number alteration records for `
-                + params[MelvinAttributes.GENE_NAME]
-            );
-        }
+        add_cnv_plot(image_list, params);
+        build_cnv_by_study_response(params, response, speech);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         add_cnv_plot(image_list, params);
