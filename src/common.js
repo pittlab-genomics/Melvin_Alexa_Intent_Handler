@@ -1,3 +1,6 @@
+const _ = require('lodash');
+const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
+
 // common types
 
 const MelvinAttributes = {
@@ -46,14 +49,8 @@ const CNVTypes = {
     ALTERATIONS: "alterations"
 };
 
-const GeneSpeechResponses = {
-    "PIK3CA": "Pik 3 CA",
-    "BRAF": "B raff",
-    "CTNNB1": "Catenin Beta 1"
-};
-
 const get_gene_speech_text = function (gene_name) {
-    return (GeneSpeechResponses[gene_name] ? GeneSpeechResponses[gene_name] : gene_name);
+    return (_.has(GeneSSMLMappings, gene_name) ? GeneSSMLMappings[gene_name] : gene_name);
 }
 
 /*

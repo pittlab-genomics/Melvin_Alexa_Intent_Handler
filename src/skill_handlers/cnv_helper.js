@@ -6,7 +6,8 @@ const {
     MelvinIntentErrors,
     melvin_error,
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
-    CNVTypes
+    CNVTypes,
+    get_gene_speech_text
 } = require('../common.js');
 
 const { get_cnv_change_percent } = require('../http_clients/cnv_client.js');
@@ -18,6 +19,8 @@ async function build_cnv_response(params) {
 
     try {
         const response = await get_cnv_change_percent(params);
+        const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+
         if (response['data']) {
             add_cnv_plot(image_list, params);
             if (params.cnv_change === 'alterations' && response['data']['amplifications'] &&
@@ -25,15 +28,18 @@ async function build_cnv_response(params) {
                 speech
                     .sayAs({ word: response['data']['amplifications'], interpret: 'digits' })
                     .say(`percentage of ${params[MelvinAttributes.STUDY_NAME]}`
-                        + ` cancer patients have amplifications whereas`);
-                speech.sayAs({ word: response['data']['deletions'], interpret: 'digits' })
-                speech.say(`percentage have deletions at ${params[MelvinAttributes.GENE_NAME]}`);
+                        + ` cancer patients have amplifications whereas`)
+                    .sayAs({ word: response['data']['deletions'], interpret: 'digits' })
+                    .say(`percentage have deletions at`)
+                    .sayWithSSML(gene_speech_text);
+
 
             } else if (response['data'][params.cnv_change]) {
                 speech
                     .sayAs({ word: response['data'][params.cnv_change], interpret: 'digits' })
                     .say(`percentage of ${params[MelvinAttributes.STUDY_NAME]} cancer patients have ` +
-                        `${params.cnv_change} at ${params[MelvinAttributes.GENE_NAME]}`);
+                        `${params.cnv_change} at`)
+                    .sayWithSSML(gene_speech_text);
             } else {
                 speech.say(`Sorry, I could not find the requested CNV change data.`);
             }
@@ -42,12 +48,15 @@ async function build_cnv_response(params) {
             speech.say(`Sorry, I could not find a study called ${params[MelvinAttributes.STUDY_NAME]}`);
 
         } else if (response['error'] && response['error'] === MelvinExplorerErrors.UNIDENTIFIED_GENE) {
-            speech.say(`Sorry, I could not find a gene called ${params[MelvinAttributes.GENE_NAME]}`);
+            speech
+                .say(`Sorry, I could not find a gene called`)
+                .sayWithSSML(gene_speech_text);
 
         } else {
-            speech.say(`There was a problem while looking for ${params.cnv_change} in ` +
-                `${params[MelvinAttributes.GENE_NAME]} for ${params[MelvinAttributes.STUDY_NAME]}`
-                + ` cancer patients. Please try again.`);
+            speech
+                .say(`There was a problem while looking for ${params.cnv_change} in`)
+                .sayWithSSML(gene_speech_text)
+                .say(`for ${params[MelvinAttributes.STUDY_NAME]} cancer patients. Please try again.`);
         }
 
     } catch (error) {
@@ -62,15 +71,19 @@ async function build_cnv_response(params) {
 };
 
 function build_cnv_alterations_response(params, response, speech) {
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+    const study = params[MelvinAttributes.STUDY_NAME];
+
     if (params.cnv_change == CNVTypes.ALTERATIONS
         && response['data']['amplifications_percentage']
         && response['data']['deletions_percentage']) {
+
         const amplifications = round(response['data']['amplifications_percentage'], 1);
         const deletions = round(response['data']['deletions_percentage'], 1);
         speech
-            .say(`${params[MelvinAttributes.GENE_NAME]} is amplified in`
-                + ` ${amplifications} percent of ${params[MelvinAttributes.STUDY_NAME]}`
-                + ` patients while deleted in ${deletions} percent`);
+            .sayWithSSML(gene_speech_text)
+            .say(`is amplified in ${amplifications} percent of ${study}`)
+            .say(`patients while deleted in ${deletions} percent`);
 
     } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
         && response['data']['amplifications_percentage']) {
@@ -81,47 +94,57 @@ function build_cnv_alterations_response(params, response, speech) {
         build_cnv_deletions_response(params, response, speech)
 
     } else {
-        speech.say(`Sorry, I could not find copy number alterations data for`
-            + ` ${params[MelvinAttributes.STUDY_NAME]} in ${params[MelvinAttributes.GENE_NAME]}`);
+        speech
+            .say(`Sorry, I could not find copy number alterations data for ${study} in`)
+            .sayWithSSML(gene_speech_text);
     }
 }
 
 function build_cnv_deletions_response(params, response, speech) {
     const deletions = round(response['data']['deletions_percentage'], 1);
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+    const study = params[MelvinAttributes.STUDY_NAME];
     speech
-        .say(`${params[MelvinAttributes.GENE_NAME]} is deleted in ${deletions} percent of`
-            + ` ${params[MelvinAttributes.STUDY_NAME]} patients`);
+        .sayWithSSML(gene_speech_text)
+        .say(`is deleted in ${deletions} percent of ${study} patients`);
 
 }
 
 function build_cnv_amplifications_response(params, response, speech) {
     const amplifications = round(response['data']['amplifications_percentage'], 1);
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+    const study = params[MelvinAttributes.STUDY_NAME];
     speech
-        .say(`${params[MelvinAttributes.GENE_NAME]} is amplified in ${amplifications} percent of`
-            + ` ${params[MelvinAttributes.STUDY_NAME]} patients.`);
+        .sayWithSSML(gene_speech_text)
+        .say(`is amplified in ${amplifications} percent of ${study} patients.`);
 }
 
 function build_cnv_by_study_response(params, response, speech) {
     const records_list = response['data']['records'];
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+    const gene_0_speech_text = get_gene_speech_text(records_list[0]['gene']);
+    const gene_1_speech_text = get_gene_speech_text(records_list[1]['gene']);
+    const study = params[MelvinAttributes.STUDY_NAME];
+
     if (Array.isArray(records_list)) {
         if (records_list.length > 2) {
             speech
-                .say(`${records_list[0]['gene']} and ${records_list[1]['gene']} have the greatest number of`
-                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent and`
-                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
+                .sayWithSSML(`${gene_0_speech_text} and ${gene_1_speech_text}`)
+                .say(`have the greatest number of copy number alterations in ${study} at`)
+                .say(`${round(records_list[0]['cna_percentage'], 1)} percent and`)
+                .say(`${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
 
         } else if (records_list.length > 1) {
             speech
-                .say(`${records_list[0]['gene']} has the greatest number of`
-                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent`);
+                .sayWithSSML(gene_0_speech_text)
+                .say(`has the greatest number of copy number alterations in ${study} at`)
+                .say(`${round(records_list[0]['cna_percentage'], 1)} percent`);
 
         } else if (records_list.length == 1) {
             speech
-                .say(`${records_list[0]['gene']} is the only gene that contains`
-                    + ` copy number alterations in ${params[MelvinAttributes.STUDY_NAME]} at`
-                    + ` ${round(records_list[0]['cna_percentage'], 1)} percent`);
+                .sayWithSSML(gene_0_speech_text)
+                .say(`is the only gene that contains copy number alterations in ${study} at`)
+                .say(`${round(records_list[0]['cna_percentage'], 1)} percent`);
 
         } else {
             speech.say('There were no copy number alterations found.');
@@ -131,8 +154,7 @@ function build_cnv_by_study_response(params, response, speech) {
         throw melvin_error(
             `[build_cnv_by_study_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
-            `Sorry, I'm having trouble accessing copy number alteration records for `
-            + params[MelvinAttributes.GENE_NAME]
+            `Sorry, I'm having trouble accessing copy number alteration records for ${gene_speech_text}`
         );
     }
 }

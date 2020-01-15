@@ -38,8 +38,10 @@ async function build_mutations_response(params) {
         if (Array.isArray(records_list)) {
             add_mutations_stats_plot(image_list, params);
             add_mutations_treemap_plot(image_list, params);
-            speech.say(`${gene_speech_text} mutations are found in ${mutated_cancer_type_count}`
-                + ` out of ${total_cancer_types} cancer types.`);
+            speech
+                .sayWithSSML(gene_speech_text)
+                .say(`mutations are found in ${mutated_cancer_type_count}`)
+                .say(`out of ${total_cancer_types} cancer types.`);
 
             if (records_list.length >= 2) {
                 speech
@@ -51,13 +53,15 @@ async function build_mutations_response(params) {
 
             } else if (records_list.length >= 1) {
                 speech
-                    .say(`${gene_speech_text} mutations are found in ${mutated_cancer_type_count}`
-                        + ` out of ${total_cancer_types} cancer types.`)
+                    .sayWithSSML(gene_speech_text)
+                    .say(`mutations are found in ${mutated_cancer_type_count}`)
+                    .say(`out of ${total_cancer_types} cancer types.`)
                     .say(`It is most mutated in ${records_list[0][MelvinAttributes.STUDY_NAME]} at `)
                     .say(`${round(records_list[0]['percent_cancer_patients_with_mutgene'], 1)} percent.`)
 
             } else {
-                speech.say(`There were no mutations found for ${gene_speech_text}`);
+                speech
+                    .say(`There were no mutations found for ${gene_speech_text}`);
             }
 
         } else {
@@ -71,11 +75,13 @@ async function build_mutations_response(params) {
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         add_mutations_profile_plot(image_list, params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+        const recc_positions = response['data']['recurrent_positions'];
+
         speech
+            .sayWithSSML(`${gene_speech_text} mutations are found in`)
             .say(round(response['data']['patient_percentage'], 1))
-            .say(`percent of ${params[MelvinAttributes.STUDY_NAME]} patients have `
-                + `${gene_speech_text} mutations with` +
-                ` ${response['data']['recurrent_positions']} amino acid residues recurrently mutated.`);
+            .say(`percent of ${params[MelvinAttributes.STUDY_NAME]} patients`)
+            .say(`with ${recc_positions} amino acid residues recurrently mutated.`);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         speech.say("I'm still working on this analysis. Please try again later.");
@@ -101,27 +107,30 @@ function build_mutations_domain_response_helper(params, records_list, speech, ge
 
     if (records_list.length > 2) {
         speech
-            .say(`${records_list[0]['domain']} and ${records_list[1]['domain']}`
-                + ` are the most affected domains containing`)
+            .sayWithSSML(`In ${gene_speech_text},`)
+            .say(`${records_list[0]['domain']} and ${records_list[1]['domain']}`)
+            .say(`are the most affected domains containing`)
             .say(round(records_list[0]['percentage'], 1))
             .say('percent and')
             .say(round(records_list[1]['percentage'], 1))
-            .say(`percent of all ${gene_speech_text} mutations respectively.`);
+            .say(`percent of mutations respectively.`);
 
     } else if (records_list.length > 1) {
         speech
+            .sayWithSSML(`In ${gene_speech_text},`)
             .say(`${records_list[0]['domain']} is the most affected domain containing`)
             .say(round(records_list[0]['percentage'], 1))
-            .say(`percent of all ${gene_speech_text} mutations.`);
+            .say(`percent of mutations.`);
 
     } else if (records_list.length == 1) {
         speech
+            .sayWithSSML(`In ${gene_speech_text},`)
             .say(`${records_list[0]['domain']} is the only affected domain containing`)
             .say(round(records_list[0]['percentage'], 1))
-            .say(`percent of all ${gene_speech_text} mutations.`);
+            .say(`percent of mutations.`);
 
     } else {
-        speech.say('There were no mutation domains found.');
+        speech.sayWithSSML('There were no mutation domains found in ${gene_speech_text}');
     }
 }
 
