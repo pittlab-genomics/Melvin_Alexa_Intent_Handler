@@ -4,18 +4,22 @@ const _ = require('lodash');
 const { get_gene_by_name } = require('../http_clients/gene_client.js');
 
 const {
-    MelvinAttributes
+    MelvinAttributes,
+    get_gene_speech_text
 } = require('../common.js');
 
 
 async function build_gene_definition_response(params) {
     const speech = new Speech();
     const response = await get_gene_by_name(params);
-
-    speech.say(`${params[MelvinAttributes.GENE_NAME]} is at ${response.data.location}`);
-    speech.pause('200ms');
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const sentence_sum = response.data.summary.match(/\S.*?\."?(?=\s|$)/g)[0]
-    speech.say(sentence_sum);
+
+    speech
+        .sayWithSSML(gene_speech_text)
+        .say(`is at ${response.data.location}`)
+        .pause('200ms')
+        .say(sentence_sum);
 
     return {
         'speech_text': speech.ssml(),
