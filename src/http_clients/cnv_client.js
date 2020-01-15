@@ -10,8 +10,8 @@ const {
 const { add_query_params } = require('../utils/response_builder_utils.js');
 
 
-module.exports.get_cnv_change_percent = function (params) {
-    const cnv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/percent_patients`);
+module.exports.get_cnvs_tcga_stats = function (params) {
+    const cnv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/tcga/stats`);
     add_query_params(cnv_url, params);
     var options = { json: true };
 

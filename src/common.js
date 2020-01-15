@@ -7,7 +7,8 @@ const MelvinAttributes = {
     GENE_NAME: "gene_name",
     STUDY_NAME: "study_name",
     STUDY_ABBRV: "study_abbreviation",
-    DTYPE: "data_type"
+    DTYPE: "data_type",
+    DSOURCE: "data_source"
 };
 
 const MelvinExplorerErrors = {
@@ -30,7 +31,8 @@ const MelvinIntentErrors = {
 const OOVEntityTypes = {
     GENE: "GENE",
     STUDY: "STUDY",
-    DTYPE: "DTYPE"
+    DTYPE: "DTYPE",
+    DSOURCE: "DSOURCE"
 };
 
 const DataTypes = {
@@ -41,6 +43,11 @@ const DataTypes = {
     CNV_DELETIONS: "CNV_DELETIONS",
     MUTATION_DOMAINS: "MUTATION_DOMAINS",
     GENE_DEFINITION: "GENE_DEFINITION"
+};
+
+const DataSources = {
+    TCGA: "TCGA",
+    CLINVAR: "CLINVAR"
 };
 
 const CNVTypes = {
@@ -90,6 +97,7 @@ module.exports = {
     get_gene_speech_text,
     OOVEntityTypes,
     DataTypes,
+    DataSources,
     CNVTypes,
     melvin_error,
     MelvinIntentErrors,

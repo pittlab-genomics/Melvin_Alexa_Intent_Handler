@@ -2,11 +2,11 @@ const Speech = require('ssml-builder');
 const _ = require('lodash');
 
 const {
-    add_mutations_stats_plot,
-    add_mutations_profile_plot,
-    add_mutations_treemap_plot,
-    add_domain_pie_plot,
-    add_domain_stack_plot,
+    add_mutations_tcga_stats_plot,
+    add_mutations_tcga_profile_plot,
+    add_mutations_tcga_treemap_plot,
+    add_mutations_tcga_domain_pie_plot,
+    add_mutations_tcga_domain_stack_plot,
     round
 } = require('../utils/response_builder_utils.js');
 
@@ -19,15 +19,15 @@ const {
 } = require('../common.js');
 
 const {
-    get_mutated_patient_stats,
-    get_mutations_domain_percent
+    get_mutations_tcga_stats,
+    get_mutations_tcga_domain_stats
 } = require('../http_clients/mutations_client.js');
 
 async function build_mutations_response(params) {
     const speech = new Speech();
     const image_list = [];
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
-    const response = await get_mutated_patient_stats(params);
+    const response = await get_mutations_tcga_stats(params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
         const mutated_cancer_type_count = response['data']['cancer_types_with_mutated_gene'];
@@ -36,8 +36,8 @@ async function build_mutations_response(params) {
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
 
         if (Array.isArray(records_list)) {
-            add_mutations_stats_plot(image_list, params);
-            add_mutations_treemap_plot(image_list, params);
+            add_mutations_tcga_stats_plot(image_list, params);
+            add_mutations_tcga_treemap_plot(image_list, params);
             speech
                 .sayWithSSML(gene_speech_text)
                 .say(`mutations are found in ${mutated_cancer_type_count}`)
@@ -73,7 +73,7 @@ async function build_mutations_response(params) {
         }
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
-        add_mutations_profile_plot(image_list, params);
+        add_mutations_tcga_profile_plot(image_list, params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
         const recc_positions = response['data']['recurrent_positions'];
 
@@ -139,7 +139,7 @@ async function build_mutations_domain_response(params) {
     console.log(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
     const speech = new Speech();
     const image_list = [];
-    const response = await get_mutations_domain_percent(params);
+    const response = await get_mutations_tcga_domain_stats(params);
     const records_list = response['data']['records'];
 
     if (
@@ -148,8 +148,8 @@ async function build_mutations_domain_response(params) {
     ) {
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
         if (Array.isArray(records_list)) {
-            add_domain_pie_plot(image_list, params);
-            add_domain_stack_plot(image_list, params);
+            add_mutations_tcga_domain_pie_plot(image_list, params);
+            add_mutations_tcga_domain_stack_plot(image_list, params);
             build_mutations_domain_response_helper(params, records_list, speech, gene_speech_text);
 
         } else {

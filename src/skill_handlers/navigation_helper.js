@@ -9,6 +9,7 @@ const {
     OOVEntityTypes,
     RequiredAttributes,
     DataTypes,
+    DataSources,
     melvin_error
 } = require('../common.js');
 
@@ -30,6 +31,9 @@ const update_melvin_state = async function (handlerInput) {
 
     if (sessionAttributes['MELVIN.STATE']) {
         prev_melvin_state = sessionAttributes['MELVIN.STATE'];
+    } else {
+        // default to TCGA data source
+        prev_melvin_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
 
     const query = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value');
@@ -51,7 +55,11 @@ const update_melvin_state = async function (handlerInput) {
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.DTYPE) {
                 new_melvin_state[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.dtype");
+
+            } else if (query_response['data']['entity_type'] === OOVEntityTypes.DSOURCE) {
+                new_melvin_state[MelvinAttributes.DSOURCE] = _.get(query_response, "data.entity_data.dsource");
             }
+
             console.log(`[update_melvin_state] prev_melvin_state: ${JSON.stringify(prev_melvin_state)},` +
                 `new_melvin_state: ${JSON.stringify(new_melvin_state)}`);
 

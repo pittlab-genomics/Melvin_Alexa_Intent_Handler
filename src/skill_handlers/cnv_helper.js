@@ -10,19 +10,19 @@ const {
     get_gene_speech_text
 } = require('../common.js');
 
-const { get_cnv_change_percent } = require('../http_clients/cnv_client.js');
-const { add_cnv_plot, round } = require('../utils/response_builder_utils.js');
+const { get_cnvs_tcga_stats } = require('../http_clients/cnv_client.js');
+const { add_cnvs_tcga_plot, round } = require('../utils/response_builder_utils.js');
 
 async function build_cnv_response(params) {
     const speech = new Speech();
     const image_list = [];
 
     try {
-        const response = await get_cnv_change_percent(params);
+        const response = await get_cnvs_tcga_stats(params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
 
         if (response['data']) {
-            add_cnv_plot(image_list, params);
+            add_cnvs_tcga_plot(image_list, params);
             if (params.cnv_change === 'alterations' && response['data']['amplifications'] &&
                 response['data']['deletions']) {
                 speech
@@ -85,12 +85,16 @@ function build_cnv_alterations_response(params, response, speech) {
             .say(`is amplified in ${amplifications} percent of ${study}`)
             .say(`patients while deleted in ${deletions} percent`);
 
-    } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
-        && response['data']['amplifications_percentage']) {
+    } else if (
+        (params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
+        && response['data']['amplifications_percentage']
+    ) {
         build_cnv_amplifications_response(params, response, speech)
 
-    } else if ((params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.DELETIONS)
-        && response['data']['deletions_percentage']) {
+    } else if (
+        (params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.DELETIONS)
+        && response['data']['deletions_percentage']
+    ) {
         build_cnv_deletions_response(params, response, speech)
 
     } else {
@@ -163,14 +167,14 @@ async function build_navigate_cnv_response(params) {
     const speech = new Speech();
     const image_list = [];
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
-    const response = await get_cnv_change_percent(params);
+    const response = await get_cnvs_tcga_stats(params);
 
     if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
-        add_cnv_plot(image_list, params);
+        add_cnvs_tcga_plot(image_list, params);
         build_cnv_by_study_response(params, response, speech);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
-        add_cnv_plot(image_list, params);
+        add_cnvs_tcga_plot(image_list, params);
         build_cnv_alterations_response(params, response, speech);
 
     } else {
