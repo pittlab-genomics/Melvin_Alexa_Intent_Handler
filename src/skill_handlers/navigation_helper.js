@@ -31,7 +31,9 @@ const update_melvin_state = async function (handlerInput) {
 
     if (sessionAttributes['MELVIN.STATE']) {
         prev_melvin_state = sessionAttributes['MELVIN.STATE'];
-    } else {
+    }
+
+    if (!_.has(prev_melvin_state, DataTypes.DSOURCE)) {
         // default to TCGA data source
         prev_melvin_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
@@ -45,19 +47,19 @@ const update_melvin_state = async function (handlerInput) {
 
             if (query_response['data']['entity_type'] === OOVEntityTypes.GENE) {
                 new_melvin_state[MelvinAttributes.GENE_NAME] = _.get(
-                    query_response, "data.entity_data.gene_name");
+                    query_response, "data.entity_data.value");
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.STUDY) {
                 new_melvin_state[MelvinAttributes.STUDY_NAME] = _.get(
                     query_response, "data.entity_data.study_name");
                 new_melvin_state[MelvinAttributes.STUDY_ABBRV] = _.get(
-                    query_response, "data.entity_data.study_abbreviation");
+                    query_response, "data.entity_data.value");
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.DTYPE) {
-                new_melvin_state[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.dtype");
+                new_melvin_state[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.value");
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.DSOURCE) {
-                new_melvin_state[MelvinAttributes.DSOURCE] = _.get(query_response, "data.entity_data.dsource");
+                new_melvin_state[MelvinAttributes.DSOURCE] = _.get(query_response, "data.entity_data.value");
             }
 
             console.log(`[update_melvin_state] prev_melvin_state: ${JSON.stringify(prev_melvin_state)},` +

@@ -36,6 +36,7 @@ const OOVEntityTypes = {
 };
 
 const DataTypes = {
+    OVERVIEW: "OVERVIEW",
     MUTATIONS: "MUTATIONS",
     EXPRESSION: "EXPRESSION",
     CNV_ALTERATIONS: "CNV_ALTERATIONS",
