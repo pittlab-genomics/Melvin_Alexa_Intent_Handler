@@ -1,0 +1,122 @@
+const URL = require('url').URL;
+const Speech = require('ssml-builder');
+const _ = require('lodash');
+
+const { add_query_params } = require('../utils/response_builder_utils.js');
+
+const {
+    MelvinAttributes,
+    MelvinIntentErrors,
+    melvin_error,
+    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
+    get_gene_speech_text,
+    MELVIN_EXPLORER_ENDPOINT
+} = require('../common.js');
+
+const {
+    get_overview_clinvar_stats
+} = require('../http_clients/overview_clinvar_client.js');
+
+function _populate_overview_by_study_gene_response(params, data, speech) {
+    const mutation_count = data['mutation'];
+    const sv_count = data['structural variant'];
+    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+
+    const mutations_text = (mutation_count == 1) ? 'mutation' : 'mutations';
+    const sv_text = (sv_count == 1) ? 'structural variant' : 'structural variants';
+
+    if (mutation_count == 0 && sv_count == 0) {
+        speech
+            .say(`There are no mutations or structural variants found`)
+            .sayWithSSML(`at ${gene_speech_text}`)
+            .say(`in ${params[MelvinAttributes.STUDY_NAME]}`);
+    } else {
+        speech
+            .say(`There are ${mutation_count} ${mutations_text} and ${sv_count} ${sv_text}`)
+            .sayWithSSML(`at ${gene_speech_text}`)
+            .say(`in ${params[MelvinAttributes.STUDY_NAME]}`);
+    }
+
+}
+
+function _populate_overview_by_study_response(params, gene_mut_list, speech) {
+    if (gene_mut_list.length > 2) {
+        const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0][0]);
+        const gene_1_speech_text = get_gene_speech_text(gene_mut_list[1][0]);
+        speech
+            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .sayWithSSML(`${gene_0_speech_text} and ${gene_1_speech_text}`)
+            .say(`are the top two genes with`)
+            .say(gene_mut_list[0][1])
+            .say('and')
+            .say(gene_mut_list[1][1])
+            .say(`pathogenic variants respectively.`);
+
+    } else if (gene_mut_list.length > 1) {
+        const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0]);
+        speech
+            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .sayWithSSML(`${gene_0_speech_text}`)
+            .say(`is the top gene with`)
+            .say(gene_mut_list[0][1])
+            .say(`pathogenic variants.`);
+
+    } else if (gene_mut_list.length == 1) {
+        const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0]);
+        speech
+            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .sayWithSSML(`${gene_0_speech_text}`)
+            .say(`is the only gene with`)
+            .say(gene_mut_list[0][1])
+            .say(`pathogenic variants.`);
+
+    } else {
+        speech.sayWithSSML(`There is no data found in clinvar for ${params[MelvinAttributes.STUDY_NAME]}`);
+    }
+}
+
+async function build_overview_clinvar_response(params) {
+    const speech = new Speech();
+    const image_list = [];
+    const response = await get_overview_clinvar_stats(params);
+
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
+
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        add_overview_clinvar_plot(image_list, params);
+        const data = response['data'];
+        _populate_overview_by_study_gene_response(params, data, speech);
+
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+        add_overview_clinvar_plot(image_list, params);
+        const gene_mut_dict = response['data'];
+        const gene_mut_list = Object.keys(gene_mut_dict).map(function (key) {
+            return [key, gene_mut_dict[key]];
+        });
+        _populate_overview_by_study_response(params, gene_mut_list, speech);
+
+    } else {
+        throw melvin_error(
+            `[build_overview_clinvar_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+        );
+    }
+
+    return {
+        'speech_text': speech.ssml(),
+        'image_list': image_list
+    }
+}
+
+const add_overview_clinvar_plot = function (image_list, params) {
+    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/overview/clinvar/plot`);
+    add_query_params(count_plot_url, params);
+    image_list.push(count_plot_url);
+}
+
+module.exports = {
+    build_overview_clinvar_response
+}

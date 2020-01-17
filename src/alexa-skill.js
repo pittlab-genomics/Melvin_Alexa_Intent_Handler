@@ -1,7 +1,6 @@
 'use strict';
 
 const Alexa = require('ask-sdk-core');
-const _ = require('lodash');
 
 const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME } = require('./common.js');
 const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
@@ -9,11 +8,13 @@ const {
     SearchGeneIntentHandler,
     NavigateGeneDefinitionIntentHandler
 } = require('./skill_handlers/gene_handler.js');
+
 const {
     NavigateStartIntentHandler,
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler
 } = require('./skill_handlers/navigation_handler.js');
+
 const {
     CNVAmplificationGeneIntentHandler,
     CNVDeletionGeneIntent,
@@ -22,12 +23,15 @@ const {
     NavigateCNVAmplificationsIntentHandler,
     NavigateCNVDeletionsIntentHandler
 } = require('./skill_handlers/cnv_handler.js');
+
 const {
     MutationCountIntentHandler,
     MutationPercentageIntentHandler,
     NavigateMutationsIntentHandler,
     NavigateMutationsDomainIntentHandler
 } = require('./skill_handlers/mutations_handler.js');
+
+const { NavigateOverviewIntentHandler } = require('./skill_handlers/overview_handler.js');
 
 const { NavigateEmailIntentHandler } = require('./skill_handlers/email_handler.js');
 
@@ -152,6 +156,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateStartIntentHandler,
         NavigateResetIntentHandler,
         NavigateGeneDefinitionIntentHandler,
+        NavigateOverviewIntentHandler,
         NavigateJoinFilterIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,

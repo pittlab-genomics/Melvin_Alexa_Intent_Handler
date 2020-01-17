@@ -10,14 +10,14 @@ const {
 const { add_query_params } = require('../utils/response_builder_utils.js');
 
 
-module.exports.get_cnv_change_percent = function (params) {
-    const cnv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/percent_patients`);
-    add_query_params(cnv_url, params);
+const get_mutations_clinvar_stats = function (params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/stats`);
+    add_query_params(mutations_url, params);
     var options = { json: true };
 
     return new Promise(function (resolve, reject) {
-        https(cnv_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${cnv_url.href},`
+        https(mutations_url.href, options, function (error, response, body) {
+            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${mutations_url.href},`
                 + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
@@ -37,3 +37,7 @@ module.exports.get_cnv_change_percent = function (params) {
         });
     });
 };
+
+module.exports = {
+    get_mutations_clinvar_stats
+}

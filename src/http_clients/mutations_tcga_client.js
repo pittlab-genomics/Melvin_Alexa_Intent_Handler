@@ -10,8 +10,8 @@ const {
 const { add_query_params } = require('../utils/response_builder_utils.js');
 
 
-const get_mutated_patient_stats = function (params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/patient_stats`);
+const get_mutations_tcga_stats = function (params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats`);
     add_query_params(mutations_url, params);
     var options = { json: true };
 
@@ -38,8 +38,8 @@ const get_mutated_patient_stats = function (params) {
     });
 };
 
-const get_mutations_top_list = function (params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/mutations_top_list`);
+const get_mutations_tcga_top_genes = function (params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/top_genes`);
     add_query_params(mutations_url, params);
     var options = { json: true };
 
@@ -66,8 +66,8 @@ const get_mutations_top_list = function (params) {
     });
 }
 
-const get_mutations_domain_percent = function (params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/domain_percent`);
+const get_mutations_tcga_domain_stats = function (params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_stats`);
     add_query_params(mutations_url, params);
     var options = { json: true };
 
@@ -95,7 +95,7 @@ const get_mutations_domain_percent = function (params) {
 }
 
 module.exports = {
-    get_mutated_patient_stats,
-    get_mutations_top_list,
-    get_mutations_domain_percent
+    get_mutations_tcga_stats,
+    get_mutations_tcga_top_genes,
+    get_mutations_tcga_domain_stats
 }

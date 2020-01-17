@@ -1,5 +1,4 @@
 const Speech = require('ssml-builder');
-const URL = require('url').URL;
 const _ = require('lodash');
 
 const {
@@ -9,15 +8,19 @@ const {
 } = require('../common.js');
 
 const {
-    get_mutated_patient_stats
-} = require('../http_clients/mutations_client.js');
+    get_mutations_tcga_stats
+} = require('../http_clients/mutations_tcga_client.js');
 
 const {
     validate_action_intent_state,
     update_melvin_state
 } = require('./navigation_helper.js');
 
-const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
+const {
+    build_mutations_response,
+    build_mutations_domain_response
+} = require('./mutations_helper.js');
+
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 
 
@@ -42,7 +45,7 @@ const MutationCountIntentHandler = {
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
 
-            let response = await get_mutated_patient_stats(params);
+            let response = await get_mutations_tcga_stats(params);
             if (response['data']['patient_count'] && !_.isNil(study)) {
                 speech.say(`${response.data.patient_count} ${study} cancer patients have ${gene_name} mutation.`);
                 speechText = speech.ssml();
@@ -99,7 +102,7 @@ const MutationPercentageIntentHandler = {
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
 
-            let response = await get_mutated_patient_stats(params);
+            let response = await get_mutations_tcga_stats(params);
             if (response['data']['patient_percentage'] && !_.isNil(study)) {
                 speech
                     .sayAs({ word: response['data']['patient_percentage'], interpret: 'digits' })
