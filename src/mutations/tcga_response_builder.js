@@ -9,6 +9,7 @@ const {
     MelvinIntentErrors,
     melvin_error,
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
@@ -16,7 +17,7 @@ const {
 const {
     get_mutations_tcga_stats,
     get_mutations_tcga_domain_stats
-} = require('../http_clients/mutations_client.js');
+} = require('../http_clients/mutations_tcga_client.js');
 
 async function build_mutations_tcga_response(params) {
     const speech = new Speech();
@@ -78,7 +79,7 @@ async function build_mutations_tcga_response(params) {
             .say(`with ${recc_positions} amino acid residues recurrently mutated.`);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
-        speech.say("I'm still working on this analysis. Please try again later.");
+        speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
 
     } else {
         throw melvin_error(
@@ -124,7 +125,7 @@ function _populate_domain_response(params, records_list, speech, gene_speech_tex
             .say(`percent of mutations.`);
 
     } else {
-        speech.sayWithSSML('There were no mutation domains found in ${gene_speech_text}');
+        speech.sayWithSSML(`There were no mutation domains found in ${gene_speech_text}`);
     }
 }
 

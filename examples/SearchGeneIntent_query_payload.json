@@ -45,8 +45,8 @@
                     "name": "gene",
                     "confirmationStatus": "NONE"
                 },
-                "gene_query": {
-                    "name": "gene_query",
+                "query": {
+                    "name": "query",
                     "value": "TP 53",
                     "confirmationStatus": "NONE",
                     "source": "USER"

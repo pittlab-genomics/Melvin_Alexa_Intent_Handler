@@ -19,22 +19,31 @@ serverless deploy
 
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_query_payload.json
+
 serverless invoke local --function alexa-skill -p ./examples/CNVAmplificationGeneIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_payload.json
+
+serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_payload.json
+serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_study_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/NavigateGene_payload.json
-
 serverless invoke local --function alexa-skill -p ./examples/NavigateGeneDefinition_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateMutationsIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateMutationDomains_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/NavigateCNVIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateCNVDeletionsIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateCNVCancerIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateCNV_with_study_payload.json
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_payload.json
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_gene_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_BRCA_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_payload.json
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMutationsIntent_payload.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVDeletionsIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVCancerIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNV_with_study_payload.json
+
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateJoinIntent_SV_payload.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
 

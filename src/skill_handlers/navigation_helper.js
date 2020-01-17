@@ -7,7 +7,8 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     OOVEntityTypes,
-    RequiredAttributes,
+    RequiredAttributesTCGA,
+    RequiredAttributesClinvar,
     DataTypes,
     DataSources,
     melvin_error
@@ -33,7 +34,7 @@ const update_melvin_state = async function (handlerInput) {
         prev_melvin_state = sessionAttributes['MELVIN.STATE'];
     }
 
-    if (!_.has(prev_melvin_state, DataTypes.DSOURCE)) {
+    if (!_.has(prev_melvin_state, MelvinAttributes.DSOURCE)) {
         // default to TCGA data source
         prev_melvin_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
@@ -85,33 +86,19 @@ function validate_required_attributes(melvin_state) {
         return;
     }
 
-    let key = '';
-    if (melvin_state['data_type'] === DataTypes.GENE_DEFINITION) {
-        key = DataTypes.GENE_DEFINITION;
-
-    } else if (melvin_state['data_type'] === 'mutation'
-        || melvin_state['data_type'] === DataTypes.MUTATIONS) {
-        key = DataTypes.MUTATIONS;
-
-    } else if (melvin_state['data_type'] === 'domain'
-        || melvin_state['data_type'] === DataTypes.MUTATION_DOMAINS) {
-        key = DataTypes.MUTATION_DOMAINS;
-
-    } else if (melvin_state['data_type'] === 'amplification'
-        || melvin_state['data_type'] === DataTypes.CNV_AMPLIFICATIONS) {
-        key = DataTypes.CNV_AMPLIFICATIONS;
-
-    } else if (melvin_state['data_type'] === 'deletion'
-        || melvin_state['data_type'] === DataTypes.CNV_DELETIONS) {
-        key = DataTypes.CNV_DELETIONS;
-
-    } else if (melvin_state['data_type'] === 'copy number change'
-        || melvin_state['data_type'] === 'copy number variation'
-        || melvin_state['data_type'] === 'copy number alteration'
-        || melvin_state['data_type'] === DataTypes.CNV_ALTERATIONS) {
-        key = DataTypes.CNV_ALTERATIONS;
+    const key = melvin_state['data_type'];
+    if (!(melvin_state['data_type'] in DataTypes)) {
+        let error = new Error('Error while validating required attributes in melvin_state', melvin_state);
+        error.type = MelvinIntentErrors.INVALID_DATA_TYPE;
+        error.speech = "I could not understand that data type. Please try again.";
+        throw error;
     }
-    const allowed_list = RequiredAttributes[key];
+
+    let allowed_list = RequiredAttributesTCGA[key];
+    if (_.has(melvin_state, 'data_source') && melvin_state['data_source'] === DataSources.CLINVAR) {
+        allowed_list = RequiredAttributesClinvar[key];
+    }
+
     const has_gene = !_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]);
     const has_study = !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV]);
 
@@ -163,12 +150,12 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
     console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    if (state_change['oov_data']['entity_type'] === OOVEntityTypes.DTYPE) {
-        let error = new Error('Error while validating action intent state', state_change);
-        error.type = MelvinIntentErrors.INVALID_ENTITY_TYPE;
-        error.speech = "Your query is invalid. A data type cannot be used in an action intent";
-        throw error;
-    }
+    // if (state_change['oov_data']['entity_type'] === OOVEntityTypes.DTYPE) {
+    //     let error = new Error('Error while validating action intent state', state_change);
+    //     error.type = MelvinIntentErrors.INVALID_ENTITY_TYPE;
+    //     error.speech = "Your query is invalid. A data type cannot be used in an action intent";
+    //     throw error;
+    // }
 
     // merge the previous state and new state. Overwrite with the latest
     const melvin_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };

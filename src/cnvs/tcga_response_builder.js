@@ -12,7 +12,7 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
 
-const { get_cnvs_tcga_stats } = require('../http_clients/cnv_client.js');
+const { get_cnvs_tcga_stats } = require('../http_clients/cnvs_tcga_client.js');
 const { round, add_query_params } = require('../utils/response_builder_utils.js');
 
 function build_cnv_alterations_response(params, response, speech) {
@@ -70,13 +70,12 @@ function build_cnv_amplifications_response(params, response, speech) {
 
 function build_cnv_by_study_response(params, response, speech) {
     const records_list = response['data']['records'];
-    const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const gene_0_speech_text = get_gene_speech_text(records_list[0]['gene']);
-    const gene_1_speech_text = get_gene_speech_text(records_list[1]['gene']);
     const study = params[MelvinAttributes.STUDY_NAME];
 
     if (Array.isArray(records_list)) {
         if (records_list.length > 2) {
+            const gene_0_speech_text = get_gene_speech_text(records_list[0]['gene']);
+            const gene_1_speech_text = get_gene_speech_text(records_list[1]['gene']);
             speech
                 .sayWithSSML(`${gene_0_speech_text} and ${gene_1_speech_text}`)
                 .say(`have the greatest number of copy number alterations in ${study} at`)
@@ -84,12 +83,14 @@ function build_cnv_by_study_response(params, response, speech) {
                 .say(`${round(records_list[0]['cna_percentage'], 1)} percent respectively`);
 
         } else if (records_list.length > 1) {
+            const gene_0_speech_text = get_gene_speech_text(records_list[0]['gene']);
             speech
                 .sayWithSSML(gene_0_speech_text)
                 .say(`has the greatest number of copy number alterations in ${study} at`)
                 .say(`${round(records_list[0]['cna_percentage'], 1)} percent`);
 
         } else if (records_list.length == 1) {
+            const gene_0_speech_text = get_gene_speech_text(records_list[0]['gene']);
             speech
                 .sayWithSSML(gene_0_speech_text)
                 .say(`is the only gene that contains copy number alterations in ${study} at`)
@@ -103,7 +104,7 @@ function build_cnv_by_study_response(params, response, speech) {
         throw melvin_error(
             `[build_cnv_by_study_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
-            `Sorry, I'm having trouble accessing copy number alteration records for ${gene_speech_text}`
+            `Sorry, I'm having trouble accessing copy number alteration records for ${study}`
         );
     }
 }

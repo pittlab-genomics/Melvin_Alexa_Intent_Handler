@@ -1,5 +1,4 @@
 const Speech = require('ssml-builder');
-const URL = require('url').URL;
 const _ = require('lodash');
 
 const {
@@ -10,14 +9,18 @@ const {
 
 const {
     get_mutations_tcga_stats
-} = require('../http_clients/mutations_client.js');
+} = require('../http_clients/mutations_tcga_client.js');
 
 const {
     validate_action_intent_state,
     update_melvin_state
 } = require('./navigation_helper.js');
 
-const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
+const {
+    build_mutations_response,
+    build_mutations_domain_response
+} = require('./mutations_helper.js');
+
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 
 

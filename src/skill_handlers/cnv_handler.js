@@ -3,6 +3,7 @@ const Speech = require('ssml-builder');
 const {
     MelvinAttributes,
     DataTypes,
+    DataSources,
     CNVTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
@@ -21,6 +22,7 @@ const CNVAmplificationGeneIntentHandler = {
     },
     async handle(handlerInput) {
         const params = {
+            [MelvinAttributes.DSOURCE]: DataSources.TCGA,
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
             [MelvinAttributes.STUDY_NAME]: handlerInput.requestEnvelope.request.intent.slots.study.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots

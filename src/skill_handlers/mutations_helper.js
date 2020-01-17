@@ -14,6 +14,10 @@ const {
     build_mutations_tcga_domain_response
 } = require('../mutations/tcga_response_builder.js');
 
+const {
+    build_mutations_clinvar_response
+} = require('../mutations/clinvar_response_builder.js');
+
 async function build_mutations_response(params) {
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
     let response = {};
@@ -21,6 +25,7 @@ async function build_mutations_response(params) {
         response = await build_mutations_tcga_response(params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
+        response = await build_mutations_clinvar_response(params);
 
     } else {
         throw melvin_error(

@@ -13,27 +13,40 @@ const {
     get_gene_speech_text
 } = require('../common.js');
 
+const { build_overview_clinvar_response } = require('../overview/clinvar_response_builder.js');
 const { build_mutations_response, build_mutations_domain_response } = require('./mutations_helper.js');
 const { update_melvin_state, validate_navigation_intent_state } = require('./navigation_helper.js');
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 const { build_navigate_cnv_response } = require('./cnv_helper.js');
+const { build_gene_definition_response } = require('./gene_helper.js');
+const { build_sv_clinvar_response } = require('../structural_variants/clinvar_response_builder.js');
+
+function add_followup_text(handlerInput, speechText) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    melvin_state = sessionAttributes['MELVIN.STATE'];
+    if (_.has(melvin_state, MelvinAttributes.GENE_NAME) || _.has(melvin_state, MelvinAttributes.STUDY_NAME)) {
+        speechText.concat('What would you like to know?');
+    }
+}
 
 function ack_attribute_change(handlerInput, oov_data) {
     let speechText = '';
     if (oov_data['entity_type'] === OOVEntityTypes.GENE) {
         const gene_name = oov_data['entity_data']['value'];
         const gene_speech_text = get_gene_speech_text(gene_name);
-        speechText = `Ok, ${gene_speech_text}. What would you like to know?`
+        speechText = `Ok, ${gene_speech_text}.`;
+        add_followup_text(handlerInput, speechText);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
 
     } else if (oov_data['entity_type'] === OOVEntityTypes.STUDY) {
         const study_name = oov_data['entity_data']['study_name'];
-        speechText = `Ok, ${study_name}. What would you like to know?`;
+        speechText = `Ok, ${study_name}.`;
+        add_followup_text(handlerInput, speechText);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${study_name}`);
 
     } else if (oov_data['entity_type'] === OOVEntityTypes.DSOURCE) {
         const dsource = oov_data['entity_data']['value'];
-        speechText = `Ok, ${dsource}. What would you like to know?`;
+        speechText = `Ok, switching to ${dsource}`;
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dsource}`);
     }
 
@@ -88,7 +101,13 @@ const NavigateJoinFilterIntentHandler = {
                 response = ack_attribute_change(handlerInput, state_change['oov_data']);
 
             } else {
-                if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
+                if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.OVERVIEW) {
+                    response = await build_overview_clinvar_response(melvin_state);
+
+                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
+                    response = await build_gene_definition_response(melvin_state);
+
+                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
                     response = await build_mutations_response(melvin_state);
 
                 } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
@@ -114,6 +133,9 @@ const NavigateJoinFilterIntentHandler = {
                         cnv_change: CNVTypes.ALTERATIONS
                     };
                     response = await build_navigate_cnv_response(params);
+
+                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
+                    response = await build_sv_clinvar_response(melvin_state);
 
                 } else {
                     throw melvin_error(`Unknown data_type found in melvin_state: ${JSON.stringify(melvin_state)}`,
