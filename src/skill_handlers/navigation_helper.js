@@ -30,7 +30,7 @@ const update_melvin_state = async function (handlerInput) {
     let prev_melvin_state, new_melvin_state, oov_data;
     prev_melvin_state = new_melvin_state = oov_data = {};
 
-    if (sessionAttributes['MELVIN.STATE']) {
+    if (_.has(sessionAttributes, 'MELVIN.STATE')) {
         prev_melvin_state = sessionAttributes['MELVIN.STATE'];
     }
 
@@ -88,7 +88,7 @@ function validate_required_attributes(melvin_state) {
 
     const key = melvin_state['data_type'];
     if (!(melvin_state['data_type'] in DataTypes)) {
-        let error = new Error('Error while validating required attributes in melvin_state', melvin_state);
+        let error = new Error('Error while validating data_type in melvin_state', melvin_state);
         error.type = MelvinIntentErrors.INVALID_DATA_TYPE;
         error.speech = "I could not understand that data type. Please try again.";
         throw error;
@@ -97,6 +97,13 @@ function validate_required_attributes(melvin_state) {
     let allowed_list = RequiredAttributesTCGA[key];
     if (_.has(melvin_state, 'data_source') && melvin_state['data_source'] === DataSources.CLINVAR) {
         allowed_list = RequiredAttributesClinvar[key];
+    }
+
+    if (_.isNil(allowed_list)) {
+        let error = new Error('Error while retrieving required attributes in melvin_state', melvin_state);
+        error.type = MelvinIntentErrors.INVALID_STATE;
+        error.speech = `This data type is not supported in ${melvin_state['data_source']}.`;
+        throw error;
     }
 
     const has_gene = !_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]);

@@ -11,8 +11,7 @@
     "resources": [
         {
             "description": "All page resources",
-            "strings": {
-            }
+            "strings": {}
         },
         {
             "description": "Stock color for the light theme",
@@ -128,6 +127,10 @@
                 {
                     "name": "imageURL",
                     "type": "string"
+                },
+                {
+                    "name": "footer_text",
+                    "type": "string"
                 }
             ],
             "items": [
@@ -135,23 +138,28 @@
                     "type": "Container",
                     "width": "100vw",
                     "height": "100vh",
+                    "alignItems": "center",
+                    "justifyContent": "center",
                     "items": [
                         {
-                            "type": "Container",
+                            "type": "Image",
+                            "source": "${imageURL}",
+                            "scale": "best-fit",
                             "width": "100vw",
-                            "height": "100vh",
-                            "alignItems": "center",
-                            "justifyContent": "center",
-                            "items": [
-                                {
-                                    "type": "Image",
-                                    "source": "${imageURL}",
-                                    "scale": "best-fit",
-                                    "width": "100vw",
-                                    "height": "100vh",
-                                    "align": "center"
-                                }
-                            ]
+                            "height": "90vh",
+                            "align": "center"
+                        },
+                        {
+                            "type": "Text",
+                            "width": "100vw",
+                            "height": "10vh",
+                            "paddingLeft": "@spacingSmall",
+                            "paddingRight": "@spacingSmall",
+                            "textAlign": "left",
+                            "textAlignVertical": "center",
+                            "fontSize": "30dp",
+                            "text": "${footer_text}",
+                            "fontWeight": "200"
                         }
                     ]
                 }
@@ -171,7 +179,8 @@
                 "items": [
                     {
                         "type": "Page1",
-                        "imageURL": "${payload.pagerTemplateData.properties.image1.URL}"
+                        "imageURL": "${payload.pagerTemplateData.properties.image1.URL}",
+                        "footer_text": "${payload.pagerTemplateData.footer_text}"
                     }
                 ]
             }
