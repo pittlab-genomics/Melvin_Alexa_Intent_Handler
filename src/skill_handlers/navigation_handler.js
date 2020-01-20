@@ -10,7 +10,8 @@ const {
     melvin_error,
     MELVIN_WELCOME_GREETING,
     MELVIN_APP_NAME,
-    get_gene_speech_text
+    get_gene_speech_text,
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
 const { build_overview_clinvar_response } = require('../overview/clinvar_response_builder.js');
@@ -24,7 +25,7 @@ const { build_sv_clinvar_response } = require('../structural_variants/clinvar_re
 function add_followup_text(handlerInput, speechText) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     melvin_state = sessionAttributes['MELVIN.STATE'];
-    if (_.has(melvin_state, MelvinAttributes.GENE_NAME) || _.has(melvin_state, MelvinAttributes.STUDY_NAME)) {
+    if (!_.has(melvin_state, MelvinAttributes.GENE_NAME) && !_.has(melvin_state, MelvinAttributes.STUDY_NAME)) {
         speechText.concat('What would you like to know?');
     }
 }
@@ -73,7 +74,7 @@ const NavigateStartIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = "Sorry, something went wrong while processing the request. Please try again later.";
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateStartIntentHandler`, error);
         }
@@ -151,7 +152,7 @@ const NavigateJoinFilterIntentHandler = {
             if (error['speech']) {
                 speechText = error['speech'];
             } else {
-                speechText = "Sorry, something went wrong while processing the request. Please try again later.";
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error(`Error in NavigateJoinFilterIntentHandler`, error);
         }

@@ -1,7 +1,15 @@
 const _ = require('lodash');
+const { MelvinAttributes } = require('../common.js');
 
 const APLDocs = {
     image_pager: require('../../resources/APL/image_pager.json'),
+};
+
+const MelvinAttributesLabels = {
+    [MelvinAttributes.GENE_NAME]: "Gene",
+    [MelvinAttributes.STUDY_ABBRV]: "Study",
+    [MelvinAttributes.DTYPE]: "Data-type",
+    [MelvinAttributes.DSOURCE]: "Data-source"
 };
 
 const supportsAPL = function (handlerInput) {
@@ -23,7 +31,18 @@ function build_APL_datasource_properties(url_list) {
     return properties;
 }
 
-
+function build_APL_footer_text(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let melvin_state = {};
+    let footer_text = '';
+    if (_.has(sessionAttributes, 'MELVIN.STATE')) {
+        melvin_state = sessionAttributes['MELVIN.STATE'];
+        footer_text = Object.keys(melvin_state).filter(k => (k in MelvinAttributesLabels)).map(
+            k => `${MelvinAttributesLabels[k]}: ${melvin_state[k]}`
+        ).join("  |  ");
+    }
+    return footer_text;
+}
 
 function build_APL_layouts(url_list) {
     const layouts = {};
@@ -32,6 +51,10 @@ function build_APL_layouts(url_list) {
             {
                 "name": "imageURL",
                 "type": "string"
+            },
+            {
+                "name": "footer_text",
+                "type": "string"
             }
         ],
         "items": [
@@ -39,23 +62,28 @@ function build_APL_layouts(url_list) {
                 "type": "Container",
                 "width": "100vw",
                 "height": "100vh",
+                "alignItems": "center",
+                "justifyContent": "center",
                 "items": [
                     {
-                        "type": "Container",
+                        "type": "Image",
+                        "source": "${imageURL}",
+                        "scale": "best-fit",
                         "width": "100vw",
-                        "height": "100vh",
-                        "alignItems": "center",
-                        "justifyContent": "center",
-                        "items": [
-                            {
-                                "type": "Image",
-                                "source": "${imageURL}",
-                                "scale": "best-fit",
-                                "width": "100vw",
-                                "height": "100vh",
-                                "align": "center"
-                            }
-                        ]
+                        "height": "90vh",
+                        "align": "center"
+                    },
+                    {
+                        "type": "Text",
+                        "width": "100vw",
+                        "height": "10vh",
+                        "paddingLeft": "@spacingSmall",
+                        "paddingRight": "@spacingSmall",
+                        "textAlign": "left",
+                        "textAlignVertical": "center",
+                        "fontSize": "30dp",
+                        "text": "${footer_text}",
+                        "fontWeight": "200"
                     }
                 ]
             }
@@ -79,7 +107,8 @@ function build_APL_main_template_items(url_list) {
 
         let item = {
             "type": type,
-            "imageURL": "${payload.pagerTemplateData.properties." + imageLabel + ".URL}"
+            "imageURL": "${payload.pagerTemplateData.properties." + imageLabel + ".URL}",
+            "footer_text": "${payload.pagerTemplateData.footer_text}"
         };
         items.push(item);
     });
@@ -117,7 +146,8 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
             datasources: {
                 'pagerTemplateData': {
                     'type': 'object',
-                    'properties': build_APL_datasource_properties(url_list)
+                    'properties': build_APL_datasource_properties(url_list),
+                    'footer_text': build_APL_footer_text(handlerInput)
                 },
             },
         });
