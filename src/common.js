@@ -81,7 +81,7 @@ RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
-    "Please try again later."
+    " Please try again later."
 
 const DEFAULT_MELVIN_ERROR_SPEECH_TEXT = "Sorry, I got lost during the conversation. Please start over.";
 
