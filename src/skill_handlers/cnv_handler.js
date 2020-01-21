@@ -1,5 +1,3 @@
-const Speech = require('ssml-builder');
-
 const {
     MelvinAttributes,
     DataTypes,
@@ -8,12 +6,12 @@ const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
-const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
-const { build_navigate_cnv_response } = require('./cnv_helper.js');
+const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
+
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require('./navigation_helper.js');
+} = require('../navigation/navigation_helper.js');
 
 const CNVAmplificationGeneIntentHandler = {
     canHandle(handlerInput) {
@@ -29,8 +27,7 @@ const CNVAmplificationGeneIntentHandler = {
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.AMPLIFICATIONS
         };
-        const cnv_response = await build_navigate_cnv_response(params);
-        add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
         speechText = cnv_response['speech_text'];
 
         return handlerInput.responseBuilder
@@ -53,8 +50,7 @@ const CNVDeletionGeneIntent = {
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.DELETIONS
         };
-        const cnv_response = await build_navigate_cnv_response(params);
-        add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
         speechText = cnv_response['speech_text'];
 
         return handlerInput.responseBuilder
@@ -77,8 +73,7 @@ const CNVAlterationGeneIntent = {
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.ALTERATIONS
         };
-        const cnv_response = await build_navigate_cnv_response(params);
-        add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
         speechText = cnv_response['speech_text'];
 
         return handlerInput.responseBuilder
@@ -104,8 +99,7 @@ const NavigateCNVIntentHandler = {
                 ...melvin_state,
                 cnv_change: CNVTypes.ALTERATIONS
             };
-            const cnv_response = await build_navigate_cnv_response(params);
-            add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
             speechText = cnv_response['speech_text'];
 
         } catch (error) {
@@ -139,8 +133,7 @@ const NavigateCNVAmplificationsIntentHandler = {
                 ...melvin_state,
                 cnv_change: CNVTypes.AMPLIFICATIONS
             };
-            const cnv_response = await build_navigate_cnv_response(params);
-            add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
             speechText = cnv_response['speech_text'];
 
         } catch (error) {
@@ -174,8 +167,7 @@ const NavigateCNVDeletionsIntentHandler = {
                 ...melvin_state,
                 cnv_change: CNVTypes.DELETIONS
             };
-            const cnv_response = await build_navigate_cnv_response(params);
-            add_to_APL_image_pager(handlerInput, cnv_response['image_list']);
+            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
             speechText = cnv_response['speech_text'];
 
         } catch (error) {

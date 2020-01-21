@@ -18,14 +18,14 @@ const {
     build_mutations_clinvar_response
 } = require('../mutations/clinvar_response_builder.js');
 
-async function build_mutations_response(params) {
+async function build_mutations_response(handlerInput, params) {
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_response(params);
+        response = await build_mutations_tcga_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = await build_mutations_clinvar_response(params);
+        response = await build_mutations_clinvar_response(handlerInput, params);
 
     } else {
         throw melvin_error(
@@ -37,13 +37,16 @@ async function build_mutations_response(params) {
     return response;
 }
 
-async function build_mutations_domain_response(params) {
+async function build_mutations_domain_response(handlerInput, params) {
     console.info(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_domain_response(params);
+        response = await build_mutations_tcga_domain_response(handlerInput, params);
 
-    } else if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
+    } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
+        response = {
+            'speech_text': "Mutation domains analysis is not supported in clinvar."
+        };
 
     } else {
         throw melvin_error(

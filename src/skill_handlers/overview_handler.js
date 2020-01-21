@@ -3,14 +3,12 @@ const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
-const { build_overview_clinvar_response } = require('../overview/clinvar_response_builder.js');
+const { build_overview_response } = require('../overview/overview_helper.js');
 
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require('./navigation_helper.js');
-
-const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
+} = require('../navigation/navigation_helper.js');
 
 const NavigateOverviewIntentHandler = {
     canHandle(handlerInput) {
@@ -22,8 +20,7 @@ const NavigateOverviewIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.OVERVIEW);
-            const overview_response = await build_overview_clinvar_response(melvin_state);
-            add_to_APL_image_pager(handlerInput, overview_response['image_list']);
+            const overview_response = await build_overview_response(handlerInput, melvin_state);
             speechText = overview_response['speech_text'];
 
         } catch (error) {

@@ -1,7 +1,7 @@
 const URL = require('url').URL;
 const Speech = require('ssml-builder');
 const _ = require('lodash');
-
+const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 const { add_query_params } = require('../utils/response_builder_utils.js');
 
 const {
@@ -76,7 +76,7 @@ function _populate_overview_by_study_response(params, gene_mut_list, speech) {
     }
 }
 
-async function build_overview_clinvar_response(params) {
+async function build_overview_clinvar_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const response = await get_overview_clinvar_stats(params);
@@ -105,9 +105,9 @@ async function build_overview_clinvar_response(params) {
         );
     }
 
+    add_to_APL_image_pager(handlerInput, image_list);
     return {
-        'speech_text': speech.ssml(),
-        'image_list': image_list
+        'speech_text': speech.ssml()
     }
 }
 

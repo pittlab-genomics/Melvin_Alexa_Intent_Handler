@@ -43,6 +43,9 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNV_wi
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateJoinIntent_SV_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_Mutations_TP53_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_SV-MD_TP53_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
