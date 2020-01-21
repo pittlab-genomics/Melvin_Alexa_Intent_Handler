@@ -5,7 +5,7 @@ const URL = require('url').URL;
 const { get_clinical_trials } = require('../http_clients/clinical_trials_client.js');
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 const { add_query_list_params } = require('../utils/response_builder_utils.js');
-const { get_melvin_state } = require('./navigation_helper.js');
+const { get_melvin_state } = require('../navigation/navigation_helper.js');
 
 const {
     MelvinAttributes,

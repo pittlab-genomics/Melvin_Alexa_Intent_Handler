@@ -14,14 +14,12 @@ const {
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require('./navigation_helper.js');
+} = require('../navigation/navigation_helper.js');
 
 const {
     build_mutations_response,
     build_mutations_domain_response
-} = require('./mutations_helper.js');
-
-const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
+} = require('../mutations/mutations_helper.js');
 
 
 const MutationCountIntentHandler = {
@@ -154,8 +152,7 @@ const NavigateMutationsIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATIONS);
-            const response = await build_mutations_response(melvin_state);
-            add_to_APL_image_pager(handlerInput, response['image_list']);
+            const response = await build_mutations_response(handlerInput, melvin_state);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -185,8 +182,7 @@ const NavigateMutationsDomainIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATION_DOMAINS);
-            const domain_response = await build_mutations_domain_response(melvin_state);
-            add_to_APL_image_pager(handlerInput, domain_response['image_list']);
+            const domain_response = await build_mutations_domain_response(handlerInput, melvin_state);
             speechText = domain_response['speech_text'];
 
         } catch (error) {

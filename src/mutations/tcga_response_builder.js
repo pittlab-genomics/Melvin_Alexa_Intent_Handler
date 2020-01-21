@@ -1,7 +1,7 @@
 const URL = require('url').URL;
 const Speech = require('ssml-builder');
 const _ = require('lodash');
-
+const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
 const { round, add_query_params } = require('../utils/response_builder_utils.js');
 
 const {
@@ -19,7 +19,7 @@ const {
     get_mutations_tcga_domain_stats
 } = require('../http_clients/mutations_tcga_client.js');
 
-async function build_mutations_tcga_response(params) {
+async function build_mutations_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const response = await get_mutations_tcga_stats(params);
@@ -89,9 +89,9 @@ async function build_mutations_tcga_response(params) {
         );
     }
 
+    add_to_APL_image_pager(handlerInput, image_list);
     return {
-        'speech_text': speech.ssml(),
-        'image_list': image_list
+        'speech_text': speech.ssml()
     }
 }
 
@@ -130,7 +130,7 @@ function _populate_domain_response(params, records_list, speech, gene_speech_tex
 }
 
 
-async function build_mutations_tcga_domain_response(params) {
+async function build_mutations_tcga_domain_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const response = await get_mutations_tcga_domain_stats(params);
@@ -163,9 +163,9 @@ async function build_mutations_tcga_domain_response(params) {
         );
     }
 
+    add_to_APL_image_pager(handlerInput, image_list);
     return {
-        'speech_text': speech.ssml(),
-        'image_list': image_list
+        'speech_text': speech.ssml()
     }
 }
 

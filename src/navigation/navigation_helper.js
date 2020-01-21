@@ -86,7 +86,7 @@ function validate_required_attributes(melvin_state) {
         return;
     }
 
-    const key = melvin_state['data_type'];
+    const attr_key = melvin_state['data_type'];
     if (!(melvin_state['data_type'] in DataTypes)) {
         let error = new Error('Error while validating data_type in melvin_state', melvin_state);
         error.type = MelvinIntentErrors.INVALID_DATA_TYPE;
@@ -94,18 +94,19 @@ function validate_required_attributes(melvin_state) {
         throw error;
     }
 
-    let allowed_list = RequiredAttributesTCGA[key];
+    let req_attr_dict = RequiredAttributesTCGA;
     if (_.has(melvin_state, 'data_source') && melvin_state['data_source'] === DataSources.CLINVAR) {
-        allowed_list = RequiredAttributesClinvar[key];
+        req_attr_dict = RequiredAttributesClinvar;
     }
 
-    if (_.isNil(allowed_list)) {
+    if (!_.has(req_attr_dict, attr_key) || !_.isArray(req_attr_dict[attr_key])) {
         let error = new Error('Error while retrieving required attributes in melvin_state', melvin_state);
         error.type = MelvinIntentErrors.INVALID_STATE;
         error.speech = `This data type is not supported in ${melvin_state['data_source']}.`;
         throw error;
     }
 
+    const required_attributes = req_attr_dict[attr_key];
     const has_gene = !_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]);
     const has_study = !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV]);
 
@@ -116,7 +117,7 @@ function validate_required_attributes(melvin_state) {
     if (has_study) {
         code += 1;
     }
-    const is_valid = allowed_list.includes(code);
+    const is_valid = required_attributes.includes(code);
 
     if (!is_valid && !has_gene) {
         let error = new Error('Error while validating required attributes in melvin_state', melvin_state);

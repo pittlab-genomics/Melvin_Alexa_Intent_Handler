@@ -1,8 +1,8 @@
 const URL = require('url').URL;
 const Speech = require('ssml-builder');
 const _ = require('lodash');
-
-const { round, add_query_params } = require('../utils/response_builder_utils.js');
+const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
+const { add_query_params } = require('../utils/response_builder_utils.js');
 
 const {
     MelvinAttributes,
@@ -29,7 +29,7 @@ function _populate_response(params, data, speech) {
         .say(`in ${params[MelvinAttributes.STUDY_NAME]}`);
 }
 
-async function build_mutations_clinvar_response(params) {
+async function build_mutations_clinvar_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const response = await get_mutations_clinvar_stats(params);
@@ -53,9 +53,9 @@ async function build_mutations_clinvar_response(params) {
         );
     }
 
+    add_to_APL_image_pager(handlerInput, image_list);
     return {
-        'speech_text': speech.ssml(),
-        'image_list': image_list
+        'speech_text': speech.ssml()
     }
 }
 
