@@ -37,7 +37,7 @@ function ack_attribute_change(handlerInput, oov_data) {
     if (oov_data['entity_type'] === OOVEntityTypes.GENE) {
         const gene_name = oov_data['entity_data']['value'];
         const gene_speech_text = get_gene_speech_text(gene_name);
-        speech.say(`Ok, ${gene_speech_text}.`);
+        speech.sayWithSSML(`Ok, ${gene_speech_text}.`);
         add_followup_text(handlerInput, speech);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
 
