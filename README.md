@@ -29,9 +29,11 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateGene_payloa
 serverless invoke local --function alexa-skill -p ./examples/NavigateGeneDefinition_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_payload.json
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_gene_payload.json
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_gene_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_payload.json
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMutationsIntent_payload.json
 
