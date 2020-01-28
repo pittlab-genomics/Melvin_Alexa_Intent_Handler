@@ -76,7 +76,7 @@ RequiredAttributesTCGA[DataTypes.CNV_AMPLIFICATIONS] = [3, 1]; // ['GC', 'C'];
 RequiredAttributesTCGA[DataTypes.CNV_DELETIONS] = [3, 1]; // ['GC', 'C'];
 
 const RequiredAttributesClinvar = {};
-RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1]; // ['C'];
+RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 

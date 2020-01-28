@@ -27,25 +27,24 @@ function build_cnv_alterations_response(params, response, speech) {
         const amplifications = round(response['data']['amplifications_percentage'], 1);
         const deletions = round(response['data']['deletions_percentage'], 1);
         speech
+            .say(`In ${study} patients,`)
             .sayWithSSML(gene_speech_text)
-            .say(`is amplified in ${amplifications} percent of ${study}`)
-            .say(`patients while deleted in ${deletions} percent`);
+            .say(`is amplified ${amplifications} percent`)
+            .say(`and deleted ${deletions} percent.`);
 
     } else if (
-        (params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.AMPLIFICATIONS)
-        && response['data']['amplifications_percentage']
+        params.cnv_change == CNVTypes.AMPLIFICATIONS && response['data']['amplifications_percentage']
     ) {
         build_cnv_amplifications_response(params, response, speech)
 
     } else if (
-        (params.cnv_change == CNVTypes.ALTERATIONS || params.cnv_change == CNVTypes.DELETIONS)
-        && response['data']['deletions_percentage']
+        params.cnv_change == CNVTypes.DELETIONS && response['data']['deletions_percentage']
     ) {
         build_cnv_deletions_response(params, response, speech)
 
     } else {
         speech
-            .say(`Sorry, I could not find copy number alterations data for ${study} in`)
+            .say(`I could not find any copy number alterations for ${study} in`)
             .sayWithSSML(gene_speech_text);
     }
 }
@@ -55,8 +54,9 @@ function build_cnv_deletions_response(params, response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const study = params[MelvinAttributes.STUDY_NAME];
     speech
+        .say(`In ${study} patients,`)
         .sayWithSSML(gene_speech_text)
-        .say(`is deleted in ${deletions} percent of ${study} patients`);
+        .say(`is deleted ${deletions} percent.`);
 
 }
 
@@ -65,8 +65,9 @@ function build_cnv_amplifications_response(params, response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const study = params[MelvinAttributes.STUDY_NAME];
     speech
+        .say(`In ${study} patients,`)
         .sayWithSSML(gene_speech_text)
-        .say(`is amplified in ${amplifications} percent of ${study} patients.`);
+        .say(`is amplified ${amplifications} percent.`);
 }
 
 function build_cnv_by_study_response(params, response, speech) {
@@ -98,7 +99,7 @@ function build_cnv_by_study_response(params, response, speech) {
                 .say(`${round(records_list[0]['cna_percentage'], 1)} percent`);
 
         } else {
-            speech.say('There were no copy number alterations found.');
+            speech.say(`I could not find copy number alterations for ${study}.`);
         }
 
     } else {
