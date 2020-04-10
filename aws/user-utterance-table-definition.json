@@ -1,0 +1,45 @@
+{
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "user_id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "createdAt",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "utterance_id",
+      "AttributeType": "S"
+    }
+  ],
+  "TableName": "_MELVIN_DYNAMODB_TABLE_NAME",
+  "KeySchema": [
+    {
+      "AttributeName": "user_id",
+      "KeyType": "HASH"
+    },
+    {
+      "AttributeName": "createdAt",
+      "KeyType": "RANGE"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GlobalCreatedAtIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "user_id",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "utterance_id",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "KEYS_ONLY"
+      }
+    }
+  ]
+}

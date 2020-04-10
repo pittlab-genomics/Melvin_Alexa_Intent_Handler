@@ -1,9 +1,17 @@
 'use strict';
 
 const Alexa = require('ask-sdk-core');
+const moment = require('moment');
 
-const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME } = require('./common.js');
-const { RequestLogInterceptor, ResponseLogInterceptor } = require('./interceptors.js');
+const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME, MelvinEventTypes } = require('./common.js');
+const { add_event_configuration } = require('./navigation/handler_configuration.js');
+
+const {
+    RequestLogInterceptor,
+    ResponseLogInterceptor,
+    UserUtteranceTrackInterceptor
+} = require('./interceptors.js');
+
 const {
     SearchGeneIntentHandler,
     NavigateGeneDefinitionIntentHandler
@@ -41,13 +49,25 @@ const {
     ClinicalTrialClosestIntentHandler
 } = require('./skill_handlers/clinical_trials_handler.js');
 
+const sessions_doc = require('./dao/sessions.js');
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
     },
-    handle(handlerInput) {
-        const reprompt_text = 'What would you like to know? You can ask me about a gene or cancer type.'
+    async handle(handlerInput) {
+        if (handlerInput.requestEnvelope.session.new) {
+            const new_session_rec = {
+                'user_id': handlerInput.requestEnvelope.session.user.userId,
+                'session_start': moment(handlerInput.requestEnvelope.request.timestamp).valueOf(),
+                'session_id': handlerInput.requestEnvelope.session.sessionId,
+                'request': handlerInput.requestEnvelope.request,
+                'device': handlerInput.requestEnvelope.context.System.device
+            };
+            await sessions_doc.addUserSession(new_session_rec);
+        }
 
+        const reprompt_text = 'What would you like to know? You can ask me about a gene or cancer type.'
         return handlerInput.responseBuilder
             .speak(MELVIN_WELCOME_GREETING)
             .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
@@ -116,6 +136,8 @@ const IntentReflectorHandler = {
     }
 };
 
+
+
 // Generic error handling to capture any syntax or routing errors. If you receive an error
 // stating the request handler chain is not found, you have not implemented a handler for
 // the intent being invoked or included it in the skill builder below.
@@ -134,12 +156,35 @@ const ErrorHandler = {
     }
 };
 
+add_event_configuration("SearchGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, SearchGeneIntentHandler);
+add_event_configuration("CNVAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVAmplificationGeneIntentHandler);
+add_event_configuration("CNVDeletionGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVDeletionGeneIntent);
+add_event_configuration("CNVAlterationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVAlterationGeneIntent);
+add_event_configuration("MutationCountIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationCountIntentHandler);
+add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationPercentageIntentHandler);
+add_event_configuration("NavigateStartIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateStartIntentHandler);
+add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateResetIntentHandler);
+add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateGeneDefinitionIntentHandler);
+add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
+add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
+add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
+add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
+add_event_configuration("NavigateCNVIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVIntentHandler);
+add_event_configuration("NavigateCNVAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVAmplificationsIntentHandler);
+add_event_configuration("NavigateCNVDeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVDeletionsIntentHandler);
+add_event_configuration("NavigateEmailIntent", MelvinEventTypes.IRS_EVENT, NavigateEmailIntentHandler);
+add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.IRS_EVENT, ClinicalTrialsNearbyIntentHandler);
+add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.IRS_EVENT, ClinicalTrialsWithinIntentHandler);
+add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.IRS_EVENT, ClinicalTrialClosestIntentHandler);
+
+
 // This handler acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestInterceptors(RequestLogInterceptor)
     .addResponseInterceptors(ResponseLogInterceptor)
+    .addResponseInterceptors(UserUtteranceTrackInterceptor)
     .addRequestHandlers(
         LaunchRequestHandler,
         SearchGeneIntentHandler,

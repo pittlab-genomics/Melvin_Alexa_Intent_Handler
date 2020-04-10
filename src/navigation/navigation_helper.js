@@ -1,7 +1,9 @@
 const Speech = require('ssml-builder');
 const _ = require('lodash');
 const yaml = require('js-yaml');
+const moment = require('moment');
 
+const utterances_doc = require('../dao/utterances.js');
 const { get_oov_mapping_by_query } = require('../http_clients/oov_mapper_client.js');
 const {
     MelvinAttributes,
@@ -14,6 +16,8 @@ const {
     melvin_error
 } = require('../common.js');
 
+const { get_event_type } = require('./handler_configuration.js');
+
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
 
 const get_melvin_state = function (handlerInput) {
@@ -23,6 +27,15 @@ const get_melvin_state = function (handlerInput) {
         melvin_state = sessionAttributes['MELVIN.STATE'];
     }
     return melvin_state;
+}
+
+const get_melvin_history = function (handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let melvin_history = [];
+    if (sessionAttributes['MELVIN.HISTORY']) {
+        melvin_history = sessionAttributes['MELVIN.HISTORY'];
+    }
+    return melvin_history;
 }
 
 const update_melvin_state = async function (handlerInput) {
@@ -78,7 +91,38 @@ const update_melvin_state = async function (handlerInput) {
         "new_melvin_state": new_melvin_state,
         "oov_data": oov_data
     }
-}
+};
+
+const update_melvin_history = async function (handlerInput) {
+    const timestamp = moment().valueOf();
+    const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
+    const melvin_state = get_melvin_state(handlerInput);
+
+    // store utterance as a session attribute for faster navigation
+    const melvin_history = get_melvin_history(handlerInput);
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const event_type = get_event_type(handlerInput);
+    const history_event = {
+        melvin_state: melvin_state,
+        intent: handlerInput.requestEnvelope.request.intent.name,
+        event_type: event_type
+    };
+    melvin_history.push(history_event);
+    sessionAttributes['MELVIN.HISTORY'] = melvin_history;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+    const new_utterance_rec = {
+        'user_id': handlerInput.requestEnvelope.session.user.userId,
+        'utterance_id': utterance_id,
+        'createdAt': timestamp,
+        'request': handlerInput.requestEnvelope.request,
+        'device': handlerInput.requestEnvelope.context.System.device,
+        'melvin_state': melvin_state,
+        'melvin_history': melvin_history
+    };
+    await utterances_doc.addUserUtterance(new_utterance_rec);
+};
+
 
 function validate_required_attributes(melvin_state) {
     console.log(`[validate_required_attributes] | melvin_state: ${JSON.stringify(melvin_state)}`);
@@ -132,7 +176,7 @@ function validate_required_attributes(melvin_state) {
         error.speech = "I need to know a cancer type first. What cancer type are you interested in?";
         throw error;
     }
-}
+};
 
 const validate_navigation_intent_state = function (handlerInput, state_change) {
     console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
@@ -152,7 +196,7 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     validate_required_attributes(melvin_state);
     return melvin_state;
-}
+};
 
 const validate_action_intent_state = function (handlerInput, state_change, intent_data_type) {
     console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
@@ -172,12 +216,14 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     validate_required_attributes(melvin_state);
     return melvin_state;
-}
+};
 
 module.exports = {
     NAVIGATION_TOPICS,
     get_melvin_state,
+    get_melvin_history,
     update_melvin_state,
+    update_melvin_history,
     validate_navigation_intent_state,
     validate_action_intent_state,
 }

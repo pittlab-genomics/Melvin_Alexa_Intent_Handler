@@ -1,0 +1,45 @@
+{
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "user_id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "session_start",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "session_id",
+      "AttributeType": "S"
+    }
+  ],
+  "TableName": "_MELVIN_DYNAMODB_TABLE_NAME",
+  "KeySchema": [
+    {
+      "KeyType": "HASH",
+      "AttributeName": "user_id"
+    },
+    {
+      "KeyType": "RANGE",
+      "AttributeName": "session_start"
+    }
+  ],
+  "LocalSecondaryIndexes": [
+    {
+      "IndexName": "LocalSessionIdIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "user_id",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "session_id",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "KEYS_ONLY"
+      }
+    }
+  ]
+}

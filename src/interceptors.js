@@ -1,4 +1,4 @@
-
+const { update_melvin_history } = require('./navigation/navigation_helper.js');
 
 const RequestLogInterceptor = {
     process(handlerInput) {
@@ -12,7 +12,14 @@ const ResponseLogInterceptor = {
     },
 };
 
+const UserUtteranceTrackInterceptor = {
+    async process(handlerInput) {
+        update_melvin_history(handlerInput);
+    },
+}
+
 module.exports = {
     RequestLogInterceptor,
-    ResponseLogInterceptor
+    ResponseLogInterceptor,
+    UserUtteranceTrackInterceptor
 }

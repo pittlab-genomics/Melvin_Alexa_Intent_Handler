@@ -3,6 +3,13 @@ const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
 
 // common types
 
+const MelvinEventTypes = {
+    ANALYSIS_EVENT: "analysis_event",
+    NAVIGATION_EVENT: "navigation_event",
+    IRS_EVENT: "irs_event",
+    UNKNOWN: "unknown"
+}
+
 const MelvinAttributes = {
     GENE_NAME: "gene_name",
     STUDY_NAME: "study_name",
@@ -103,6 +110,7 @@ module.exports = {
     OOV_MAPPER_ENDPOINT: process.env.OOV_MAPPER_ENDPOINT,
     MELVIN_APP_NAME: process.env.MELVIN_APP_NAME,
     MelvinAttributes,
+    MelvinEventTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
