@@ -111,7 +111,7 @@ const update_melvin_history = async function (handlerInput) {
     const melvin_state = get_melvin_state(handlerInput);
 
     // store utterance as a session attribute for faster navigation
-    const melvin_history = get_melvin_history(handlerInput);
+    let melvin_history = get_melvin_history(handlerInput);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const event_type = get_event_type(handlerInput);
 

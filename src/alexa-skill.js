@@ -182,7 +182,7 @@ add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_
 add_event_configuration("NavigateStartIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateStartIntentHandler);
 add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateResetIntentHandler);
 add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRestoreSessionIntentHandler);
-add_event_configuration("NavigateGoBackIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateGoBackIntentHandler);
+add_event_configuration("NavigateGoBackIntent", MelvinEventTypes.NAVIGATION_REVERT_EVENT, NavigateGoBackIntentHandler);
 add_event_configuration("NavigateRepeatIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRepeatIntentHandler);
 
 

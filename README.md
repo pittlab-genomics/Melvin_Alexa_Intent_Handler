@@ -17,8 +17,6 @@ serverless deploy
 
 ## Test Locally
 
-serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_payload.json
-
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_query_payload.json
 
@@ -60,8 +58,11 @@ serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialCloses
 
 
 ### Navigation
+serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/TestMelvinHistory_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateRestoreSessionIntent_payload.json
+
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_1_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
 

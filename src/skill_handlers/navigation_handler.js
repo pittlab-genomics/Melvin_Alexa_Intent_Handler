@@ -17,6 +17,8 @@ const {
     ack_attribute_change
 } = require('../navigation/navigation_helper.js');
 
+const sessions_doc = require('../dao/sessions.js');
+const utterances_doc = require('../dao/utterances.js');
 
 const NavigateStartIntentHandler = {
     canHandle(handlerInput) {
@@ -105,13 +107,52 @@ const NavigateRestoreSessionIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === 'NavigateRestoreSessionIntent';
     },
     async handle(handlerInput) {
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
+        let speechText = "";
+        let repromptText = "";
+        const user_id = handlerInput.requestEnvelope.session.user.userId;
+        const curr_session_id = handlerInput.requestEnvelope.session.sessionId;
 
+        let recent_session = await sessions_doc.getMostRecentSession(user_id);
+        recent_session = recent_session.filter(item => item['session_id'] != curr_session_id); // filter current session
+        if (recent_session.length == 0) {
+            speechText = "I could not find any previous sessions.";
+            repromptText = "There were no previous sessions. Please continue with current analysis.";
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(repromptText)
+                .getResponse();
+        }
+
+        const utterance_list = await utterances_doc.getMostRecentUtterance(user_id, recent_session[0]['session_id']);
+        console.debug(`[NavigateRestoreSessionIntentHandler] recent_utterance: ${JSON.stringify(utterance_list)}`);
+
+        if (utterance_list.length == 0) {
+            speechText = "Something went wrong while restoring the session. Please try again later.";
+            repromptText = "Something went wrong while restoring the session. Please try again later.";
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(repromptText)
+                .getResponse();
+        }
+
+        const melvin_state = utterance_list[0]['melvin_state'];
+        const melvin_history = utterance_list[0]['melvin_history'];
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        sessionAttributes['MELVIN.HISTORY'] = melvin_history;
+        sessionAttributes['MELVIN.STATE'] = melvin_state;
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        speechText = `Ok. Your last session was restored.`;
+        repromptText = "You may continue from your last analysis now."
+
+        let card_text_list = [];
+        for (let key in melvin_state) {
+            card_text_list.push(`${key}: ${melvin_state[key]}`);
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(reprompt_text)
-            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
+            .reprompt(repromptText)
+            .withSimpleCard(MELVIN_APP_NAME, card_text_list.join(" | "))
             .getResponse();
     }
 };

@@ -15,8 +15,11 @@ const get_event_type = function (handlerInput) {
         }
         return MelvinEventTypes.UNMAPPED_EVENT;
 
-    } else if (_.get(handlerInput, "requestEnvelope.request.intent.type") === "LaunchRequest") {
-        return MelvinEventTypes.NAVIGATION_EVENT;
+    } else if (_.get(handlerInput, "requestEnvelope.request.type") === "LaunchRequest") {
+        return MelvinEventTypes.LAUNCH_EVENT;
+
+    } else if (_.get(handlerInput, "requestEnvelope.request.type") === "SessionEndedRequest") {
+        return MelvinEventTypes.SESSION_ENDED_EVENT;
 
     } else {
         return MelvinEventTypes.UNKNOWN_EVENT;

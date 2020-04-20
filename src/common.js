@@ -3,13 +3,15 @@ const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
 
 // common types
 
-const MELVIN_MAX_HISTORY_ITEMS = 10;
+const MELVIN_MAX_HISTORY_ITEMS = 30;
 const FOLLOW_UP_TEXT_THRESHOLD = 2;
 
 const MelvinEventTypes = {
     ANALYSIS_EVENT: "analysis_event",
     NAVIGATION_REVERT_EVENT: "navigation_revert_event",
     NAVIGATION_EVENT: "navigation_event",
+    LAUNCH_EVENT: "launch_event",
+    SESSION_ENDED_EVENT: "session_ended",
     IRS_EVENT: "irs_event",
     UNMAPPED_EVENT: "unmapped_event",
     UNKNOWN_EVENT: "unknown_event"
