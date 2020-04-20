@@ -8,11 +8,19 @@ const handler_map = {
 };
 
 const get_event_type = function (handlerInput) {
-    const intent_name = handlerInput.requestEnvelope.request.intent.name;
-    if (_.has(handler_map, intent_name)) {
-        return handler_map[intent_name]['event'];
+    if (_.has(handlerInput, "requestEnvelope.request.intent.name")) {
+        const intent_name = handlerInput.requestEnvelope.request.intent.name;
+        if (_.has(handler_map, intent_name)) {
+            return handler_map[intent_name]['event'];
+        }
+        return MelvinEventTypes.UNMAPPED_EVENT;
+
+    } else if (_.get(handlerInput, "requestEnvelope.request.intent.type") === "LaunchRequest") {
+        return MelvinEventTypes.NAVIGATION_EVENT;
+
+    } else {
+        return MelvinEventTypes.UNKNOWN_EVENT;
     }
-    return MelvinEventTypes.UNKNOWN;
 }
 
 const add_event_configuration = function (name, event, intent) {

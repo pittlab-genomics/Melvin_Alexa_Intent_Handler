@@ -52,10 +52,17 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFi
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_SV-MD_TP53_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
-
 
 ### Clinical Trials
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsNearbyIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsWithinIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialClosestIntent_payload.json
+
+
+### Navigation
+serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/TestMelvinHistory_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_1_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
+
+

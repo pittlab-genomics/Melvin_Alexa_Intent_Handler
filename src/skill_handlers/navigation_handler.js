@@ -2,61 +2,21 @@ const Speech = require('ssml-builder');
 const _ = require('lodash');
 
 const {
-    MelvinAttributes,
-    DataTypes,
-    OOVEntityTypes,
-    CNVTypes,
-    MelvinIntentErrors,
-    melvin_error,
+    MelvinEventTypes,
     MELVIN_WELCOME_GREETING,
     MELVIN_APP_NAME,
-    get_gene_speech_text,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
-const { build_overview_response } = require('../overview/overview_helper.js');
-const { build_mutations_response, build_mutations_domain_response } = require('../mutations/mutations_helper.js');
-const { update_melvin_state, validate_navigation_intent_state } = require('../navigation/navigation_helper.js');
-const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
-const { build_gene_definition_response } = require('./gene_handler.js');
-const { build_sv_response } = require('../structural_variants/sv_helper.js');
+const {
+    update_melvin_state,
+    validate_navigation_intent_state,
+    get_melvin_history,
+    get_melvin_state,
+    build_navigation_response,
+    ack_attribute_change
+} = require('../navigation/navigation_helper.js');
 
-const FOLLOW_UP_TEXT_THRESHOLD = 2;
-
-function add_followup_text(handlerInput, speech) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    melvin_state = sessionAttributes['MELVIN.STATE'];
-    if (Object.keys(melvin_state).length <= FOLLOW_UP_TEXT_THRESHOLD) {
-        speech.prosody({ rate: '110%' }, 'What would you like to know?');
-    }
-}
-
-function ack_attribute_change(handlerInput, oov_data) {
-    const speech = new Speech();
-
-    if (oov_data['entity_type'] === OOVEntityTypes.GENE) {
-        const gene_name = oov_data['entity_data']['value'];
-        const gene_speech_text = get_gene_speech_text(gene_name);
-        speech.sayWithSSML(`Ok, ${gene_speech_text}.`);
-        add_followup_text(handlerInput, speech);
-        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
-
-    } else if (oov_data['entity_type'] === OOVEntityTypes.STUDY) {
-        const study_name = oov_data['entity_data']['study_name'];
-        speech.say(`Ok, ${study_name}.`);
-        add_followup_text(handlerInput, speech);
-        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${study_name}`);
-
-    } else if (oov_data['entity_type'] === OOVEntityTypes.DSOURCE) {
-        const dsource = oov_data['entity_data']['value'];
-        speech.say(`Ok, switching to ${dsource}.`);
-        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dsource}`);
-    }
-
-    return {
-        'speech_text': speech.ssml()
-    };
-}
 
 const NavigateStartIntentHandler = {
     canHandle(handlerInput) {
@@ -99,54 +59,7 @@ const NavigateJoinFilterIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_navigation_intent_state(handlerInput, state_change);
-            let response = {};
-            if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
-                response = ack_attribute_change(handlerInput, state_change['oov_data']);
-
-            } else {
-                if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.OVERVIEW) {
-                    response = await build_overview_response(handlerInput, melvin_state);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
-                    response = await build_gene_definition_response(melvin_state);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
-                    response = await build_mutations_response(handlerInput, melvin_state);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
-                    response = await build_mutations_domain_response(handlerInput, melvin_state);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_AMPLIFICATIONS) {
-                    const params = {
-                        ...melvin_state,
-                        cnv_change: CNVTypes.APLIFICATIONS
-                    };
-                    response = await build_navigate_cnv_response(handlerInput, params);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
-                    const params = {
-                        ...melvin_state,
-                        cnv_change: CNVTypes.DELETIONS
-                    };
-                    response = await build_navigate_cnv_response(handlerInput, params);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
-                    const params = {
-                        ...melvin_state,
-                        cnv_change: CNVTypes.ALTERATIONS
-                    };
-                    response = await build_navigate_cnv_response(handlerInput, params);
-
-                } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
-                    response = await build_sv_response(handlerInput, melvin_state);
-
-                } else {
-                    throw melvin_error(`Unknown data_type found in melvin_state: ${JSON.stringify(melvin_state)}`,
-                        MelvinIntentErrors.INVALID_DATA_TYPE);
-                }
-            }
-
-            console.log(`[NavigateJoinFilterIntentHandler] response = ${JSON.stringify(response)}`);
+            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -155,10 +68,10 @@ const NavigateJoinFilterIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error(`Error in NavigateJoinFilterIntentHandler`, error);
+            console.error(`[NavigateJoinFilterIntentHandler] Error! except: `, error);
         }
 
-        console.log("SPEECH TEXT = " + speechText);
+        console.log("[NavigateJoinFilterIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -169,7 +82,7 @@ const NavigateJoinFilterIntentHandler = {
 const NavigateResetIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateReset';
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateResetIntent';
     },
     async handle(handlerInput) {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -186,8 +99,119 @@ const NavigateResetIntentHandler = {
     }
 };
 
+const NavigateRestoreSessionIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateRestoreSessionIntent';
+    },
+    async handle(handlerInput) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(reprompt_text)
+            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
+            .getResponse();
+    }
+};
+
+const NavigateRepeatIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateRepeatIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+        try {
+            const melvin_state = get_melvin_state(handlerInput);
+            let response = await build_navigation_response(handlerInput, melvin_state);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
+            }
+            console.error(`[NavigateRepeatIntentHandler] Error! except: `, error);
+        }
+
+        console.log("SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+};
+
+const NavigateGoBackIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateGoBackIntent';
+    },
+    async handle(handlerInput) {
+        const melvin_history = get_melvin_history(handlerInput);
+        console.debug("[NavigateGoBackIntentHandler] melvin_history: " + JSON.stringify(melvin_history));
+        let go_back_counter = 1;
+        let prev_item = 0;
+
+        for (let item in melvin_history) {
+            let item_event_type = melvin_history[item]['event_type'];
+            if (item_event_type === MelvinEventTypes.ANALYSIS_EVENT) {
+                if (go_back_counter <= 0) {
+                    prev_item = melvin_history[item];
+                    break;
+                }
+                go_back_counter -= 1;
+                console.debug(`[NavigateGoBackIntentHandler] decrement go_back_counter: ${go_back_counter}`)
+
+            } else if (item_event_type === MelvinEventTypes.NAVIGATION_REVERT_EVENT) {
+                go_back_counter += 1;
+                console.debug(`[NavigateGoBackIntentHandler] increment go_back_counter: ${go_back_counter}`)
+
+            }
+        }
+        console.debug("[NavigateGoBackIntentHandler] prev_item: " + JSON.stringify(prev_item));
+
+        if (prev_item == 0) {
+            const speechText = `You have reached the end of analysis series. Please provide a new query.`;
+            return handlerInput.responseBuilder
+                .speak(speechText)
+                .reprompt(speechText)
+                .getResponse();
+        }
+
+        let speechText = '';
+        try {
+            const melvin_state = prev_item['melvin_state'];
+            let response = await build_navigation_response(handlerInput, melvin_state);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
+            }
+            console.error(`[NavigateGoBackIntentHandler} Error! except: `, error);
+        }
+
+        console.log("SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+
+    }
+};
+
+
 module.exports = {
     NavigateStartIntentHandler,
     NavigateResetIntentHandler,
-    NavigateJoinFilterIntentHandler
+    NavigateRestoreSessionIntentHandler,
+    NavigateJoinFilterIntentHandler,
+    NavigateGoBackIntentHandler,
+    NavigateRepeatIntentHandler
 }

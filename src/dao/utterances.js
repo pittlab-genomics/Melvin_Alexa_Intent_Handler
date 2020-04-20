@@ -15,8 +15,8 @@ utterances_doc.prototype.addUserUtterance = async (record) => {
 
     try {
         const data = await docClient.put(params).promise();
-        console.log(`Saved user utterance: ${JSON.stringify(data)} | 
-            TableName: ${process.env.DYNAMODB_TABLE_USER_UTTERANCE}`);
+        console.log(`[utterances_doc] saved user utterance: ${JSON.stringify(data)} | `
+            + `TableName: ${process.env.DYNAMODB_TABLE_USER_UTTERANCE}`);
         return data;
 
     } catch (error) {

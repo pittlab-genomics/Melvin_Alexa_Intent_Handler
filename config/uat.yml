@@ -1,7 +1,6 @@
 environment:
   MELVIN_WELCOME_GREETING: "Welcome to Melvin."
   MELVIN_APP_NAME: "Melvin"
-  DYNAMODB_TABLE_ENTITY_QUERIES: melvin-entity-queries-${self:provider.stage}
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}
   DYNAMODB_TABLE_USER_SESSION: melvin-user-session-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.uat.melvin.pittlabgenomics.com/v0.1"
