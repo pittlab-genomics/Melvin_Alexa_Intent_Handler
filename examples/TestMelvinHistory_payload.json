@@ -9,7 +9,20 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53"
-            }
+            },
+            "MELVIN.HISTORY": [
+                {
+                    "melvin_state": {
+                        "gene_name": "TP53",
+                        "data_source": "TCGA",
+                        "study_name": "Breast invasive carcinoma",
+                        "study_abbreviation": "BRCA",
+                        "data_type": "MUTATIONS"
+                    },
+                    "intent": "NavigateMutationsIntent",
+                    "event_type": "analysis_event"
+                }
+            ]
         },
         "user": {
             "userId": "xxx"
@@ -79,9 +92,14 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateResetIntent",
+            "name": "NavigateMutationsIntent",
             "confirmationStatus": "NONE",
             "slots": {
+                "query": {
+                    "name": "query",
+                    "value": "liver cancer",
+                    "confirmationStatus": "NONE"
+                }
             }
         }
     }

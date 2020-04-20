@@ -3,6 +3,18 @@ const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
 
 // common types
 
+const MELVIN_MAX_HISTORY_ITEMS = 10;
+const FOLLOW_UP_TEXT_THRESHOLD = 2;
+
+const MelvinEventTypes = {
+    ANALYSIS_EVENT: "analysis_event",
+    NAVIGATION_REVERT_EVENT: "navigation_revert_event",
+    NAVIGATION_EVENT: "navigation_event",
+    IRS_EVENT: "irs_event",
+    UNMAPPED_EVENT: "unmapped_event",
+    UNKNOWN_EVENT: "unknown_event"
+}
+
 const MelvinAttributes = {
     GENE_NAME: "gene_name",
     STUDY_NAME: "study_name",
@@ -103,6 +115,7 @@ module.exports = {
     OOV_MAPPER_ENDPOINT: process.env.OOV_MAPPER_ENDPOINT,
     MELVIN_APP_NAME: process.env.MELVIN_APP_NAME,
     MelvinAttributes,
+    MelvinEventTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
@@ -115,5 +128,7 @@ module.exports = {
     MelvinIntentErrors,
     MelvinExplorerErrors,
     RequiredAttributesTCGA,
-    RequiredAttributesClinvar
+    RequiredAttributesClinvar,
+    MELVIN_MAX_HISTORY_ITEMS,
+    FOLLOW_UP_TEXT_THRESHOLD
 };

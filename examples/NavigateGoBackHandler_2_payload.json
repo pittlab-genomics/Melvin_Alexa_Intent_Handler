@@ -9,7 +9,53 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53"
-            }
+            },
+            "MELVIN.HISTORY": [
+                {
+                    "melvin_state": {
+                        "gene_name": "TP53",
+                        "data_source": "TCGA",
+                        "study_name": "Breast invasive carcinoma",
+                        "study_abbreviation": "BRCA",
+                        "data_type": "MUTATIONS"
+                    },
+                    "intent": "NavigateMutationsIntent",
+                    "event_type": "analysis_event"
+                },
+                {
+                    "melvin_state": {
+                        "gene_name": "TP53",
+                        "data_source": "TCGA",
+                        "study_name": "Breast invasive carcinoma",
+                        "study_abbreviation": "BRCA",
+                        "data_type": "MUTATIONS"
+                    },
+                    "intent": "NavigateGoBackIntent",
+                    "event_type": "navigation_revert_event"
+                },
+                {
+                    "melvin_state": {
+                        "gene_name": "TP53",
+                        "data_source": "TCGA",
+                        "study_name": "Liver cancer",
+                        "study_abbreviation": "LIHC",
+                        "data_type": "MUTATIONS"
+                    },
+                    "intent": "NavigateMutationsIntent",
+                    "event_type": "analysis_event"
+                },
+                {
+                    "melvin_state": {
+                        "gene_name": "TP53",
+                        "data_source": "TCGA",
+                        "study_name": "Ovarian cancer",
+                        "study_abbreviation": "OV",
+                        "data_type": "MUTATIONS"
+                    },
+                    "intent": "NavigateMutationsIntent",
+                    "event_type": "analysis_event"
+                }
+            ]
         },
         "user": {
             "userId": "xxx"
@@ -79,10 +125,9 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateResetIntent",
+            "name": "NavigateGoBackIntent",
             "confirmationStatus": "NONE",
-            "slots": {
-            }
+            "slots": {}
         }
     }
 }
