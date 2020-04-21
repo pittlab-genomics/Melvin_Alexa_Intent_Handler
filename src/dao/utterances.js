@@ -28,58 +28,53 @@ utterances_doc.prototype.addUserUtterance = async (record) => {
     }
 }
 
-utterances_doc.prototype.getUtteranceByID = async function(user_id, createdAt) {
+utterances_doc.prototype.getUtteranceByID = async function (user_id, timestamp) {
     let utterance_list = [];
 
-    console.log(`[utterances_doc] querying most recent utterance for user_id: ${user_id}`);
+    console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, timestamp: ${timestamp}`);
     var query_params = {
         TableName: process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression: "user_id, createdAt, melvin_history, melvin_state",
-        KeyConditionExpression: "#user_id = :uid AND #createdAt = :timestamp",
-        ExpressionAttributeNames: {
-            "#user_id": "user_id",
-            "#createdAt": "createdAt"
-        },
-        ExpressionAttributeValues: {
-            ":uid": user_id,
-            ":timestamp": createdAt
-        },
-        ScanIndexForward: false,
-        Limit: 1
-    };
-
-    utterance_list = await queryEntireTable(docClient, query_params);
-    console.info(`[utterances_doc] utterance_list: ${JSON.stringify(utterance_list)}`)
-    return utterance_list;
-}
-
-utterances_doc.prototype.getMostRecentUtterance = async function (user_id, session_id) {
-    let utterance_id_list = [];
-    const utterance_id_prefix = `${session_id}_`;
-
-    console.log(`[utterances_doc] querying most recent utterance for user_id: ${user_id}`);
-    var query_params = {
-        TableName: process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        IndexName: "GlobalCreatedAtIndex",
-        ProjectionExpression: "utterance_id, createdAt",
-        KeyConditionExpression: "#user_id = :uid AND begins_with(#utterance_id, :utt_prefix)",
+        ProjectionExpression: "utterance_id, melvin_history, melvin_state",
+        KeyConditionExpression: "#user_id = :uid AND contains(#utterance_id, :timestamp)",
         ExpressionAttributeNames: {
             "#user_id": "user_id",
             "#utterance_id": "utterance_id"
         },
         ExpressionAttributeValues: {
             ":uid": user_id,
-            ":utt_prefix": utterance_id_prefix
+            ":timestamp": `_${timestamp}`
         },
         ScanIndexForward: false,
         Limit: 1
     };
 
-    utterance_id_list = await queryEntireTable(docClient, query_params);
-    console.info(`[utterances_doc] utterance_id_list: ${JSON.stringify(utterance_id_list)}`)
+    utterance_list = await queryEntireTable(docClient, query_params);
+    console.info(`[utterances_doc] getUtteranceByID utterance_list: ${JSON.stringify(utterance_list)}`)
+    return utterance_list;
+}
 
-    const createdAt = utterance_id_list[0]['createdAt'];
-    const utterance_list = await this.getUtteranceByID(user_id, createdAt);
+utterances_doc.prototype.getMostRecentUtterance = async function (user_id, session_id) {
+    let utterance_list = [];
+
+    console.log(`[utterances_doc] querying most recent utterance for user_id: ${user_id}, session_id: ${session_id}`);
+    var query_params = {
+        TableName: process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression: "utterance_id, melvin_history, melvin_state",
+        KeyConditionExpression: "#user_id = :uid AND begins_with(#utterance_id, :sid)",
+        ExpressionAttributeNames: {
+            "#user_id": "user_id",
+            "#utterance_id": "utterance_id"
+        },
+        ExpressionAttributeValues: {
+            ":uid": user_id,
+            ":sid": session_id
+        },
+        ScanIndexForward: false,
+        Limit: 1
+    };
+
+    utterance_list = await queryEntireTable(docClient, query_params);
+    console.info(`[utterances_doc] getMostRecentUtterance utterance_list: ${JSON.stringify(utterance_list)}`)
 
     return utterance_list;
 }

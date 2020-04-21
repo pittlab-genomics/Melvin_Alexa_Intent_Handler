@@ -223,9 +223,14 @@ const NavigateGoBackIntentHandler = {
                 .getResponse();
         }
 
+        // update current melvin state with previous state
+        const melvin_state = prev_item['melvin_state'];
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        sessionAttributes['MELVIN.STATE'] = melvin_state;
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
         let speechText = '';
         try {
-            const melvin_state = prev_item['melvin_state'];
             let response = await build_navigation_response(handlerInput, melvin_state);
             speechText = response['speech_text'];
 

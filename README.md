@@ -58,7 +58,8 @@ serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialCloses
 
 
 ### Navigation
-serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_payload.json
+serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_1_payload.json
+serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_2_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/TestMelvinHistory_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateRestoreSessionIntent_payload.json

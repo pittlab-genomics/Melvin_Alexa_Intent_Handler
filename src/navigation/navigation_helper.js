@@ -9,6 +9,7 @@ const {
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
     MelvinAttributes,
+    MelvinEventTypes,
     MelvinIntentErrors,
     OOVEntityTypes,
     RequiredAttributesTCGA,
@@ -114,6 +115,10 @@ const update_melvin_history = async function (handlerInput) {
     let melvin_history = get_melvin_history(handlerInput);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const event_type = get_event_type(handlerInput);
+
+    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
+        return; // skip launch events and session ended event since they don't have new information
+    }
 
     let intent_name = "UNKNOWN_INTENT";
     if (_.has(handlerInput, "requestEnvelope.request.intent.name")) {
