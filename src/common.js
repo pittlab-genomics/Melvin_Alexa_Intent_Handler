@@ -1,5 +1,7 @@
 const _ = require('lodash');
+
 const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
+const { CANCER_TYPES } = require('./utils/cancer_types.js')
 
 // common types
 
@@ -9,6 +11,8 @@ const FOLLOW_UP_TEXT_THRESHOLD = 2;
 const MelvinEventTypes = {
     ANALYSIS_EVENT: "analysis_event",
     NAVIGATION_REVERT_EVENT: "navigation_revert_event",
+    NAVIGATION_START_EVENT: "navigation_start_event",
+    NAVIGATION_RESET_EVENT: "navigation_reset_event",
     NAVIGATION_EVENT: "navigation_event",
     LAUNCH_EVENT: "launch_event",
     SESSION_ENDED_EVENT: "session_ended",
@@ -19,7 +23,6 @@ const MelvinEventTypes = {
 
 const MelvinAttributes = {
     GENE_NAME: "gene_name",
-    STUDY_NAME: "study_name",
     STUDY_ABBRV: "study_abbreviation",
     DTYPE: "data_type",
     DSOURCE: "data_source"
@@ -76,6 +79,10 @@ const get_gene_speech_text = function (gene_name) {
     return (_.has(GeneSSMLMappings, gene_name) ? GeneSSMLMappings[gene_name] : gene_name);
 }
 
+const get_study_name_text = function (study_abbrv) {
+    return (_.has(CANCER_TYPES, study_abbrv) ? CANCER_TYPES[study_abbrv] : study_abbrv);
+}
+
 /*
  * G (Gene) | C (CancerType)
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
@@ -122,6 +129,7 @@ module.exports = {
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
+    get_study_name_text,
     OOVEntityTypes,
     DataTypes,
     DataSources,

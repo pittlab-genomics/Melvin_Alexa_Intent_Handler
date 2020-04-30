@@ -39,7 +39,7 @@ function build_APL_footer_text(handlerInput) {
         melvin_state = sessionAttributes['MELVIN.STATE'];
         footer_text = Object.keys(melvin_state).filter(k => (k in MelvinAttributesLabels)).map(
             k => `${MelvinAttributesLabels[k]}: ${melvin_state[k]}`
-        ).join("  |  ");
+        ).join(" | ");
     }
     return footer_text;
 }

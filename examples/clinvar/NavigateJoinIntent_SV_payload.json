@@ -10,7 +10,6 @@
             "MELVIN.STATE": {
                 "gene_name": "BRCA1",
                 "study_abbreviation": "BRCA",
-                "study_name": "Breast invasive carcinoma",
                 "data_source": "CLINVAR"
             }
         },

@@ -10,7 +10,6 @@
             "MELVIN.STATE": {
                 "gene_name": "TP53",
                 "study_abbreviation": "BRCA",
-                "study_name": "Breast invasive carcinoma",
                 "data_type": "MUTATIONS"
             }
         },

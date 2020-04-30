@@ -13,6 +13,7 @@ const {
     validate_navigation_intent_state,
     get_melvin_history,
     get_melvin_state,
+    get_prev_melvin_state,
     build_navigation_response,
     ack_attribute_change
 } = require('../navigation/navigation_helper.js');
@@ -30,8 +31,7 @@ const NavigateStartIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             validate_navigation_intent_state(handlerInput, state_change);
-            const oov_data = state_change['oov_data'];
-            const response = ack_attribute_change(handlerInput, oov_data);
+            const response = ack_attribute_change(handlerInput, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -166,7 +166,13 @@ const NavigateRepeatIntentHandler = {
         let speechText = '';
         try {
             const melvin_state = get_melvin_state(handlerInput);
-            let response = await build_navigation_response(handlerInput, melvin_state);
+            const prev_melvin_state = get_prev_melvin_state(handlerInput);
+            const state_change = {
+                "prev_melvin_state": prev_melvin_state,
+                "new_melvin_state": melvin_state
+            };
+            validate_navigation_intent_state(handlerInput, state_change);
+            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -196,21 +202,29 @@ const NavigateGoBackIntentHandler = {
         console.debug("[NavigateGoBackIntentHandler] melvin_history: " + JSON.stringify(melvin_history));
         let go_back_counter = 1;
         let prev_item = 0;
+        let stop_go_back_counter = false;
 
         for (let item in melvin_history) {
             let item_event_type = melvin_history[item]['event_type'];
-            if (item_event_type === MelvinEventTypes.ANALYSIS_EVENT) {
-                if (go_back_counter <= 0) {
-                    prev_item = melvin_history[item];
-                    break;
-                }
-                go_back_counter -= 1;
-                console.debug(`[NavigateGoBackIntentHandler] decrement go_back_counter: ${go_back_counter}`)
 
-            } else if (item_event_type === MelvinEventTypes.NAVIGATION_REVERT_EVENT) {
+            if (item_event_type === MelvinEventTypes.NAVIGATION_EVENT) {
+                continue;
+            }
+
+            if (item_event_type === MelvinEventTypes.NAVIGATION_REVERT_EVENT && stop_go_back_counter == false) {
                 go_back_counter += 1;
-                console.debug(`[NavigateGoBackIntentHandler] increment go_back_counter: ${go_back_counter}`)
+                console.debug(`[NavigateGoBackIntentHandler] increment go_back_counter: ${go_back_counter}`);
 
+            } else {
+                stop_go_back_counter = true;
+                if (item_event_type === MelvinEventTypes.ANALYSIS_EVENT) {
+                    if (go_back_counter <= 0) {
+                        prev_item = melvin_history[item];
+                        break;
+                    }
+                    go_back_counter -= 1;
+                    console.debug(`[NavigateGoBackIntentHandler] decrement go_back_counter: ${go_back_counter}`)
+                }
             }
         }
         console.debug("[NavigateGoBackIntentHandler] prev_item: " + JSON.stringify(prev_item));
@@ -222,16 +236,24 @@ const NavigateGoBackIntentHandler = {
                 .reprompt(speechText)
                 .getResponse();
         }
+        // save current melvin state
+        const curr_melvin_state = get_melvin_state(handlerInput);
 
-        // update current melvin state with previous state
+        // update current melvin state with previous state in the session
         const melvin_state = prev_item['melvin_state'];
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         sessionAttributes['MELVIN.STATE'] = melvin_state;
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+        const state_change = {
+            "prev_melvin_state": curr_melvin_state,
+            "new_melvin_state": melvin_state
+        };
+
         let speechText = '';
         try {
-            let response = await build_navigation_response(handlerInput, melvin_state);
+            validate_navigation_intent_state(handlerInput, state_change);
+            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {

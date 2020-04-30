@@ -10,6 +10,7 @@ const {
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     CNVTypes,
     get_gene_speech_text,
+    get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
 
@@ -18,7 +19,7 @@ const { round, add_query_params } = require('../utils/response_builder_utils.js'
 
 function build_cnv_alterations_response(params, response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const study = params[MelvinAttributes.STUDY_NAME];
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
     if (params.cnv_change == CNVTypes.ALTERATIONS
         && response['data']['amplifications_percentage']
@@ -52,7 +53,7 @@ function build_cnv_alterations_response(params, response, speech) {
 function build_cnv_deletions_response(params, response, speech) {
     const deletions = round(response['data']['deletions_percentage'], 1);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const study = params[MelvinAttributes.STUDY_NAME];
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
     speech
         .say(`In ${study} patients,`)
         .sayWithSSML(gene_speech_text)
@@ -63,7 +64,7 @@ function build_cnv_deletions_response(params, response, speech) {
 function build_cnv_amplifications_response(params, response, speech) {
     const amplifications = round(response['data']['amplifications_percentage'], 1);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const study = params[MelvinAttributes.STUDY_NAME];
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
     speech
         .say(`In ${study} patients,`)
         .sayWithSSML(gene_speech_text)
@@ -72,7 +73,7 @@ function build_cnv_amplifications_response(params, response, speech) {
 
 function build_cnv_by_study_response(params, response, speech) {
     const records_list = response['data']['records'];
-    const study = params[MelvinAttributes.STUDY_NAME];
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
     if (Array.isArray(records_list)) {
         if (records_list.length > 2) {
@@ -115,12 +116,13 @@ async function build_cnvs_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const response = await get_cnvs_tcga_stats(params);
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
-    if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(study)) {
         add_cnvs_tcga_plot(image_list, params);
         build_cnv_by_study_response(params, response, speech);
 
-    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(study)) {
         add_cnvs_tcga_plot(image_list, params);
         build_cnv_alterations_response(params, response, speech);
 

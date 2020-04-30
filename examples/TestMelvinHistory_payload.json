@@ -15,7 +15,6 @@
                     "melvin_state": {
                         "gene_name": "TP53",
                         "data_source": "TCGA",
-                        "study_name": "Breast invasive carcinoma",
                         "study_abbreviation": "BRCA",
                         "data_type": "MUTATIONS"
                     },

@@ -10,6 +10,7 @@ const {
     melvin_error,
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     get_gene_speech_text,
+    get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
 
@@ -21,7 +22,7 @@ function _populate_overview_by_study_gene_response(params, data, speech) {
     const mutation_count = data['mutation'];
     const sv_count = data['structural variant'];
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
     const mutations_text = (mutation_count == 1) ? 'mutation' : 'mutations';
     const sv_text = (sv_count == 1) ? 'structural variant' : 'structural variants';
 
@@ -29,12 +30,12 @@ function _populate_overview_by_study_gene_response(params, data, speech) {
         speech
             .say(`There are no mutations or structural variants found`)
             .sayWithSSML(`at ${gene_speech_text}`)
-            .say(`in ${params[MelvinAttributes.STUDY_NAME]}`);
+            .say(`in ${study}`);
     } else {
         speech
             .say(`There are ${mutation_count} ${mutations_text} and ${sv_count} ${sv_text}`)
             .sayWithSSML(`at ${gene_speech_text}`)
-            .say(`in ${params[MelvinAttributes.STUDY_NAME]}`);
+            .say(`in ${study}`);
     }
 
 }
@@ -75,11 +76,12 @@ function _populate_overview_by_gene_response(params, study_mut_list, speech) {
 }
 
 function _populate_overview_by_study_response(params, gene_mut_list, speech) {
+    const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
     if (gene_mut_list.length > 2) {
         const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0][0]);
-        const gene_1_speech_text = get_gene_speech_text(gene_mut_list[1][0]);
+        const gene_1_speech_text = get_gene_speech_text(gene_mut_list[1][0]);        
         speech
-            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .say(`In ${study},`)
             .sayWithSSML(`${gene_0_speech_text} and ${gene_1_speech_text}`)
             .say(`are the top two genes with`)
             .say(gene_mut_list[0][1])
@@ -90,7 +92,7 @@ function _populate_overview_by_study_response(params, gene_mut_list, speech) {
     } else if (gene_mut_list.length > 1) {
         const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0]);
         speech
-            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .say(`In ${study},`)
             .sayWithSSML(`${gene_0_speech_text}`)
             .say(`is the top gene with`)
             .say(gene_mut_list[0][1])
@@ -99,14 +101,14 @@ function _populate_overview_by_study_response(params, gene_mut_list, speech) {
     } else if (gene_mut_list.length == 1) {
         const gene_0_speech_text = get_gene_speech_text(gene_mut_list[0]);
         speech
-            .say(`In ${params[MelvinAttributes.STUDY_NAME]},`)
+            .say(`In ${study},`)
             .sayWithSSML(`${gene_0_speech_text}`)
             .say(`is the only gene with`)
             .say(gene_mut_list[0][1])
             .say(`pathogenic variants.`);
 
     } else {
-        speech.say(`There is no data found in clinvar for ${params[MelvinAttributes.STUDY_NAME]}`);
+        speech.say(`There is no data found in clinvar for ${study}`);
     }
 }
 
@@ -115,7 +117,7 @@ async function build_overview_clinvar_response(handlerInput, params) {
     const image_list = [];
     const response = await get_overview_clinvar_stats(params);
 
-    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         add_overview_clinvar_plot(image_list, params);
         const study_mut_dict = response['data'];
         const study_mut_list = Object.keys(study_mut_dict).map(function (key) {
@@ -123,12 +125,12 @@ async function build_overview_clinvar_response(handlerInput, params) {
         });
         _populate_overview_by_gene_response(params, study_mut_list, speech);
 
-    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         add_overview_clinvar_plot(image_list, params);
         const data = response['data'];
         _populate_overview_by_study_gene_response(params, data, speech);
 
-    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         add_overview_clinvar_plot(image_list, params);
         const gene_mut_dict = response['data'];
         const gene_mut_list = Object.keys(gene_mut_dict).map(function (key) {

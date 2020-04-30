@@ -38,7 +38,6 @@ const MutationCountIntentHandler = {
 
             let study = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
             if (!_.isNil(study)) {
-                params[MelvinAttributes.STUDY_NAME] = study;
                 params[MelvinAttributes.STUDY_ABBRV] = handlerInput.requestEnvelope.request.intent.slots
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
@@ -95,7 +94,6 @@ const MutationPercentageIntentHandler = {
 
             let study = _.get(handlerInput, 'requestEnvelope.request.intent.slots.study.value');
             if (!_.isNil(study)) {
-                params[MelvinAttributes.STUDY_NAME] = study;
                 params[MelvinAttributes.STUDY_ABBRV] = handlerInput.requestEnvelope.request.intent.slots
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
