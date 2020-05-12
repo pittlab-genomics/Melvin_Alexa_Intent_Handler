@@ -104,6 +104,102 @@ async function build_mutations_tcga_response(handlerInput, params) {
     }
 }
 
+async function build_mutations_compare_tcga_response(handlerInput, params, compare_params, sate_diff) {
+    const speech = new Speech();
+    const image_list = [];
+    const response = await get_mutations_tcga_stats(params);
+    const compare_response = await get_mutations_tcga_stats(compare_params);
+
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        if (sate_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
+            const gene_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+            const c_gene_text = get_gene_speech_text(compare_params[MelvinAttributes.GENE_NAME]);
+
+            const mut_ct_count = response['data']['cancer_types_with_mutated_gene'];
+            const tot_ct_count = response['data']['total_cancer_types'];
+            const mut_ct_perc = round(100 * mut_ct_count / tot_ct_count, 1);
+
+            const c_mut_ct_count = compare_response['data']['cancer_types_with_mutated_gene'];
+            const c_tot_ct_count = compare_response['data']['total_cancer_types'];
+            const c_mut_ct_perc = round(100 * c_mut_ct_count / c_tot_ct_count, 1);
+
+            const mut_cases = round(response['data']['patient_percentage'], 1);
+            const c_mut_cases = round(compare_response['data']['patient_percentage'], 1);
+
+            speech
+                .sayWithSSML(`${c_gene_text} and ${gene_text} mutations are found in`)
+                .say(`${c_mut_ct_perc} and ${mut_ct_perc} percent of cancer types respectively.`)
+                .say(`Across all of TCGA,`)
+                .sayWithSSML(`${c_gene_text} is mutated in ${c_mut_cases} percent of all cases while`)
+                .sayWithSSML(`${gene_text} is mutated in ${mut_cases} percent`);
+
+            add_mutations_tcga_stats_plot(image_list, params);
+            add_mutations_tcga_treemap_plot(image_list, params);
+
+            add_mutations_tcga_stats_plot(image_list, compare_params);
+            add_mutations_tcga_treemap_plot(image_list, compare_params);
+        } else {
+            throw melvin_error(
+                `[build_mutations_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+                MelvinIntentErrors.INVALID_STATE,
+                "Sorry, I need a gene name to make a comparison."
+            );
+        }
+
+
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        const gene_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+        const study_text = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
+
+        const patient_perc = round(response['data']['patient_percentage'], 1);
+        const c_patient_perc = round(compare_response['data']['patient_percentage'], 1);
+        const freq_adj = (c_patient_perc > patient_perc) ? "more" : "less";
+
+        if (sate_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
+            const c_gene_text = get_gene_speech_text(compare_params[MelvinAttributes.GENE_NAME]);
+            speech
+                .sayWithSSML(`${study_text} patients have ${freq_adj} mutations`)
+                .say(`in ${c_gene_text} at ${c_patient_perc} percent,`)
+                .say(`while ${patient_perc} percent of cases have ${gene_text} mutations.`);
+
+        } else if (sate_diff['entity_type'] === MelvinAttributes.STUDY_ABBRV) {
+            const c_study_text = get_study_name_text(compare_params[MelvinAttributes.STUDY_ABBRV]);
+            speech
+                .sayWithSSML(`${gene_text} is mutated ${freq_adj} frequently`)
+                .say(`in ${c_study_text} at ${c_patient_perc} percent,`)
+                .say(`while ${patient_perc} percent of ${study_text} cases have mutations.`);
+
+        } else {
+            throw melvin_error(
+                `[build_mutations_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+                MelvinIntentErrors.INVALID_STATE,
+                "Sorry, something went wrong while performing the comparison analysis."
+            );
+        }
+
+
+        add_mutations_tcga_profile_plot(image_list, params);
+        add_mutations_tcga_profile_plot(image_list, compare_params);
+
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_stats_plot(image_list, params);
+        add_mutations_tcga_stats_plot(image_list, compare_params);
+        speech.say("Sorry, I'm still working on this analysis.");
+
+    } else {
+        throw melvin_error(
+            `[build_mutations_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+        );
+    }
+
+    add_to_APL_image_pager(handlerInput, image_list);
+    return {
+        'speech_text': speech.ssml()
+    }
+}
+
 
 function _populate_domain_response(params, records_list, speech, gene_speech_text) {
     // remove 'none' domain from the list since it should not be considered for speech response
@@ -207,5 +303,6 @@ const add_mutations_tcga_domain_stack_plot = function (image_list, params) {
 
 module.exports = {
     build_mutations_tcga_response,
-    build_mutations_tcga_domain_response
+    build_mutations_tcga_domain_response,
+    build_mutations_compare_tcga_response
 }

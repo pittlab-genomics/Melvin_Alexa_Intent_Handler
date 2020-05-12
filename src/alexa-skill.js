@@ -21,6 +21,7 @@ const {
     NavigateStartIntentHandler,
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler,
+    NavigateCompareIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
@@ -168,6 +169,7 @@ add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EV
 add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateGeneDefinitionIntentHandler);
 add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
+add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
 add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
 add_event_configuration("NavigateCNVIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVIntentHandler);
@@ -221,6 +223,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateGeneDefinitionIntentHandler,
         NavigateOverviewIntentHandler,
         NavigateJoinFilterIntentHandler,
+        NavigateCompareIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
         NavigateCNVIntentHandler,

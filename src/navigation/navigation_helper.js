@@ -29,7 +29,11 @@ const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
 const { build_gene_definition_response } = require('../gene/gene_definition_response_builder.js');
 const { build_sv_response } = require('../structural_variants/sv_helper.js');
 const { build_overview_response } = require('../overview/overview_helper.js');
-const { build_mutations_response, build_mutations_domain_response } = require('../mutations/mutations_helper.js');
+const {
+    build_mutations_response,
+    build_mutations_domain_response,
+    build_mutations_compare_response
+} = require('../mutations/mutations_helper.js');
 
 
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
@@ -280,6 +284,62 @@ const ack_attribute_change = function (handlerInput, state_change) {
     };
 }
 
+const build_compare_response = async function (handlerInput, melvin_state, compare_state, sate_diff) {
+    let response = {};
+    console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
+        + `compare_state: ${JSON.stringify(compare_state)}, sate_diff: ${JSON.stringify(sate_diff)}`);
+
+    if (sate_diff['entity_type'] === MelvinAttributes.DTYPE) {
+        return {
+            'speech_text': "comparisons across data types are not yet supported"
+        }
+
+    } else if (sate_diff['entity_type'] === MelvinAttributes.DSOURCE) {
+        return {
+            'speech_text': "comparisons across data sources are not yet supported"
+        }
+
+    } else {
+        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
+            response = await build_mutations_compare_response(handlerInput, melvin_state, compare_state, sate_diff);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
+            response = await build_mutations_domain_response(handlerInput, melvin_state);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_AMPLIFICATIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.APLIFICATIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.DELETIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.ALTERATIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else {
+            let error = new Error(`Error while building compare reponse: melvin_state: ${melvin_state}, compare_state: ${compare_state}`);
+            error.type = MelvinIntentErrors.INVALID_STATE;
+            error.speech = `The data type is missing for comparison.`;
+            throw error;
+        }
+    }
+
+
+    console.log(`[build_compare_response] response = ${JSON.stringify(response)}`);
+    return response;
+}
+
 const build_navigation_response = async function (handlerInput, melvin_state, state_change) {
     let response = {};
     if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
@@ -347,5 +407,6 @@ module.exports = {
     validate_navigation_intent_state,
     validate_action_intent_state,
     build_navigation_response,
+    build_compare_response,
     ack_attribute_change
 }

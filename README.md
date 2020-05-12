@@ -51,6 +51,11 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFi
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
 
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_GS_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_GS_vs_S.json
+
+
 ### Clinical Trials
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsNearbyIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsWithinIntent_payload.json

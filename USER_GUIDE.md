@@ -1,5 +1,7 @@
 
-open mel vin
+## Mutations
+
+open Melvin
 
 tell me about TP53
 
@@ -23,19 +25,17 @@ show me structural variants
 
 
 
-----------------
+## Compare mutations
 
-open mel vin
+open Melvin
 
-tell me about TP53
+tell me about BRCA1
 
+show me mutations
 
-tell me about breast cancer
+compare with CDH1
 
+how about breast cancer
 
-show me structural variants
-
-how about in ClinVar
-
-show me overview
+compare with TP53
 

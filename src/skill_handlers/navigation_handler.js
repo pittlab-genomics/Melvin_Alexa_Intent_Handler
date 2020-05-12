@@ -15,9 +15,11 @@ const {
     get_melvin_state,
     get_prev_melvin_state,
     build_navigation_response,
+    build_compare_response,
     ack_attribute_change
 } = require('../navigation/navigation_helper.js');
 
+const { get_state_change_diff } = require('../utils/response_builder_utils.js');
 const sessions_doc = require('../dao/sessions.js');
 const utterances_doc = require('../dao/utterances.js');
 
@@ -74,6 +76,39 @@ const NavigateJoinFilterIntentHandler = {
         }
 
         console.log("[NavigateJoinFilterIntentHandler] SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+}
+
+const NavigateCompareIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCompareIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+        try {
+            const state_change = await update_melvin_state(handlerInput);
+            const melvin_state = get_melvin_state(handlerInput);
+            // const compare_state = validate_navigation_intent_state(handlerInput, state_change);
+            const compare_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
+            const sate_diff = get_state_change_diff(state_change);
+            let response = await build_compare_response(handlerInput, melvin_state, compare_state, sate_diff);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
+            }
+            console.trace(`[NavigateCompareIntentHandler] Error! except: `, error);
+        }
+
+        console.log("[NavigateCompareIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -280,6 +315,7 @@ module.exports = {
     NavigateResetIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateJoinFilterIntentHandler,
+    NavigateCompareIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
 }
