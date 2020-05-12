@@ -17,8 +17,8 @@ const get_overview_clinvar_stats = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(overview_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${overview_url.href},`
-                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            console.info(`[get_overview_clinvar_stats] url: ${overview_url.href}, `
+                + `response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }

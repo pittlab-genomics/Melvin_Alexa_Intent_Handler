@@ -17,8 +17,8 @@ const get_mutations_tcga_stats = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(mutations_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${mutations_url.href},`
-                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            console.info(`[get_mutations_tcga_stats] url: ${mutations_url.href}, `
+                + `response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
@@ -45,8 +45,8 @@ const get_mutations_tcga_top_genes = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(mutations_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${mutations_url.href},`
-                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            console.info(`[get_mutations_tcga_top_genes] mutations_url: ${cnv_url.href}, `
+                + `response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
@@ -73,8 +73,8 @@ const get_mutations_tcga_domain_stats = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(mutations_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${mutations_url.href},`
-                + ` [response]: ${JSON.stringify(response)}, [body]: ${JSON.stringify(body)}`);
+            console.info(`[get_mutations_tcga_domain_stats] url: ${mutations_url.href}, `
+                + `response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
