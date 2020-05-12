@@ -9,6 +9,7 @@ const { get_melvin_state } = require('../navigation/navigation_helper.js');
 
 const {
     MelvinAttributes,
+    get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT,
     MelvinExplorerErrors,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
@@ -62,8 +63,9 @@ const ClinicalTrialsNearbyIntentHandler = {
                 const record_count = response['data'].length;
                 if (record_count > 0) {
                     if (params['study']) {
+                        const study = get_study_name_text(melvin_state[MelvinAttributes.STUDY_ABBRV]);
                         speech.say(`There are ${record_count} clinical trials near` +
-                            ` ${location} for ${melvin_state[MelvinAttributes.STUDY_NAME]}.`);
+                            ` ${location} for ${study}.`);
                     } else {
                         speech.say(`There are ${record_count} clinical trials near ${location}.`);
                     }
@@ -127,8 +129,9 @@ const ClinicalTrialsWithinIntentHandler = {
                 const record_count = response['data'].length;
                 if (record_count > 0) {
                     if (params['study']) {
+                        const study = get_study_name_text(melvin_state[MelvinAttributes.STUDY_ABBRV]);
                         speech.say(`There are ${record_count} clinical trials within ${params['distance']}` +
-                            ` kilometres of ${location} for ${melvin_state[MelvinAttributes.STUDY_NAME]}.`);
+                            ` kilometres of ${location} for ${study}.`);
                     } else {
                         speech.say(`There are ${record_count} clinical trials within ${params['distance']}` +
                             ` kilometres of ${location}.`);

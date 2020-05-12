@@ -21,6 +21,7 @@ const {
     NavigateStartIntentHandler,
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler,
+    NavigateCompareIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
@@ -168,21 +169,23 @@ add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EV
 add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateGeneDefinitionIntentHandler);
 add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
+add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
 add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
 add_event_configuration("NavigateCNVIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVIntentHandler);
 add_event_configuration("NavigateCNVAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVAmplificationsIntentHandler);
 add_event_configuration("NavigateCNVDeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVDeletionsIntentHandler);
+add_event_configuration("NavigateStartIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateStartIntentHandler);
 
 add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsNearbyIntentHandler);
 add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsWithinIntentHandler);
 add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialClosestIntentHandler);
 
 
-add_event_configuration("NavigateStartIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateStartIntentHandler);
-add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateResetIntentHandler);
-add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRestoreSessionIntentHandler);
+add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_RESET_EVENT, NavigateResetIntentHandler);
 add_event_configuration("NavigateGoBackIntent", MelvinEventTypes.NAVIGATION_REVERT_EVENT, NavigateGoBackIntentHandler);
+
+add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRestoreSessionIntentHandler);
 add_event_configuration("NavigateRepeatIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRepeatIntentHandler);
 
 
@@ -220,6 +223,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateGeneDefinitionIntentHandler,
         NavigateOverviewIntentHandler,
         NavigateJoinFilterIntentHandler,
+        NavigateCompareIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
         NavigateCNVIntentHandler,

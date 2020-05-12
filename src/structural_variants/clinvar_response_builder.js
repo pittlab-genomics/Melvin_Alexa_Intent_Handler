@@ -11,6 +11,7 @@ const {
     DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
     DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
+    get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
 
@@ -23,21 +24,22 @@ async function build_sv_clinvar_response(handlerInput, params) {
     const image_list = [];
     const response = await get_sv_clinvar_stats(params);
 
-    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
 
-    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         add_sv_clinvar_plot(image_list, params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+        const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
         const data = response['data'];
         const sv_types_count = Object.keys(data).length;
         const top_sv = Object.keys(data)[0];
         const top_sv_count = data[top_sv]
-        if (sv_types_count > 0) {
+        if (sv_types_count > 1) {
             speech
                 .sayWithSSML(`In ${gene_speech_text},`)
                 .say(`there are ${sv_types_count} types of structural variants`)
-                .say(`for ${params[MelvinAttributes.STUDY_NAME]} with the most frequent one being`)
+                .say(`for ${study} with the most frequent one being`)
                 .say(`${top_sv} with ${top_sv_count}`);
             (top_sv_count == 1) ? speech.say(`variant`) : speech.say(`variants`);
 
@@ -45,15 +47,15 @@ async function build_sv_clinvar_response(handlerInput, params) {
             speech
                 .sayWithSSML(`In ${gene_speech_text},`)
                 .say(`${top_sv} is the only type of structural variant with ${top_sv_count} variants`)
-                .say(`for ${params[MelvinAttributes.STUDY_NAME]}`);
+                .say(`for ${study}`);
         } else {
             speech
                 .say(`There are no structural variants at`)
                 .sayWithSSML(gene_speech_text)
-                .say(`for ${params[MelvinAttributes.STUDY_NAME]}`);
+                .say(`for ${study}`);
         }
 
-    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_NAME])) {
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
 
     } else {

@@ -5,10 +5,6 @@
       "AttributeType": "S"
     },
     {
-      "AttributeName": "createdAt",
-      "AttributeType": "N"
-    },
-    {
       "AttributeName": "utterance_id",
       "AttributeType": "S"
     }
@@ -20,26 +16,8 @@
       "KeyType": "HASH"
     },
     {
-      "AttributeName": "createdAt",
+      "AttributeName": "utterance_id",
       "KeyType": "RANGE"
-    }
-  ],
-  "GlobalSecondaryIndexes": [
-    {
-      "IndexName": "GlobalCreatedAtIndex",
-      "KeySchema": [
-        {
-          "AttributeName": "user_id",
-          "KeyType": "HASH"
-        },
-        {
-          "AttributeName": "utterance_id",
-          "KeyType": "RANGE"
-        }
-      ],
-      "Projection": {
-        "ProjectionType": "KEYS_ONLY"
-      }
     }
   ]
 }

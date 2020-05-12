@@ -82,6 +82,11 @@
             "name": "NavigateGeneDefinitionIntent",
             "confirmationStatus": "NONE",
             "slots": {
+                "query": {
+                    "name": "query",
+                    "value": "Hif one alpha",
+                    "confirmationStatus": "NONE"
+                }
             }
         }
     }

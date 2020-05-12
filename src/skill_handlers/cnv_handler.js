@@ -22,7 +22,6 @@ const CNVAmplificationGeneIntentHandler = {
         const params = {
             [MelvinAttributes.DSOURCE]: DataSources.TCGA,
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_NAME]: handlerInput.requestEnvelope.request.intent.slots.study.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.AMPLIFICATIONS
@@ -45,7 +44,6 @@ const CNVDeletionGeneIntent = {
     async handle(handlerInput) {
         const params = {
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_NAME]: handlerInput.requestEnvelope.request.intent.slots.study.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.DELETIONS
@@ -68,7 +66,6 @@ const CNVAlterationGeneIntent = {
     async handle(handlerInput) {
         const params = {
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_NAME]: handlerInput.requestEnvelope.request.intent.slots.study.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
             cnv_change: CNVTypes.ALTERATIONS

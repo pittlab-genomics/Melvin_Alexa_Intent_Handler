@@ -8,8 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "BRCA",
-                "study_name": "breast cancer"
+                "study_abbreviation": "BRCA"
             }
         },
         "user": {

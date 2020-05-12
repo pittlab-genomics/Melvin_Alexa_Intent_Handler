@@ -11,7 +11,8 @@ const {
 
 const {
     build_mutations_tcga_response,
-    build_mutations_tcga_domain_response
+    build_mutations_tcga_domain_response,
+    build_mutations_compare_tcga_response
 } = require('../mutations/tcga_response_builder.js');
 
 const {
@@ -58,7 +59,29 @@ async function build_mutations_domain_response(handlerInput, params) {
     return response;
 }
 
+async function build_mutations_compare_response(handlerInput, params, compare_params, sate_diff) {
+    console.info(`[build_mutations_compare_response] params: ${JSON.stringify(params)}`);
+    let response = {};
+    if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
+        response = await build_mutations_compare_tcga_response(handlerInput, params, compare_params, sate_diff);
+
+    } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
+        response = {
+            'speech_text': "Mutation compare analysis is not supported in clinvar."
+        };
+
+    } else {
+        throw melvin_error(
+            `[build_mutations_compare_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+        );
+    }
+    return response;
+}
+
 module.exports = {
     build_mutations_response,
-    build_mutations_domain_response
+    build_mutations_domain_response,
+    build_mutations_compare_response
 }

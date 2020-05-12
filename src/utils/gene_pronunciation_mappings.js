@@ -17,8 +17,8 @@ const GeneSSMLMappings = {
     "AMER1": "<phoneme alphabet=\"x-sampa\" ph='eh\\m@r wUn'>AMER1</phoneme>",
     "CTNNB1": "Catenin Beta 1",
     "PIK3CA": "Pik 3 CA",
-    "BRCA1": "braca one",
-    "BRCA2": "braca two"
+    "BRCA1": "Braca one",
+    "BRCA2": "Braca two"
 };
 
 module.exports = {

@@ -3,12 +3,14 @@ const _ = require('lodash');
 const yaml = require('js-yaml');
 const moment = require('moment');
 
+const { get_state_change_diff } = require('../utils/response_builder_utils.js');
 const utterances_doc = require('../dao/utterances.js');
 const { get_oov_mapping_by_query } = require('../http_clients/oov_mapper_client.js');
 const {
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
     MelvinAttributes,
+    MelvinEventTypes,
     MelvinIntentErrors,
     OOVEntityTypes,
     RequiredAttributesTCGA,
@@ -18,16 +20,20 @@ const {
     melvin_error,
     CNVTypes,
     get_gene_speech_text,
+    get_study_name_text,
     MELVIN_APP_NAME
 } = require('../common.js');
 
 const { get_event_type } = require('./handler_configuration.js');
-
 const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
-const { build_gene_definition_response } = require('../skill_handlers/gene_handler.js');
+const { build_gene_definition_response } = require('../gene/gene_definition_response_builder.js');
 const { build_sv_response } = require('../structural_variants/sv_helper.js');
 const { build_overview_response } = require('../overview/overview_helper.js');
-const { build_mutations_response, build_mutations_domain_response } = require('../mutations/mutations_helper.js');
+const {
+    build_mutations_response,
+    build_mutations_domain_response,
+    build_mutations_compare_response
+} = require('../mutations/mutations_helper.js');
 
 
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
@@ -41,6 +47,15 @@ const get_melvin_state = function (handlerInput) {
     return melvin_state;
 }
 
+const get_prev_melvin_state = function (handlerInput) {
+    const melvin_history = get_melvin_history(handlerInput);
+    let prev_melvin_state = {};
+    if (melvin_history.length > 0) {
+        prev_melvin_state = melvin_history['melvin_state'];
+    }
+    return prev_melvin_state;
+}
+
 const get_melvin_history = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     let melvin_history = [];
@@ -52,8 +67,8 @@ const get_melvin_history = function (handlerInput) {
 
 const update_melvin_state = async function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let prev_melvin_state, new_melvin_state, oov_data;
-    prev_melvin_state = new_melvin_state = oov_data = {};
+    const new_melvin_state = {};
+    let prev_melvin_state = {};
 
     if (_.has(sessionAttributes, 'MELVIN.STATE')) {
         prev_melvin_state = sessionAttributes['MELVIN.STATE'];
@@ -65,21 +80,16 @@ const update_melvin_state = async function (handlerInput) {
     }
 
     const query = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value');
-    if (!_.isEmpty(query)) {
+    if (!_.isEmpty(query)) { // empty query is valid for direct intent invocations
         try {
             const params = { query };
             const query_response = await get_oov_mapping_by_query(params);
-            oov_data = query_response['data'];
 
             if (query_response['data']['entity_type'] === OOVEntityTypes.GENE) {
-                new_melvin_state[MelvinAttributes.GENE_NAME] = _.get(
-                    query_response, "data.entity_data.value");
+                new_melvin_state[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.entity_data.value");
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.STUDY) {
-                new_melvin_state[MelvinAttributes.STUDY_NAME] = _.get(
-                    query_response, "data.entity_data.study_name");
-                new_melvin_state[MelvinAttributes.STUDY_ABBRV] = _.get(
-                    query_response, "data.entity_data.value");
+                new_melvin_state[MelvinAttributes.STUDY_ABBRV] = _.get(query_response, "data.entity_data.value");
 
             } else if (query_response['data']['entity_type'] === OOVEntityTypes.DTYPE) {
                 new_melvin_state[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.value");
@@ -88,7 +98,7 @@ const update_melvin_state = async function (handlerInput) {
                 new_melvin_state[MelvinAttributes.DSOURCE] = _.get(query_response, "data.entity_data.value");
             }
 
-            console.log(`[update_melvin_state] prev_melvin_state: ${JSON.stringify(prev_melvin_state)},` +
+            console.log(`[update_melvin_state] prev_melvin_state: ${JSON.stringify(prev_melvin_state)}, ` +
                 `new_melvin_state: ${JSON.stringify(new_melvin_state)}`);
 
         } catch (error) {
@@ -100,8 +110,7 @@ const update_melvin_state = async function (handlerInput) {
 
     return {
         "prev_melvin_state": prev_melvin_state,
-        "new_melvin_state": new_melvin_state,
-        "oov_data": oov_data
+        "new_melvin_state": new_melvin_state
     }
 };
 
@@ -114,6 +123,10 @@ const update_melvin_history = async function (handlerInput) {
     let melvin_history = get_melvin_history(handlerInput);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const event_type = get_event_type(handlerInput);
+
+    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
+        return; // skip launch events and session ended event since they don't have new information
+    }
 
     let intent_name = "UNKNOWN_INTENT";
     if (_.has(handlerInput, "requestEnvelope.request.intent.name")) {
@@ -203,12 +216,14 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
     console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-    if (_.isEmpty(state_change['oov_data']['entity_data'])) {
-        let error = new Error('Error while validating oov_data in state_change', state_change);
-        error.type = MelvinIntentErrors.MISSING_GENE;
-        error.speech = "Sorry, I did not understand that query.";
-        throw error;
-    }
+    // if (_.isEmpty(state_change['oov_data']['entity_data'])) {
+    //     let error = new Error('Error while validating oov_data in state_change', state_change);
+    //     error.type = MelvinIntentErrors.MISSING_GENE;
+    //     error.speech = "Sorry, I did not understand that query.";
+    //     throw error;
+    // }
+
+    // TODO: validate stuff
 
     // Merge the previous state and new state. Overwrite with the latest.
     const melvin_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
@@ -222,13 +237,6 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
 const validate_action_intent_state = function (handlerInput, state_change, intent_data_type) {
     console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-    // if (state_change['oov_data']['entity_type'] === OOVEntityTypes.DTYPE) {
-    //     let error = new Error('Error while validating action intent state', state_change);
-    //     error.type = MelvinIntentErrors.INVALID_ENTITY_TYPE;
-    //     error.speech = "Your query is invalid. A data type cannot be used in an action intent";
-    //     throw error;
-    // }
 
     // merge the previous state and new state. Overwrite with the latest
     const melvin_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
@@ -247,24 +255,26 @@ function add_followup_text(handlerInput, speech) {
     }
 }
 
-const ack_attribute_change = function (handlerInput, oov_data) {
+const ack_attribute_change = function (handlerInput, state_change) {
     const speech = new Speech();
+    const sate_diff = get_state_change_diff(state_change);
 
-    if (oov_data['entity_type'] === OOVEntityTypes.GENE) {
-        const gene_name = oov_data['entity_data']['value'];
+    if (sate_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
+        const gene_name = sate_diff['entity_value'];
         const gene_speech_text = get_gene_speech_text(gene_name);
         speech.sayWithSSML(`Ok, ${gene_speech_text}.`);
         add_followup_text(handlerInput, speech);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
 
-    } else if (oov_data['entity_type'] === OOVEntityTypes.STUDY) {
-        const study_name = oov_data['entity_data']['study_name'];
+    } else if (sate_diff['entity_type'] === MelvinAttributes.STUDY_ABBRV) {
+        const study_abbrv = sate_diff['entity_value'];
+        const study_name = get_study_name_text(study_abbrv);
         speech.say(`Ok, ${study_name}.`);
         add_followup_text(handlerInput, speech);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${study_name}`);
 
-    } else if (oov_data['entity_type'] === OOVEntityTypes.DSOURCE) {
-        const dsource = oov_data['entity_data']['value'];
+    } else if (sate_diff['entity_type'] === MelvinAttributes.DSOURCE) {
+        const dsource = sate_diff['entity_value'];
         speech.say(`Ok, switching to ${dsource}.`);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dsource}`);
     }
@@ -274,21 +284,71 @@ const ack_attribute_change = function (handlerInput, oov_data) {
     };
 }
 
-const build_navigation_response = async function (handlerInput, melvin_state, state_change = []) {
+const build_compare_response = async function (handlerInput, melvin_state, compare_state, sate_diff) {
+    let response = {};
+    console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
+        + `compare_state: ${JSON.stringify(compare_state)}, sate_diff: ${JSON.stringify(sate_diff)}`);
+
+    if (sate_diff['entity_type'] === MelvinAttributes.DTYPE) {
+        return {
+            'speech_text': "comparisons across data types are not yet supported"
+        }
+
+    } else if (sate_diff['entity_type'] === MelvinAttributes.DSOURCE) {
+        return {
+            'speech_text': "comparisons across data sources are not yet supported"
+        }
+
+    } else {
+        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
+            response = await build_mutations_compare_response(handlerInput, melvin_state, compare_state, sate_diff);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
+            response = await build_mutations_domain_response(handlerInput, melvin_state);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_AMPLIFICATIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.APLIFICATIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.DELETIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
+            const params = {
+                ...melvin_state,
+                cnv_change: CNVTypes.ALTERATIONS
+            };
+            response = await build_navigate_cnv_response(handlerInput, params);
+
+        } else {
+            let error = new Error(`Error while building compare reponse: melvin_state: ${melvin_state}, compare_state: ${compare_state}`);
+            error.type = MelvinIntentErrors.INVALID_STATE;
+            error.speech = `The data type is missing for comparison.`;
+            throw error;
+        }
+    }
+
+
+    console.log(`[build_compare_response] response = ${JSON.stringify(response)}`);
+    return response;
+}
+
+const build_navigation_response = async function (handlerInput, melvin_state, state_change) {
     let response = {};
     if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
-        if (_.has(state_change, 'oov_data')) {
-            response = ack_attribute_change(handlerInput, state_change['oov_data']);
-        } else {
-            let card_text_list = [];
-            for (let key in melvin_state) {
-                card_text_list.push(`${key}: ${melvin_state[key]}`);
-            }
-            handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, card_text_list.join(" | "));
-            response = {
-                'speech_text': "Ok. navigation complete"
-            }
+        response = ack_attribute_change(handlerInput, state_change);
+        let card_text_list = [];
+        for (let key in melvin_state) {
+            card_text_list.push(`${key}: ${melvin_state[key]}`);
         }
+        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, card_text_list.join(" | "));
 
     } else {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.OVERVIEW) {
@@ -340,11 +400,13 @@ const build_navigation_response = async function (handlerInput, melvin_state, st
 module.exports = {
     NAVIGATION_TOPICS,
     get_melvin_state,
+    get_prev_melvin_state,
     get_melvin_history,
     update_melvin_state,
     update_melvin_history,
     validate_navigation_intent_state,
     validate_action_intent_state,
     build_navigation_response,
+    build_compare_response,
     ack_attribute_change
 }

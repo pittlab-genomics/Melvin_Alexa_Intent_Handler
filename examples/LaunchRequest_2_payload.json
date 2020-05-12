@@ -1,15 +1,12 @@
 {
     "version": "1.0",
     "session": {
-        "new": false,
-        "sessionId": "amzn1.echo-api.session.cf3db16c-15f7-42f9-b3a9-23047a14ad9f",
+        "new": true,
+        "sessionId": "amzn1.echo-api.session.cf3db16c-15f7-42f9-b3a9-2304a14ad10f",
         "application": {
             "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
         },
         "attributes": {
-            "MELVIN.STATE": {
-                "study_abbreviation": "BRCA"
-            }
         },
         "user": {
             "userId": "xxx"
@@ -74,14 +71,11 @@
         }
     },
     "request": {
-        "type": "IntentRequest",
+        "type": "LaunchRequest",
         "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
-        "timestamp": "2019-10-09T00:34:12Z",
+        "timestamp": "2019-11-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNVIntent",
-            "confirmationStatus": "NONE",
-            "slots": {}
         }
     }
 }

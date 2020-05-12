@@ -15,7 +15,7 @@ module.exports.get_clinical_trials = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(clinical_trials_url.href, options, function (error, response, body) {
-            console.info(`MELVIN_EXPLORER RESPONSE | [url]: ${clinical_trials_url.href}`);
+            console.info(`[get_clinical_trials] url: ${clinical_trials_url.href}, response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
             }
