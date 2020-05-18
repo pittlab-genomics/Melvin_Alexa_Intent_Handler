@@ -43,13 +43,13 @@ provider:
 
     - Effect: Allow
       Action:
-        - s3:*
-        - SNS:Publish
-        - SES:Publish
         - sqs:SendMessage
         - sqs:ReceiveMessage
-        - sqs:ListQueues
-        - sqs:GetQueueUrl
+      Resource: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
       Resource: "*"
 
 functions:
