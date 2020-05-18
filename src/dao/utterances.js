@@ -1,6 +1,5 @@
 var AWS = require("aws-sdk");
 var _ = require('lodash');
-const moment = require('moment');
 
 const { queryEntireTable, scanEntireTable } = require("./dao_utils.js");
 
@@ -24,11 +23,10 @@ utterances_doc.prototype.addUserUtterance = async (record) => {
 
     } catch (error) {
         console.log(`Unable to insert user utterance => ${JSON.stringify(params)}`, error);
-        return reject("Unable to insert user utterance");
     }
 }
 
-utterances_doc.prototype.getUtteranceByID = async function (user_id, timestamp) {
+utterances_doc.prototype.getUtteranceByTimestamp = async function (user_id, timestamp) {
     let utterance_list = [];
 
     console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, timestamp: ${timestamp}`);
@@ -49,9 +47,36 @@ utterances_doc.prototype.getUtteranceByID = async function (user_id, timestamp) 
     };
 
     utterance_list = await queryEntireTable(docClient, query_params);
-    console.info(`[utterances_doc] getUtteranceByID utterance_list: ${JSON.stringify(utterance_list)}`)
+    console.info(`[utterances_doc] getUtteranceByTimestamp utterance_list.len: ${utterance_list.length}`)
     return utterance_list;
 }
+
+utterances_doc.prototype.get_last_n_events = async function (user_id, count, event_type) {
+    let utterance_list = [];
+
+    console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, count: ${count}`);
+    var query_params = {
+        TableName: process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression: "utterance_id, melvin_state, melvin_response, event_type",
+        KeyConditionExpression: "#user_id = :uid",
+        FilterExpression: "#event_type = :event_type",
+        ExpressionAttributeNames: {
+            "#user_id": "user_id",
+            "#event_type": "event_type"
+        },
+        ExpressionAttributeValues: {
+            ":uid": user_id,
+            ":event_type": event_type
+        },
+        ScanIndexForward: false,
+        Limit: count
+    };
+
+    utterance_list = await queryEntireTable(docClient, query_params);
+    console.info(`[utterances_doc] [get_last_n_events] utterance_list.len: ${utterance_list.length}`)
+    return utterance_list;
+}
+
 
 utterances_doc.prototype.getMostRecentUtterance = async function (user_id, session_id) {
     let utterance_list = [];
@@ -74,7 +99,7 @@ utterances_doc.prototype.getMostRecentUtterance = async function (user_id, sessi
     };
 
     utterance_list = await queryEntireTable(docClient, query_params);
-    console.info(`[utterances_doc] getMostRecentUtterance utterance_list: ${JSON.stringify(utterance_list)}`)
+    console.info(`[utterances_doc] getMostRecentUtterance utterance_list.len: ${utterance_list.length}`)
 
     return utterance_list;
 }

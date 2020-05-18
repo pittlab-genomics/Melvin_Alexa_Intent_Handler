@@ -73,3 +73,9 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandl
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
 
 
+## IRS
+
+serverless invoke local --function alexa-skill -p ./examples/irs/email_count.json
+serverless invoke local --function alexa-skill -p ./examples/irs/email_duration.json
+serverless invoke local --function sqs_irs_subscriber --path ./examples/irs/ses_payload_1.json
+serverless invoke local --function sqs_irs_subscriber --path ./examples/irs/ses_payload_2.json

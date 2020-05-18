@@ -41,6 +41,17 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_USER_SESSION}"
 
+    - Effect: Allow
+      Action:
+        - s3:*
+        - SNS:Publish
+        - SES:Publish
+        - sqs:SendMessage
+        - sqs:ReceiveMessage
+        - sqs:ListQueues
+        - sqs:GetQueueUrl
+      Resource: "*"
+
 functions:
   alexa-skill:
     handler: src/alexa-skill.handler
@@ -48,6 +59,16 @@ functions:
       - alexaSkill:
           appId: ${self:custom.config.alexa.appId}
           enabled: true
+
+  sqs_irs_subscriber:
+    handler: src/sqs/irs_subscriber.handler
+    events:
+      - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+
+  sqs_warmup_consumer:
+    handler: src/sqs/warmup_consumer.handler
+    events:
+      - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_WARMUP}
 
 plugins:
   - serverless-plugin-aws-alerts

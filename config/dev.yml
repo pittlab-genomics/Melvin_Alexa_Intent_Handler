@@ -3,6 +3,8 @@ environment:
   MELVIN_APP_NAME: "Melvin develop"
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}
   DYNAMODB_TABLE_USER_SESSION: melvin-user-session-${self:provider.stage}
+  SQS_IRS: 073302257160:melvin-sqs-irs-${self:provider.stage}
+  SQS_WARMUP: 073302257160:melvin-sqs-warmup-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.dev.melvin.pittlabgenomics.com/v0.1"
   OOV_MAPPER_ENDPOINT: "https://api.dev.oovm.pittlabgenomics.com/v0.1"
 

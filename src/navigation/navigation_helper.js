@@ -115,6 +115,11 @@ const update_melvin_state = async function (handlerInput) {
 };
 
 const update_melvin_history = async function (handlerInput) {
+    const event_type = get_event_type(handlerInput);
+    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
+        return; // skip launch events and session ended event since they don't have new information
+    }
+
     const timestamp = moment().valueOf();
     const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
     const melvin_state = get_melvin_state(handlerInput);
@@ -122,17 +127,7 @@ const update_melvin_history = async function (handlerInput) {
     // store utterance as a session attribute for faster navigation
     let melvin_history = get_melvin_history(handlerInput);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const event_type = get_event_type(handlerInput);
-
-    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
-        return; // skip launch events and session ended event since they don't have new information
-    }
-
-    let intent_name = "UNKNOWN_INTENT";
-    if (_.has(handlerInput, "requestEnvelope.request.intent.name")) {
-        intent_name = handlerInput.requestEnvelope.request.intent.name;
-    }
-
+    const intent_name = _.get(handlerInput, 'requestEnvelope.request.intent.name', 'UNKNOWN_INTENT');
     const history_event = {
         melvin_state: melvin_state,
         intent: intent_name,
@@ -145,6 +140,7 @@ const update_melvin_history = async function (handlerInput) {
     sessionAttributes['MELVIN.HISTORY'] = melvin_history;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+    const melvin_response = handlerInput.responseBuilder.getResponse();
     const new_utterance_rec = {
         'user_id': handlerInput.requestEnvelope.session.user.userId,
         'utterance_id': utterance_id,
@@ -152,7 +148,10 @@ const update_melvin_history = async function (handlerInput) {
         'request': handlerInput.requestEnvelope.request,
         'device': handlerInput.requestEnvelope.context.System.device,
         'melvin_state': melvin_state,
-        'melvin_history': melvin_history
+        'intent': intent_name,
+        'event_type': event_type,
+        'melvin_history': melvin_history,
+        'melvin_response': melvin_response
     };
     await utterances_doc.addUserUtterance(new_utterance_rec);
 };
