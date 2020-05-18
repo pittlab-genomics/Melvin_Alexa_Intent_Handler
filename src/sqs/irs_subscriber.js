@@ -42,10 +42,10 @@ const sqs_irs_handler = async function (event, context, callback) {
 
 async function process_message(msg_data) {
     console.info(`[process_message] processing msg_data: ${JSON.stringify(msg_data)}`);
-    var date_str = moment(msg_data['timestamp']).format("YYYY-MM-DD");
+    var date_str = moment(msg_data['timestamp']).format("YYYY-MM-DD HH:mm Z");
     const sub_text = `Melvin results export on ${date_str}`;
     const body_part_text = "Hi Akila,\r\nPlease find your Melvin analyses data below.";
-    const greeting_text = "Hi Akila, <br/>Please find your Melvin analyses data below.<br/><br/>";
+    const greeting_text = "Hi Akila, <br/><br/>Please find your Melvin analyses data below.<br/><br/>";
 
     let utterance_list = [];
     if (!_.isEmpty(msg_data['irs_duration_sec'])) {
@@ -58,7 +58,7 @@ async function process_message(msg_data) {
         console.info(`[process_message] utterance_list.len: ${utterance_list.length}`);
     }
 
-    const html_part_text = await get_utterances_html(body_part_text, utterance_list);
+    const html_part_text = await get_utterances_html(greeting_text, utterance_list);
     await irs_sent_email(sub_text, body_part_text, html_part_text);
 }
 
@@ -75,8 +75,13 @@ async function get_utterances_html(greeting_text, utterance_list) {
         let melvin_response = utterance_list[item]['melvin_response'];
         let ssml_text = JSON.stringify(melvin_response['outputSpeech']['ssml']);
         let response_text = ssml_text.replace(ssml_regex, '');
-        let image_properties = melvin_response['directives'][0]['datasources']['pagerTemplateData']['properties'];
-        let params_text = melvin_response['directives'][0]['datasources']['pagerTemplateData']['footer_text'];
+        let apl_directives = melvin_response['directives'];
+        if (!Array.isArray(apl_directives) || apl_directives.length == 0) {
+            continue;
+        }
+
+        let image_properties = apl_directives[0]['datasources']['pagerTemplateData']['properties'];
+        let params_text = apl_directives[0]['datasources']['pagerTemplateData']['footer_text'];
 
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${params_text}</td></tr>\n`
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`
