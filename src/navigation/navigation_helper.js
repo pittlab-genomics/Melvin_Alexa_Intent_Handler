@@ -79,6 +79,11 @@ const update_melvin_state = async function (handlerInput) {
         prev_melvin_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
 
+    if (!_.has(prev_melvin_state, MelvinAttributes.DTYPE)) {
+        // default to OVERVIEW datatype
+        prev_melvin_state[MelvinAttributes.DTYPE] = DataTypes.OVERVIEW;
+    }
+
     const query = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value');
     if (!_.isEmpty(query)) { // empty query is valid for direct intent invocations
         try {

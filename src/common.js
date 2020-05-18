@@ -88,7 +88,7 @@ const get_study_name_text = function (study_abbrv) {
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
 */
 const RequiredAttributesTCGA = {};
-RequiredAttributesTCGA[DataTypes.OVERVIEW] = [];
+RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];

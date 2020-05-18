@@ -73,7 +73,13 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandl
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
 
 
-## IRS
+### Overview
+serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_BRCA_payload.json
+
+
+### IRS
 
 serverless invoke local --function alexa-skill -p ./examples/irs/email_count.json
 serverless invoke local --function alexa-skill -p ./examples/irs/email_duration.json

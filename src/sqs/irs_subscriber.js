@@ -42,9 +42,10 @@ const sqs_irs_handler = async function (event, context, callback) {
 
 async function process_message(msg_data) {
     console.info(`[process_message] processing msg_data: ${JSON.stringify(msg_data)}`);
-    var date_str = moment.unix(msg_data['timestamp']).format("YYYY-MM-DD");
+    var date_str = moment(msg_data['timestamp']).format("YYYY-MM-DD");
     const sub_text = `Melvin results export on ${date_str}`;
-    const body_part_text = "Hi Akila,\r\nHere is your Melvin analyses results.";
+    const body_part_text = "Hi Akila,\r\nPlease find your Melvin analyses data below.";
+    const greeting_text = "Hi Akila, <br/>Please find your Melvin analyses data below.<br/><br/>";
 
     let utterance_list = [];
     if (!_.isEmpty(msg_data['irs_duration_sec'])) {
@@ -57,11 +58,11 @@ async function process_message(msg_data) {
         console.info(`[process_message] utterance_list.len: ${utterance_list.length}`);
     }
 
-    const html_part_text = await get_utterances_html(utterance_list);
+    const html_part_text = await get_utterances_html(body_part_text, utterance_list);
     await irs_sent_email(sub_text, body_part_text, html_part_text);
 }
 
-async function get_utterances_html(utterance_list) {
+async function get_utterances_html(greeting_text, utterance_list) {
     if (utterance_list.length == 0) {
         return "Sorry, I could not find any analyses.";
     }
@@ -69,13 +70,13 @@ async function get_utterances_html(utterance_list) {
     const html_template_content = await readFile(
         __dirname + '/../../resources/SES/irs_email_template.html', 'utf8');
 
-    let results_table_html = '';
+    let results_table_html = greeting_text;
     for (let item in utterance_list) {
         let melvin_response = utterance_list[item]['melvin_response'];
         let ssml_text = JSON.stringify(melvin_response['outputSpeech']['ssml']);
         let response_text = ssml_text.replace(ssml_regex, '');
         let image_properties = melvin_response['directives'][0]['datasources']['pagerTemplateData']['properties'];
-        let params_text =  melvin_response['directives'][0]['datasources']['pagerTemplateData']['footer_text'];
+        let params_text = melvin_response['directives'][0]['datasources']['pagerTemplateData']['footer_text'];
 
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${params_text}</td></tr>\n`
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`
