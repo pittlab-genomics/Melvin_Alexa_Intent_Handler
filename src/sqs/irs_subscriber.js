@@ -71,8 +71,8 @@ async function get_utterances_html(greeting_text, utterance_list) {
         __dirname + '/../../resources/SES/irs_email_template.html', 'utf8');
 
     let results_table_html = greeting_text;
-    for (let item in utterance_list) {
-        let melvin_response = utterance_list[item]['melvin_response'];
+    for (const [i, item] of utterance_list.entries()) {
+        let melvin_response = item['melvin_response'];
         let ssml_text = JSON.stringify(melvin_response['outputSpeech']['ssml']);
         let response_text = ssml_text.replace(ssml_regex, '');
         let apl_directives = melvin_response['directives'];
@@ -83,7 +83,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
         let image_properties = apl_directives[0]['datasources']['pagerTemplateData']['properties'];
         let params_text = apl_directives[0]['datasources']['pagerTemplateData']['footer_text'];
 
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${params_text}</td></tr>\n`
+        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${i}. ${params_text}</td></tr>\n`
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`
 
         for (let image_item in image_properties) {
@@ -93,7 +93,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
             results_table_html += `<a href="${image_url}">${image_element}</a>\n`
             results_table_html += `</td></tr>\n`;
         }
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;"></td></tr>\n`
+        results_table_html += `<tr><td style="padding: 20px 0 30px 0;"><hr/></td></tr>\n`
     }
     const html_data = html_template_content.toString().replace('_TEMPLATE_PLACEHOLDER_', results_table_html);
     console.info(`[sqs_irs_handler] get_utterances_html | html_data: ${html_data}`);

@@ -34,6 +34,7 @@ serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOve
 
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_BRCA_payload.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_TP53_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_payload.json
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMutationsIntent_payload.json
 
@@ -51,9 +52,23 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFi
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
 
+### Compare - mutations
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_S_vs_S.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_GS_vs_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_GS_vs_S.json
+
+
+### Compare - CNV
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_S_vs_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_S.json
+
+### Compare - MUTATIONS vs CNV
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_S.json
 
 
 ### Clinical Trials

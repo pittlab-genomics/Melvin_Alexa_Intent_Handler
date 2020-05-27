@@ -10,7 +10,10 @@ const {
     DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE
 } = require('../common.js');
 
-const { build_cnvs_tcga_response } = require('../cnvs/tcga_response_builder.js');
+const {
+     build_cnvs_tcga_response,
+     build_cnvs_compare_tcga_response
+ } = require('../cnvs/tcga_response_builder.js');
 
 async function build_navigate_cnv_response(handlerInput, params) {
     console.info(`[build_navigate_cnv_response] params: ${JSON.stringify(params)}`);
@@ -33,7 +36,29 @@ async function build_navigate_cnv_response(handlerInput, params) {
     return response;
 }
 
+async function build_cnvs_compare_response(handlerInput, params, compare_params, sate_diff) {
+    console.info(`[build_cnvs_compare_response] params: ${JSON.stringify(params)}`);
+    let response = {};
+    if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
+        response = await build_cnvs_compare_tcga_response(handlerInput, params, compare_params, sate_diff);
+
+    } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
+        response = {
+            'speech_text': "Copy number alterations compare analysis is not supported in clinvar."
+        };
+
+    } else {
+        throw melvin_error(
+            `[build_cnvs_compare_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+        );
+    }
+    return response;
+}
+
 
 module.exports = {
-    build_navigate_cnv_response
+    build_navigate_cnv_response,
+    build_cnvs_compare_response
 }

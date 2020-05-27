@@ -165,6 +165,14 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                 ],
             });
         }
+
+    } else {
+        handlerInput.responseBuilder.withStandardCard(
+            'Melvin',
+            'Image response',
+            url_list[0],
+            url_list[0]
+        )
     }
 }
 
