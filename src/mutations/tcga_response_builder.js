@@ -85,7 +85,7 @@ async function build_mutations_tcga_response(handlerInput, params) {
         const gene_1_perc = round(response['data'][Object.keys(response['data'])[0]], 1);
         const gene_2_perc = round(response['data'][Object.keys(response['data'])[1]], 1);
         speech
-            .say(`In ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])},`)
+            .say(`Among ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])} patients,`)
             .say(`${gene_1_text} and ${gene_2_text} are the top 2 mutated genes found in`)
             .say(`${gene_1_perc} percent and ${gene_2_perc}`)
             .say(`percent of the patients respectively.`);
@@ -192,7 +192,7 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
         const c_gene_perc = round(compare_response['data'][Object.keys(compare_response['data'])[0]], 1);
 
         speech
-            .sayWithSSML(`In ${study_text}, ${gene_text}`)
+            .sayWithSSML(`Among ${study_text} patients, ${gene_text}`)
             .say(`is the top mutated gene at ${gene_perc},`)
             .sayWithSSML(`while ${c_gene_text} is most mutated in ${c_study_text}`)
             .say(`at ${c_gene_perc}`);

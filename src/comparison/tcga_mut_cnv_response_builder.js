@@ -65,7 +65,7 @@ async function build_mut_cnv_compare_tcga_response(handlerInput, params, sate_di
         const cna_perc = round(cnv_response['data']['records'][0]['cna_percentage'], 1);
 
         speech
-            .sayWithSSML(`In ${study_text}, ${mut_gene_text}`)
+            .sayWithSSML(`Among ${study_text} patients, ${mut_gene_text}`)
             .say(`is the top mutated gene at ${mut_gene_perc},`)
             .sayWithSSML(`while ${cna_gene_text} has the greatest number of copy number alterations`)
             .say(`at ${cna_perc}`)

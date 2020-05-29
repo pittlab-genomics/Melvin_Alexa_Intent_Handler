@@ -71,6 +71,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
         __dirname + '/../../resources/SES/irs_email_template.html', 'utf8');
 
     let results_table_html = greeting_text;
+    let counter = 1;
     for (const [i, item] of utterance_list.entries()) {
         let melvin_response = item['melvin_response'];
         let ssml_text = JSON.stringify(melvin_response['outputSpeech']['ssml']);
@@ -83,8 +84,9 @@ async function get_utterances_html(greeting_text, utterance_list) {
         let image_properties = apl_directives[0]['datasources']['pagerTemplateData']['properties'];
         let params_text = apl_directives[0]['datasources']['pagerTemplateData']['footer_text'];
 
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${i}. ${params_text}</td></tr>\n`
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`
+        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${counter}. ${params_text}</td></tr>\n`;
+        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`;
+        counter += 1;
 
         for (let image_item in image_properties) {
             let image_url = image_properties[image_item]['URL']['href'];

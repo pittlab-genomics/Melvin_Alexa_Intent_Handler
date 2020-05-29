@@ -8,7 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "BRCA",
+                "study_abbreviation": "OV",
                 "data_type": "CNV_ALTERATIONS"
             }
         },

@@ -92,9 +92,9 @@ RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
-RequiredAttributesTCGA[DataTypes.CNV_ALTERATIONS] = [3, 1]; // ['GC', 'C'];
-RequiredAttributesTCGA[DataTypes.CNV_AMPLIFICATIONS] = [3, 1]; // ['GC', 'C'];
-RequiredAttributesTCGA[DataTypes.CNV_DELETIONS] = [3, 1]; // ['GC', 'C'];
+RequiredAttributesTCGA[DataTypes.CNV_ALTERATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.CNV_AMPLIFICATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.CNV_DELETIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 
 const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];

@@ -8,7 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "BRCA"
+                "study_abbreviation": "OV"
             }
         },
         "user": {
@@ -81,13 +81,7 @@
         "intent": {
             "name": "NavigateCNVIntent",
             "confirmationStatus": "NONE",
-            "slots": {
-                "query": {
-                    "name": "query",
-                    "value": "breast cancer",
-                    "confirmationStatus": "NONE"
-                }
-            }
+            "slots": {}
         }
     }
 }

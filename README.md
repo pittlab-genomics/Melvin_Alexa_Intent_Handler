@@ -32,19 +32,42 @@ serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOve
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_gene_payload.json
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_gene_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_BRCA_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_TP53_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_payload.json
-serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMutationsIntent_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVDeletionsIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNVCancerIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNV_with_study_payload.json
+### Mutations
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationsIntent_G.json
 
+serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMutationsIntent_GS.json
+
+
+### Mutation Domains
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_GS.json
+
+
+### CNA - changes
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_GS.json
+
+
+### CNA - deletions
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_S.json
+
+
+### CNA - amplifications
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_S.json
+
+
+### Structural Variants
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateJoinIntent_SV_payload.json
 
+
+### Navigation
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_Mutations_TP53_BRCA_payload.json
@@ -59,11 +82,12 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mutations_GS_vs_S.json
 
 
-### Compare - CNV
+### Compare - CNA
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_G_vs_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_S_vs_S.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_S.json
+
 
 ### Compare - MUTATIONS vs CNV
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_G.json
@@ -95,7 +119,6 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/overview/Navig
 
 
 ### IRS
-
 serverless invoke local --function alexa-skill -p ./examples/irs/email_count.json
 serverless invoke local --function alexa-skill -p ./examples/irs/email_duration.json
 serverless invoke local --function sqs_irs_subscriber --path ./examples/irs/ses_payload_1.json
