@@ -9,6 +9,8 @@ const { OOV_MAPPER_ENDPOINT,
 module.exports.get_oov_mapping_by_query = function (params) {
     const oov_url = new URL(`${OOV_MAPPER_ENDPOINT}/entity_mappings`);
     oov_url.searchParams.set('query', params.query);
+    oov_url.searchParams.set('request_id', params.request_id);
+    oov_url.searchParams.set('session_id', params.session_id);
     var options = { json: true };
 
     return new Promise(function (resolve, reject) {

@@ -6,6 +6,11 @@ const moment = require('moment');
 const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME, MelvinEventTypes } = require('./common.js');
 const { add_event_configuration } = require('./navigation/handler_configuration.js');
 
+const APLDocs = {
+    welcome: require('../resources/APL/welcome.json'),
+};
+const { supportsAPL } = require('./utils/APL_utils.js');
+
 const {
     RequestLogInterceptor,
     ResponseLogInterceptor,
@@ -22,6 +27,7 @@ const {
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler,
     NavigateCompareIntentHandler,
+    NavigateSplitbyIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
@@ -72,9 +78,48 @@ const LaunchRequestHandler = {
         }
 
         const reprompt_text = 'What would you like to know? You can ask me about a gene or cancer type.'
+
+        if (supportsAPL(handlerInput)) {
+            handlerInput.responseBuilder.addDirective({
+                type: 'Alexa.Presentation.APL.RenderDocument',
+                token: 'welcomeToken',
+                version: '1.0',
+                document: APLDocs.welcome,
+                datasources: {
+                    "bodyTemplate2Data": {
+                        "type": "object",
+                        "objectId": "bt2Sample",
+                        "title": "Melvin",
+                        "textContent": {
+                            "title": {
+                                "type": "PlainText",
+                                "text": "Melvin"
+                            },
+                            "line1": {
+                                "type": "PlainText",
+                                "text": "Tell me about {cancer type}"
+                            },
+                            "line2": {
+                                "type": "PlainText",
+                                "text": "Tell me about {gene}"
+                            }
+                        },
+                        "imageContent": {
+                            "URL": "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png"
+                        },
+                        "logoUrl": "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_smallIconUri.png",
+                        "hintText": "Try, \"Alexa, tell me about TP53\""
+                    }
+                },
+            });
+
+        } else {
+            handlerInput.responseBuilder
+                .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
+        }
+
         return handlerInput.responseBuilder
             .speak(MELVIN_WELCOME_GREETING)
-            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
             .reprompt(reprompt_text)
             .getResponse();
     }
@@ -170,6 +215,7 @@ add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSI
 add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
+add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
 add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
 add_event_configuration("NavigateCNVIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVIntentHandler);
@@ -224,6 +270,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateOverviewIntentHandler,
         NavigateJoinFilterIntentHandler,
         NavigateCompareIntentHandler,
+        NavigateSplitbyIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
         NavigateCNVIntentHandler,

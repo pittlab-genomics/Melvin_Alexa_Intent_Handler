@@ -95,6 +95,13 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_S.json
 
 
+### Splitby - MUTATIONS vs CNV
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cnvs.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cnvs_G.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_S.json
+
+
 ### Clinical Trials
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsNearbyIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialsWithinIntent_payload.json
