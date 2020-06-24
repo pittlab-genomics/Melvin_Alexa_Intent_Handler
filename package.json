@@ -11,7 +11,8 @@
     "ssml-builder": "^0.4.3",
     "lodash": "^4.17.15",
     "js-yaml": "3.13.1",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "iso8601-duration": "^1.2.0"
   },
   "devDependencies": {
     "serverless": "^1.57.0",

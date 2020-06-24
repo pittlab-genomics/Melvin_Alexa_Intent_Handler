@@ -25,7 +25,7 @@ const {
 } = require('../common.js');
 
 const { get_event_type } = require('./handler_configuration.js');
-const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
+const { build_navigate_cnv_response, build_cnvs_compare_response } = require('../cnvs/cnv_helper.js');
 const { build_gene_definition_response } = require('../gene/gene_definition_response_builder.js');
 const { build_sv_response } = require('../structural_variants/sv_helper.js');
 const { build_overview_response } = require('../overview/overview_helper.js');
@@ -34,6 +34,10 @@ const {
     build_mutations_domain_response,
     build_mutations_compare_response
 } = require('../mutations/mutations_helper.js');
+
+const { build_mut_cnv_compare_response } = require('../comparison/mut_cnv_helper.js');
+
+const { build_mut_cnv_splitby_response } = require('../splitby/mut_cnv_helper.js');
 
 
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
@@ -65,13 +69,17 @@ const get_melvin_history = function (handlerInput) {
     return melvin_history;
 }
 
-const update_melvin_state = async function (handlerInput) {
+const update_melvin_state = async function (
+    handlerInput,
+    query_path = 'requestEnvelope.request.intent.slots.query.value',
+    session_path = 'MELVIN.STATE'
+) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const new_melvin_state = {};
     let prev_melvin_state = {};
 
-    if (_.has(sessionAttributes, 'MELVIN.STATE')) {
-        prev_melvin_state = sessionAttributes['MELVIN.STATE'];
+    if (_.has(sessionAttributes, session_path)) {
+        prev_melvin_state = sessionAttributes[session_path];
     }
 
     if (!_.has(prev_melvin_state, MelvinAttributes.DSOURCE)) {
@@ -79,10 +87,17 @@ const update_melvin_state = async function (handlerInput) {
         prev_melvin_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
 
-    const query = _.get(handlerInput, 'requestEnvelope.request.intent.slots.query.value');
+    if (!_.has(prev_melvin_state, MelvinAttributes.DTYPE)) {
+        // default to OVERVIEW datatype
+        prev_melvin_state[MelvinAttributes.DTYPE] = DataTypes.OVERVIEW;
+    }
+
+    const query = _.get(handlerInput, query_path);
+    const request_id = _.get(handlerInput, 'requestEnvelope.request.requestId');
+    const session_id = _.get(handlerInput, 'requestEnvelope.session.sessionId');
     if (!_.isEmpty(query)) { // empty query is valid for direct intent invocations
         try {
-            const params = { query };
+            const params = { query, request_id, session_id };
             const query_response = await get_oov_mapping_by_query(params);
 
             if (query_response['data']['entity_type'] === OOVEntityTypes.GENE) {
@@ -114,7 +129,21 @@ const update_melvin_state = async function (handlerInput) {
     }
 };
 
+const update_melvin_aux_state = async function (
+    handlerInput,
+    query_path = 'requestEnvelope.request.intent.slots.query.value',
+    session_path = 'MELVIN.AUX.STATE'
+) {
+    return update_melvin_state(handlerInput, query_path, session_path);
+}
+
+
 const update_melvin_history = async function (handlerInput) {
+    const event_type = get_event_type(handlerInput);
+    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
+        return; // skip launch events and session ended event since they don't have new information
+    }
+
     const timestamp = moment().valueOf();
     const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
     const melvin_state = get_melvin_state(handlerInput);
@@ -122,17 +151,7 @@ const update_melvin_history = async function (handlerInput) {
     // store utterance as a session attribute for faster navigation
     let melvin_history = get_melvin_history(handlerInput);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const event_type = get_event_type(handlerInput);
-
-    if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
-        return; // skip launch events and session ended event since they don't have new information
-    }
-
-    let intent_name = "UNKNOWN_INTENT";
-    if (_.has(handlerInput, "requestEnvelope.request.intent.name")) {
-        intent_name = handlerInput.requestEnvelope.request.intent.name;
-    }
-
+    const intent_name = _.get(handlerInput, 'requestEnvelope.request.intent.name', 'UNKNOWN_INTENT');
     const history_event = {
         melvin_state: melvin_state,
         intent: intent_name,
@@ -145,6 +164,7 @@ const update_melvin_history = async function (handlerInput) {
     sessionAttributes['MELVIN.HISTORY'] = melvin_history;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+    const melvin_response = handlerInput.responseBuilder.getResponse();
     const new_utterance_rec = {
         'user_id': handlerInput.requestEnvelope.session.user.userId,
         'utterance_id': utterance_id,
@@ -152,7 +172,10 @@ const update_melvin_history = async function (handlerInput) {
         'request': handlerInput.requestEnvelope.request,
         'device': handlerInput.requestEnvelope.context.System.device,
         'melvin_state': melvin_state,
-        'melvin_history': melvin_history
+        'intent': intent_name,
+        'event_type': event_type,
+        'melvin_history': melvin_history,
+        'melvin_response': melvin_response
     };
     await utterances_doc.addUserUtterance(new_utterance_rec);
 };
@@ -234,6 +257,26 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
     return melvin_state;
 };
 
+const validate_splitby_aux_state = function (handlerInput, melvin_state, state_change) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    // Merge the previous state and new state. Overwrite with the latest.
+    const melvin_aux_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
+    console.log(`[validate_splitby_aux_state] | melvin_state: ${JSON.stringify(melvin_state)}, `
+        + `state_change: ${JSON.stringify(state_change)}, melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
+
+    if (!is_splitby_supported(melvin_state, melvin_aux_state)) {
+        let error = new Error('Error while validating required attributes in melvin_aux_state', state_change);
+        error.type = MelvinIntentErrors.INVALID_STATE;
+        error.speech = "Sorry, this split-by operation is not supported yet";
+        throw error;
+    }
+
+    sessionAttributes['MELVIN.AUX.STATE'] = melvin_aux_state;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    return melvin_aux_state;
+}
+
 const validate_action_intent_state = function (handlerInput, state_change, intent_data_type) {
     console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -257,24 +300,24 @@ function add_followup_text(handlerInput, speech) {
 
 const ack_attribute_change = function (handlerInput, state_change) {
     const speech = new Speech();
-    const sate_diff = get_state_change_diff(state_change);
+    const state_diff = get_state_change_diff(state_change);
 
-    if (sate_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
-        const gene_name = sate_diff['entity_value'];
+    if (state_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
+        const gene_name = state_diff['entity_value'];
         const gene_speech_text = get_gene_speech_text(gene_name);
         speech.sayWithSSML(`Ok, ${gene_speech_text}.`);
         add_followup_text(handlerInput, speech);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, gene_name);
 
-    } else if (sate_diff['entity_type'] === MelvinAttributes.STUDY_ABBRV) {
-        const study_abbrv = sate_diff['entity_value'];
+    } else if (state_diff['entity_type'] === MelvinAttributes.STUDY_ABBRV) {
+        const study_abbrv = state_diff['entity_value'];
         const study_name = get_study_name_text(study_abbrv);
         speech.say(`Ok, ${study_name}.`);
         add_followup_text(handlerInput, speech);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${study_name}`);
 
-    } else if (sate_diff['entity_type'] === MelvinAttributes.DSOURCE) {
-        const dsource = sate_diff['entity_value'];
+    } else if (state_diff['entity_type'] === MelvinAttributes.DSOURCE) {
+        const dsource = state_diff['entity_value'];
         speech.say(`Ok, switching to ${dsource}.`);
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dsource}`);
     }
@@ -284,24 +327,31 @@ const ack_attribute_change = function (handlerInput, state_change) {
     };
 }
 
-const build_compare_response = async function (handlerInput, melvin_state, compare_state, sate_diff) {
+const build_compare_response = async function (handlerInput, melvin_state, compare_state, state_diff) {
     let response = {};
     console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
-        + `compare_state: ${JSON.stringify(compare_state)}, sate_diff: ${JSON.stringify(sate_diff)}`);
+        + `compare_state: ${JSON.stringify(compare_state)}, state_diff: ${JSON.stringify(state_diff)}`);
 
-    if (sate_diff['entity_type'] === MelvinAttributes.DTYPE) {
-        return {
-            'speech_text': "comparisons across data types are not yet supported"
+    if (state_diff['entity_type'] === MelvinAttributes.DTYPE) {
+        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
+            || melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
+            response = await build_mut_cnv_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else {
+            return {
+                'speech_text': "This data type comparison analysis is not yet supported"
+            }
         }
 
-    } else if (sate_diff['entity_type'] === MelvinAttributes.DSOURCE) {
+
+    } else if (state_diff['entity_type'] === MelvinAttributes.DSOURCE) {
         return {
             'speech_text': "comparisons across data sources are not yet supported"
         }
 
     } else {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
-            response = await build_mutations_compare_response(handlerInput, melvin_state, compare_state, sate_diff);
+            response = await build_mutations_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
             response = await build_mutations_domain_response(handlerInput, melvin_state);
@@ -311,21 +361,21 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
                 ...melvin_state,
                 cnv_change: CNVTypes.APLIFICATIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
             const params = {
                 ...melvin_state,
                 cnv_change: CNVTypes.DELETIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
             const params = {
                 ...melvin_state,
                 cnv_change: CNVTypes.ALTERATIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
 
         } else {
             let error = new Error(`Error while building compare reponse: melvin_state: ${melvin_state}, compare_state: ${compare_state}`);
@@ -337,6 +387,43 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
 
     console.log(`[build_compare_response] response = ${JSON.stringify(response)}`);
+    return response;
+}
+
+const is_splitby_supported = function (melvin_state, splitby_state) {
+    if (
+        (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS)
+        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const build_splitby_response = async function (handlerInput, melvin_state, splitby_state, state_diff) {
+    let response = {};
+    console.log(`[build_splitby_response] melvin_state: ${JSON.stringify(melvin_state)}, `
+        + `splitby_state: ${JSON.stringify(splitby_state)}, state_diff: ${JSON.stringify(state_diff)}`);
+
+    if (
+        (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS)
+        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
+    ) {
+        response = await build_mut_cnv_splitby_response(handlerInput, melvin_state, state_diff);
+
+    } else {
+        return {
+            'speech_text': "This data type split-by analysis is not yet supported"
+        }
+    }
+
+
+    console.log(`[build_splitby_response] response = ${JSON.stringify(response)}`);
     return response;
 }
 
@@ -403,10 +490,14 @@ module.exports = {
     get_prev_melvin_state,
     get_melvin_history,
     update_melvin_state,
+    update_melvin_aux_state,
     update_melvin_history,
     validate_navigation_intent_state,
+    validate_splitby_aux_state,
     validate_action_intent_state,
     build_navigation_response,
     build_compare_response,
+    is_splitby_supported,
+    build_splitby_response,
     ack_attribute_change
 }

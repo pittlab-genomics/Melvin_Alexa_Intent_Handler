@@ -8,7 +8,9 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "BRCA"
+                "gene_name": "BRCA1",
+                "study_abbreviation": "BRCA",
+                "data_type": "CNV_ALTERATIONS"
             }
         },
         "user": {
@@ -79,12 +81,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNVIntent",
+            "name": "NavigateCompareIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "breast cancer",
+                    "value": "TP53",
                     "confirmationStatus": "NONE"
                 }
             }

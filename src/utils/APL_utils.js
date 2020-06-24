@@ -38,7 +38,7 @@ function build_APL_footer_text(handlerInput) {
     if (_.has(sessionAttributes, 'MELVIN.STATE')) {
         melvin_state = sessionAttributes['MELVIN.STATE'];
         footer_text = Object.keys(melvin_state).filter(k => (k in MelvinAttributesLabels)).map(
-            k => `${MelvinAttributesLabels[k]}: ${melvin_state[k]}`
+            k => `${melvin_state[k]}`
         ).join(" | ");
     }
     return footer_text;
@@ -165,6 +165,14 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                 ],
             });
         }
+
+    } else {
+        handlerInput.responseBuilder.withStandardCard(
+            'Melvin',
+            'Image response',
+            url_list[0],
+            url_list[0]
+        )
     }
 }
 

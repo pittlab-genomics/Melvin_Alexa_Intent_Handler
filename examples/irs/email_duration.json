@@ -8,6 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
+                "gene_name": "TP53"
             }
         },
         "user": {
@@ -78,12 +79,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateMutationsIntent",
+            "name": "NavigateEmailIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "query": {
-                    "name": "query",
-                    "value": "breast cancer",
+                "duration": {
+                    "name": "duration",
+                    "value": "PT4200S",
                     "confirmationStatus": "NONE"
                 }
             }

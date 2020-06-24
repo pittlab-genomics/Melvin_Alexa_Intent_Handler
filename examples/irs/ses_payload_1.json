@@ -1,0 +1,30 @@
+{
+    "Records": [
+        {
+            "messageId": "055313bf-2e8a-4bed-bcc3-8efd9ec8bb6c",
+            "receiptHandle": "AQEBkq6QCH/1MYzrUuL/UaC6HQpfkTxU99YUf11v5mQtyPO207wcrENszxeBfbNOx5vD60dtlD6S3Q4u7lN3DUxFCg48kyqMjVA2izLvPSFRS8I2mVgKPfjfbTrYUQjLVrT/ONi0AVs0Xd53yAAzGWI9lud2L4smaWcocIsgYWwkvUntaEwW4niP6uXP93bImNRS5a8JYbhnqLJ7/a5rrX3VAAoKBslrj/juibG28Mny9P/Y7AD8WyIphXwaSVhEP96BUhzVKVh6xBYyPoO/9Lz4tWRzZgnsGW+Dznv00CYb1WY8Bd8mxdDkk28fSsNhGkjXSU/HF7HMTzIyqW2+IYFO7ZW/2moEEzoBROJy/EzhpVMYrbbItOSzw6MZEMVeTDuagXspDWLEue2aap6uNLmMGg==",
+            "body": "{\"irs_channel\":\"EMAIL\",\"timestamp\":1589418087500,\"user_id\":\"xxx\",\"irs_results_count\":2}",
+            "attributes": {
+                "ApproximateReceiveCount": "1",
+                "SentTimestamp": "1589418087569",
+                "SenderId": "AROARCEJHVYEPYXE6GJUI:melvin-alexa-intent-handlers-uat-alexa-skill",
+                "ApproximateFirstReceiveTimestamp": "1589418087637"
+            },
+            "messageAttributes": {},
+            "md5OfBody": "0fd46515539c49a34605840e258f9486",
+            "eventSource": "aws:sqs",
+            "eventSourceARN": "arn:aws:sqs:eu-west-1:073302257160:melvin-sqs-irs-uat",
+            "awsRegion": "eu-west-1"
+        }
+    ],
+    "context": {
+        "callbackWaitsForEmptyEventLoop": true,
+        "functionVersion": "$LATEST",
+        "functionName": "melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "memoryLimitInMB": "2048",
+        "logGroupName": "/aws/lambda/melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "logStreamName": "2020/05/14/[$LATEST]0fc20dc66aa845fe99ba162257f961db",
+        "invokedFunctionArn": "arn:aws:lambda:eu-west-1:073302257160:function:melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "awsRequestId": "aebe5fb1-6646-5e18-9c00-0887fcd03208"
+    }
+}

@@ -82,11 +82,7 @@
             "name": "NavigateCNVIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "query": {
-                    "name": "query",
-                    "value": "breast cancer",
-                    "confirmationStatus": "NONE"
-                }
+                "query": {}
             }
         }
     }

@@ -10,12 +10,15 @@ const {
 
 const {
     update_melvin_state,
+    update_melvin_aux_state,
     validate_navigation_intent_state,
+    validate_splitby_aux_state,
     get_melvin_history,
     get_melvin_state,
     get_prev_melvin_state,
     build_navigation_response,
     build_compare_response,
+    build_splitby_response,
     ack_attribute_change
 } = require('../navigation/navigation_helper.js');
 
@@ -93,10 +96,9 @@ const NavigateCompareIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = get_melvin_state(handlerInput);
-            // const compare_state = validate_navigation_intent_state(handlerInput, state_change);
             const compare_state = { ...state_change['prev_melvin_state'], ...state_change['new_melvin_state'] };
-            const sate_diff = get_state_change_diff(state_change);
-            let response = await build_compare_response(handlerInput, melvin_state, compare_state, sate_diff);
+            const state_diff = get_state_change_diff(state_change);
+            let response = await build_compare_response(handlerInput, melvin_state, compare_state, state_diff);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -109,6 +111,55 @@ const NavigateCompareIntentHandler = {
         }
 
         console.log("[NavigateCompareIntentHandler] SPEECH TEXT = " + speechText);
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt(speechText)
+            .getResponse();
+    }
+}
+
+const NavigateSplitbyIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateSplitbyIntent';
+    },
+    async handle(handlerInput) {
+        let speechText = '';
+        try {
+            const melvin_state = get_melvin_state(handlerInput);
+            const state_change = await update_melvin_state(handlerInput);
+            validate_splitby_aux_state(handlerInput, melvin_state, state_change);
+
+            // trigger dialog management to complete slot elicitation process
+            if (handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED') {
+                return handlerInput.responseBuilder
+                    .addDelegateDirective(handlerInput.requestEnvelope.request.intent)
+                    .getResponse();
+            }
+
+            const splitby_state_change = await update_melvin_aux_state(handlerInput,
+                'requestEnvelope.request.intent.slots.splitby_query.value');
+            const splitby_state_diff = get_state_change_diff(splitby_state_change);
+            const splitby_state = validate_splitby_aux_state(handlerInput, melvin_state, splitby_state_change);
+
+            console.log(`[NavigateSplitbyIntentHandler] melvin_state: ${JSON.stringify(melvin_state)}, `
+                + `splitby_state_change: ${JSON.stringify(splitby_state_change)}, `
+                + `splitby_state_diff: ${JSON.stringify(splitby_state_diff)}, `
+                + `splitby_state: ${splitby_state}`);
+
+            let response = await build_splitby_response(handlerInput, melvin_state, splitby_state, splitby_state_diff);
+            speechText = response['speech_text'];
+
+        } catch (error) {
+            if (error['speech']) {
+                speechText = error['speech'];
+            } else {
+                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
+            }
+            console.trace(`[NavigateSplitbyIntentHandler] Error! except: `, error);
+        }
+
+        console.log("[NavigateSplitbyIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -316,6 +367,7 @@ module.exports = {
     NavigateRestoreSessionIntentHandler,
     NavigateJoinFilterIntentHandler,
     NavigateCompareIntentHandler,
+    NavigateSplitbyIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
 }

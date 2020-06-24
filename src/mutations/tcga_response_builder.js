@@ -82,12 +82,12 @@ async function build_mutations_tcga_response(handlerInput, params) {
         add_mutations_tcga_stats_plot(image_list, params);
         const gene_1_text = get_gene_speech_text(Object.keys(response['data'])[0]);
         const gene_2_text = get_gene_speech_text(Object.keys(response['data'])[1]);
-        const gene_1_perc = response['data'][Object.keys(response['data'])[0]];
-        const gene_2_perc = response['data'][Object.keys(response['data'])[1]];
+        const gene_1_perc = round(response['data'][Object.keys(response['data'])[0]], 1);
+        const gene_2_perc = round(response['data'][Object.keys(response['data'])[1]], 1);
         speech
-            .say(`In ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])},`)
+            .say(`Among ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])} patients,`)
             .say(`${gene_1_text} and ${gene_2_text} are the top 2 mutated genes found in`)
-            .say(`${round(gene_1_perc, 1)} percent and ${round(gene_2_perc, 1)}`)
+            .say(`${gene_1_perc} percent and ${gene_2_perc}`)
             .say(`percent of the patients respectively.`);
 
     } else {
@@ -182,9 +182,23 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
         add_mutations_tcga_profile_plot(image_list, compare_params);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        const study_text = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
+        const c_study_text = get_study_name_text(compare_params[MelvinAttributes.STUDY_ABBRV]);
+
+        const gene_text = get_gene_speech_text(Object.keys(response['data'])[0]);
+        const c_gene_text = get_gene_speech_text(Object.keys(compare_response['data'])[0]);
+
+        const gene_perc = round(response['data'][Object.keys(response['data'])[0]], 1);
+        const c_gene_perc = round(compare_response['data'][Object.keys(compare_response['data'])[0]], 1);
+
+        speech
+            .sayWithSSML(`Among ${study_text} patients, ${gene_text}`)
+            .say(`is the top mutated gene at ${gene_perc},`)
+            .sayWithSSML(`while ${c_gene_text} is most mutated in ${c_study_text}`)
+            .say(`at ${c_gene_perc}`);
+
         add_mutations_tcga_stats_plot(image_list, params);
         add_mutations_tcga_stats_plot(image_list, compare_params);
-        speech.say("Sorry, I'm still working on this analysis.");
 
     } else {
         throw melvin_error(

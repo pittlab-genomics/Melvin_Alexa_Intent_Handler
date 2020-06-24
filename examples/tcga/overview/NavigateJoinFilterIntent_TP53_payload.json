@@ -8,7 +8,6 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "BRCA"
             }
         },
         "user": {
@@ -79,9 +78,15 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNVIntent",
+            "name": "NavigateJoinFilterIntent",
             "confirmationStatus": "NONE",
-            "slots": {}
+            "slots": {
+                "query": {
+                    "name": "query",
+                    "value": "TP53",
+                    "confirmationStatus": "NONE"
+                }
+            }
         }
     }
 }
