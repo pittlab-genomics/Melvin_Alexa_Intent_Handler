@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const nunjucks = require('nunjucks');
 
 const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
 const { CANCER_TYPES } = require('./utils/cancer_types.js')
@@ -42,7 +43,8 @@ const MelvinIntentErrors = {
     INVALID_DATA_TYPE: "INVALID_DATA_TYPE",
     INVALID_API_RESPOSE: "INVALID_API_RESPOSE",
     MISSING_GENE: "MISSING_GENE",
-    MISSING_STUDY: "MISSING_STUDY"
+    MISSING_STUDY: "MISSING_STUDY",
+    NOT_IMPLEMENTED: "NOT_IMPLEMENTED"
 };
 
 const OOVEntityTypes = {
@@ -57,10 +59,10 @@ const DataTypes = {
     GENE_DEFINITION: "GENE_DEFINITION",
     MUTATIONS: "MUTATIONS",
     MUTATION_DOMAINS: "MUTATION_DOMAINS",
-    EXPRESSION: "EXPRESSION",
-    CNV_ALTERATIONS: "CNV_ALTERATIONS",
-    CNV_AMPLIFICATIONS: "CNV_AMPLIFICATIONS",
-    CNV_DELETIONS: "CNV_DELETIONS",
+    EXPRESSIONS: "EXPRESSIONS",
+    CNA_ALTERATIONS: "CNA_ALTERATIONS",
+    CNA_AMPLIFICATIONS: "CNA_AMPLIFICATIONS",
+    CNA_DELETIONS: "CNA_DELETIONS",
     STRUCTURAL_VARIANTS: "STRUCTURAL_VARIANTS"
 };
 
@@ -69,7 +71,7 @@ const DataSources = {
     CLINVAR: "CLINVAR"
 };
 
-const CNVTypes = {
+const CNATypes = {
     AMPLIFICATIONS: "amplifications",
     DELETIONS: "deletions",
     ALTERATIONS: "alterations"
@@ -83,6 +85,11 @@ const get_study_name_text = function (study_abbrv) {
     return (_.has(CANCER_TYPES, study_abbrv) ? CANCER_TYPES[study_abbrv] : study_abbrv);
 }
 
+const melvin_round = function (value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
+
 /*
  * G (Gene) | C (CancerType)
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
@@ -92,9 +99,10 @@ RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
-RequiredAttributesTCGA[DataTypes.CNV_ALTERATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
-RequiredAttributesTCGA[DataTypes.CNV_AMPLIFICATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
-RequiredAttributesTCGA[DataTypes.CNV_DELETIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.CNA_ALTERATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.CNA_AMPLIFICATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.CNA_DELETIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.EXPRESSIONS] = [3]; // ['GC'];
 
 const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];
@@ -103,10 +111,8 @@ RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
     " Please try again later."
-
-const DEFAULT_MELVIN_ERROR_SPEECH_TEXT = "Sorry, I got lost during the conversation. Please start over.";
-
-const DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE = "I'm still working on this analysis. Please try again later.";
+const DEFAULT_INVALID_STATE_RESPONSE = "Sorry, I got lost during the conversation. Please start over.";
+const DEFAULT_NOT_IMPLEMENTED_RESPONSE = "I'm still working on implementing this analysis. Please try again later.";
 
 const melvin_error = function (message, type, speech = null) {
     let error = new Error(message);
@@ -117,6 +123,21 @@ const melvin_error = function (message, type, speech = null) {
     return error;
 }
 
+// configure Nunjucks
+const RESPONSE_TEMPLATES_PATH = __dirname + '/../resources/response_templates'
+const nunjucks_env = nunjucks.configure(RESPONSE_TEMPLATES_PATH, {
+    autoescape: true,
+    cache: false
+});
+
+nunjucks_env.addGlobal('Object', Object);
+nunjucks_env.addGlobal('JSON', JSON);
+nunjucks_env.addGlobal('MelvinAttributes', MelvinAttributes);
+nunjucks_env.addGlobal('MelvinIntentErrors', MelvinIntentErrors);
+nunjucks_env.addGlobal('get_gene_speech_text', get_gene_speech_text);
+nunjucks_env.addGlobal('get_study_name_text', get_study_name_text);
+nunjucks_env.addGlobal('melvin_round', melvin_round);
+
 module.exports = {
     // Welcome greeting specific to the deployment environment helps to identify which skill is being used
     MELVIN_WELCOME_GREETING: process.env.MELVIN_WELCOME_GREETING,
@@ -126,19 +147,21 @@ module.exports = {
     MelvinAttributes,
     MelvinEventTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
-    DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
+    DEFAULT_INVALID_STATE_RESPONSE,
+    DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
+    melvin_round,
     OOVEntityTypes,
     DataTypes,
     DataSources,
-    CNVTypes,
+    CNATypes,
     melvin_error,
     MelvinIntentErrors,
     MelvinExplorerErrors,
     RequiredAttributesTCGA,
     RequiredAttributesClinvar,
     MELVIN_MAX_HISTORY_ITEMS,
-    FOLLOW_UP_TEXT_THRESHOLD
+    FOLLOW_UP_TEXT_THRESHOLD,
+    nunjucks_env
 };

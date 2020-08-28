@@ -8,8 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53",
-                "data_type": "CNV_ALTERATIONS"
+                "gene_name": "TP53"
             }
         },
         "user": {
@@ -80,15 +79,9 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCompareIntent",
+            "name": "NavigateMutationsDomainIntent",
             "confirmationStatus": "NONE",
-            "slots": {
-                "query": {
-                    "name": "query",
-                    "value": "mutations",
-                    "confirmationStatus": "NONE"
-                }
-            }
+            "slots": {}
         }
     }
 }

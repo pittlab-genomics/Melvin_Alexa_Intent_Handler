@@ -8,9 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "BRCA1",
-                "study_abbreviation": "BRCA",
-                "data_type": "CNV_ALTERATIONS"
+                "gene_name": "TP53",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {
@@ -86,7 +85,7 @@
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "TP53",
+                    "value": "braca one",
                     "confirmationStatus": "NONE"
                 }
             }

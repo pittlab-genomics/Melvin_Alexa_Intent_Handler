@@ -1,7 +1,13 @@
 const _ = require('lodash');
+const Speech = require('ssml-builder');
 
 const {
-    MelvinAttributes
+    MelvinAttributes,
+    MelvinIntentErrors,
+    melvin_error,
+    nunjucks_env,
+    DEFAULT_INVALID_STATE_RESPONSE,
+    DEFAULT_NOT_IMPLEMENTED_RESPONSE
 } = require('../common.js');
 
 
@@ -29,7 +35,7 @@ const get_state_change_diff = function (state_change) {
     const diff_s = {};
     console.debug(`[get_state_change_diff] state_change: ${JSON.stringify(state_change)}`);
 
-    for (let [key, value] of Object.entries(MelvinAttributes)) {
+    for (let [_ignore, value] of Object.entries(MelvinAttributes)) {
         let prev_val = _.get(prev_s, value, '');
         let new_val = _.get(new_s, value, '');
         // console.debug(`[get_state_change_diff] ${prev_val}, ${new_val}, ${value}`);
@@ -42,7 +48,7 @@ const get_state_change_diff = function (state_change) {
             diff_s['entity_value'] = new_val;
             break;
         }
-    };
+    }
 
     console.debug(`[get_state_change_diff] diff_s: ${JSON.stringify(diff_s)}`);
     return diff_s;
@@ -53,9 +59,38 @@ const round = function (value, precision) {
     return Math.round(value * multiplier) / multiplier;
 }
 
+
+const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_context)  {
+    const speech = new Speech();
+    const nunjucks_res = nunjucks_env
+        .render(nunjucks_template, nunjucks_context)
+        .replace(/\r?\n|\r/g, " ")
+        .replace(/\s+/g,' ')
+        .trim();
+    console.debug(`[build_ssml_response_from_nunjucks] nunjucks_template: ${nunjucks_template}, ` +
+        `nunjucks_res: ${nunjucks_res}`);
+
+    if (nunjucks_res === MelvinIntentErrors.INVALID_STATE) {
+        throw melvin_error(
+            `invalid state | nunjucks_context: ${JSON.stringify(nunjucks_context)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_INVALID_STATE_RESPONSE
+        );
+    } else if (nunjucks_res === MelvinIntentErrors.NOT_IMPLEMENTED) {
+        throw melvin_error(
+            `not implemented | nunjucks_context: ${JSON.stringify(nunjucks_context)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            DEFAULT_NOT_IMPLEMENTED_RESPONSE
+        );
+    }
+    speech.sayWithSSML(nunjucks_res);
+    return speech.ssml()
+}
+
 module.exports = {
     round,
     add_query_params,
     add_query_list_params,
-    get_state_change_diff
+    get_state_change_diff,
+    build_ssml_response_from_nunjucks
 }

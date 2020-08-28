@@ -8,8 +8,8 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
-    DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE,
+    DEFAULT_INVALID_STATE_RESPONSE,
+    DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
@@ -37,7 +37,7 @@ async function build_mutations_clinvar_response(handlerInput, params) {
     const response = await get_mutations_clinvar_stats(params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
+        speech.say(DEFAULT_NOT_IMPLEMENTED_RESPONSE);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         const data = response['data'];
@@ -45,13 +45,13 @@ async function build_mutations_clinvar_response(handlerInput, params) {
         _populate_response(params, data, speech);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        speech.say(DEFAULT_MELVIN_NOT_IMPLEMENTED_RESPONSE);
+        speech.say(DEFAULT_NOT_IMPLEMENTED_RESPONSE);
 
     } else {
         throw melvin_error(
             `[build_mutations_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 

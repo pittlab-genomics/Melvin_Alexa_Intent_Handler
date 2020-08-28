@@ -49,9 +49,10 @@ async function process_message(msg_data) {
 
     let utterance_list = [];
     if (!_.isEmpty(msg_data['irs_duration_sec'])) {
-
+        // TODO
     } else {
-        utterance_list = await utterances_doc.get_last_n_events(msg_data['user_id'],
+        utterance_list = await utterances_doc.get_last_n_events(
+            msg_data['user_id'],
             msg_data['irs_results_count'],
             MelvinEventTypes.ANALYSIS_EVENT);
         utterance_list = utterance_list.slice(0, msg_data['irs_results_count']);
@@ -59,7 +60,7 @@ async function process_message(msg_data) {
     }
 
     const html_part_text = await get_utterances_html(greeting_text, utterance_list);
-    await irs_sent_email(sub_text, body_part_text, html_part_text);
+    await irs_send_email(sub_text, body_part_text, html_part_text);
 }
 
 async function get_utterances_html(greeting_text, utterance_list) {
@@ -102,7 +103,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
     return html_data;
 }
 
-async function irs_sent_email(subjectText, bodyText, bodyHTML) {
+async function irs_send_email(subjectText, bodyText, bodyHTML) {
     var payload = {
         Destination: {
             ToAddresses: [
@@ -134,7 +135,7 @@ async function irs_sent_email(subjectText, bodyText, bodyHTML) {
         ]
     };
     const response = await ses.sendEmail(payload).promise();
-    console.info(`[irs_sent_email] email sent | response: ${JSON.stringify(response)}`);
+    console.info(`[irs_send_email] email sent | response: ${JSON.stringify(response)}`);
 }
 
 exports.handler = sqs_irs_handler;

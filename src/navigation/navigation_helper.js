@@ -18,29 +18,28 @@ const {
     DataTypes,
     DataSources,
     melvin_error,
-    CNVTypes,
+    CNATypes,
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_APP_NAME
 } = require('../common.js');
 
 const { get_event_type } = require('./handler_configuration.js');
-const { build_navigate_cnv_response, build_cnvs_compare_response } = require('../cnvs/cnv_helper.js');
+const { build_navigate_cna_response, build_cna_compare_response } = require('../cna/response_builder.js');
 const { build_gene_definition_response } = require('../gene/gene_definition_response_builder.js');
 const { build_sv_response } = require('../structural_variants/sv_helper.js');
 const { build_overview_response } = require('../overview/overview_helper.js');
+const { build_gene_expression_response } = require('../gene_expression/response_builder.js');
+const { build_mut_cna_compare_response } = require('../comparison/mut_cna_helper.js');
+const { build_mut_cna_splitby_response } = require('../splitby/mut_cna_helper.js');
 const {
     build_mutations_response,
     build_mutations_domain_response,
     build_mutations_compare_response
-} = require('../mutations/mutations_helper.js');
-
-const { build_mut_cnv_compare_response } = require('../comparison/mut_cnv_helper.js');
-
-const { build_mut_cnv_splitby_response } = require('../splitby/mut_cnv_helper.js');
-
+} = require('../mutations/response_builder.js');
 
 const NAVIGATION_TOPICS = yaml.load('../../resources/navigation/topics.yml');
+
 
 const get_melvin_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -145,7 +144,7 @@ const update_melvin_history = async function (handlerInput) {
     }
 
     const timestamp = moment().valueOf();
-    const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
+    const utterance_id = `${timestamp}_${handlerInput.requestEnvelope.session.sessionId}`;
     const melvin_state = get_melvin_state(handlerInput);
 
     // store utterance as a session attribute for faster navigation
@@ -233,7 +232,7 @@ function validate_required_attributes(melvin_state) {
         error.speech = "I need to know a cancer type first. What cancer type are you interested in?";
         throw error;
     }
-};
+}
 
 const validate_navigation_intent_state = function (handlerInput, state_change) {
     console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
@@ -292,8 +291,7 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
 
 function add_followup_text(handlerInput, speech) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    melvin_state = sessionAttributes['MELVIN.STATE'];
-    if (Object.keys(melvin_state).length <= FOLLOW_UP_TEXT_THRESHOLD) {
+    if (Object.keys(sessionAttributes['MELVIN.STATE']).length <= FOLLOW_UP_TEXT_THRESHOLD) {
         speech.prosody({ rate: '110%' }, 'What would you like to know?');
     }
 }
@@ -334,8 +332,8 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
     if (state_diff['entity_type'] === MelvinAttributes.DTYPE) {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-            || melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
-            response = await build_mut_cnv_compare_response(handlerInput, melvin_state, state_diff);
+            || melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS) {
+            response = await build_mut_cna_compare_response(handlerInput, melvin_state, state_diff);
 
         } else {
             return {
@@ -356,26 +354,26 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
             response = await build_mutations_domain_response(handlerInput, melvin_state);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_AMPLIFICATIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_AMPLIFICATIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.APLIFICATIONS
+                cna_change: CNATypes.APLIFICATIONS
             };
-            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
+            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_DELETIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.DELETIONS
+                cna_change: CNATypes.DELETIONS
             };
-            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
+            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.ALTERATIONS
+                cna_change: CNATypes.ALTERATIONS
             };
-            response = await build_cnvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);;
+            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else {
             let error = new Error(`Error while building compare reponse: melvin_state: ${melvin_state}, compare_state: ${compare_state}`);
@@ -393,8 +391,8 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 const is_splitby_supported = function (melvin_state, splitby_state) {
     if (
         (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS)
-        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS)
+        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS
             && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
     ) {
         return true;
@@ -410,11 +408,11 @@ const build_splitby_response = async function (handlerInput, melvin_state, split
 
     if (
         (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS)
-        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS
+            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS)
+        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS
             && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
     ) {
-        response = await build_mut_cnv_splitby_response(handlerInput, melvin_state, state_diff);
+        response = await build_mut_cna_splitby_response(handlerInput, melvin_state, splitby_state, state_diff);
 
     } else {
         return {
@@ -450,29 +448,32 @@ const build_navigation_response = async function (handlerInput, melvin_state, st
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATION_DOMAINS) {
             response = await build_mutations_domain_response(handlerInput, melvin_state);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_AMPLIFICATIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_AMPLIFICATIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.APLIFICATIONS
+                cna_change: CNATypes.APLIFICATIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_navigate_cna_response(handlerInput, params);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_DELETIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_DELETIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.DELETIONS
+                cna_change: CNATypes.DELETIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_navigate_cna_response(handlerInput, params);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNV_ALTERATIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA_ALTERATIONS) {
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.ALTERATIONS
+                cna_change: CNATypes.ALTERATIONS
             };
-            response = await build_navigate_cnv_response(handlerInput, params);
+            response = await build_navigate_cna_response(handlerInput, params);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
             response = await build_sv_response(handlerInput, melvin_state);
+ 
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.EXPRESSIONS) {
+            response = await build_gene_expression_response(handlerInput, melvin_state);
 
         } else {
             throw melvin_error(`Unknown data_type found in melvin_state: ${JSON.stringify(melvin_state)}`,

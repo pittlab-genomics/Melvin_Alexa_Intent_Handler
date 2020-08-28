@@ -1,17 +1,21 @@
 const URL = require('url').URL;
 const Speech = require('ssml-builder');
 const _ = require('lodash');
+
+
 const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
-const { round, add_query_params } = require('../utils/response_builder_utils.js');
+const { add_query_params } = require('../utils/response_builder_utils.js');
 
 const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    DEFAULT_INVALID_STATE_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
-    MELVIN_EXPLORER_ENDPOINT
+    melvin_round,
+    nunjucks_env,
+    MELVIN_EXPLORER_ENDPOINT,
 } = require('../common.js');
 
 const {
@@ -24,80 +28,34 @@ async function build_mutations_tcga_response(handlerInput, params) {
     const image_list = [];
     const response = await get_mutations_tcga_stats(params);
 
-    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        const mutated_cancer_type_count = response['data']['cancer_types_with_mutated_gene'];
-        const total_cancer_types = response['data']['total_cancer_types'];
-        const records_list = response['data']['records'];
-        const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
+    const nunjucks_context = {
+        MelvinAttributes,
+        melvin_state: params,
+        mut_response: response
+    };
 
-        if (Array.isArray(records_list)) {
-            add_mutations_tcga_stats_plot(image_list, params);
-            add_mutations_tcga_treemap_plot(image_list, params);
-            speech
-                .sayWithSSML(gene_speech_text)
-                .say(`mutations are found in ${mutated_cancer_type_count}`)
-                .say(`out of ${total_cancer_types} cancer types.`);
-
-            if (records_list.length >= 2) {
-                speech
-                    .say(`It is most mutated in ${get_study_name_text(records_list[0][MelvinAttributes.STUDY_ABBRV])} at `)
-                    .say(round(records_list[0]['percent_cancer_patients_with_mutgene'], 1))
-                    .say(`percent, followed by ${get_study_name_text(records_list[1][MelvinAttributes.STUDY_ABBRV])} at `)
-                    .say(round(records_list[1]['percent_cancer_patients_with_mutgene'], 1))
-                    .say('percent.')
-
-            } else if (records_list.length >= 1) {
-                speech
-                    .sayWithSSML(gene_speech_text)
-                    .say(`mutations are found in ${mutated_cancer_type_count}`)
-                    .say(`out of ${total_cancer_types} cancer types.`)
-                    .say(`It is most mutated in ${get_study_name_text(records_list[0][MelvinAttributes.STUDY_ABBRV])} at `)
-                    .say(`${round(records_list[0]['percent_cancer_patients_with_mutgene'], 1)} percent.`)
-
-            } else {
-                speech
-                    .sayWithSSML(`I could not find any ${gene_speech_text} mutations.`);
-            }
-
-        } else {
-            throw melvin_error(
-                `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
-                MelvinIntentErrors.INVALID_API_RESPOSE,
-                `Sorry, I'm having trouble accessing mutations records for ${gene_speech_text}`
-            );
-        }
-
-    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_profile_plot(image_list, params);
-        const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-        const recc_positions = response['data']['recurrent_positions'];
-
-        speech
-            .sayWithSSML(`${gene_speech_text} mutations are found in`)
-            .say(round(response['data']['patient_percentage'], 1))
-            .say(`percent of ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])} patients`)
-            .say(`with ${recc_positions} amino acid residues recurrently mutated.`);
-
-    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_stats_plot(image_list, params);
-        const gene_1_text = get_gene_speech_text(Object.keys(response['data'])[0]);
-        const gene_2_text = get_gene_speech_text(Object.keys(response['data'])[1]);
-        const gene_1_perc = round(response['data'][Object.keys(response['data'])[0]], 1);
-        const gene_2_perc = round(response['data'][Object.keys(response['data'])[1]], 1);
-        speech
-            .say(`Among ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])} patients,`)
-            .say(`${gene_1_text} and ${gene_2_text} are the top 2 mutated genes found in`)
-            .say(`${gene_1_perc} percent and ${gene_2_perc}`)
-            .say(`percent of the patients respectively.`);
-
-    } else {
+    const nunjucks_res = nunjucks_env
+        .render('mutations/mutations_tcga.njk', nunjucks_context)
+        .replace(/\r?\n|\r/g, " ")
+        .replace(/\s+/g,' ');
+        
+    if (nunjucks_res == MelvinIntentErrors.INVALID_STATE) {
         throw melvin_error(
-            `[build_mutations_tcga_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_expressions_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            "Sorry, I need a gene name to make a comparison."
         );
     }
+    speech.sayWithSSML(nunjucks_res);
 
+    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_stats_plot(image_list, params);
+        add_mutations_tcga_treemap_plot(image_list, params);
+    } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_stats_plot(image_list, params);
+    } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_profile_plot(image_list, params);
+    }    
     add_to_APL_image_pager(handlerInput, image_list);
     return {
         'speech_text': speech.ssml()
@@ -117,14 +75,14 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
 
             const mut_ct_count = response['data']['cancer_types_with_mutated_gene'];
             const tot_ct_count = response['data']['total_cancer_types'];
-            const mut_ct_perc = round(100 * mut_ct_count / tot_ct_count, 1);
+            const mut_ct_perc = melvin_round(100 * mut_ct_count / tot_ct_count, 1);
 
             const c_mut_ct_count = compare_response['data']['cancer_types_with_mutated_gene'];
             const c_tot_ct_count = compare_response['data']['total_cancer_types'];
-            const c_mut_ct_perc = round(100 * c_mut_ct_count / c_tot_ct_count, 1);
+            const c_mut_ct_perc = melvin_round(100 * c_mut_ct_count / c_tot_ct_count, 1);
 
-            const mut_cases = round(response['data']['patient_percentage'], 1);
-            const c_mut_cases = round(compare_response['data']['patient_percentage'], 1);
+            const mut_cases = melvin_round(response['data']['patient_percentage'], 1);
+            const c_mut_cases = melvin_round(compare_response['data']['patient_percentage'], 1);
 
             speech
                 .sayWithSSML(`${c_gene_text} and ${gene_text} mutations are found in`)
@@ -151,8 +109,8 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
         const gene_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
         const study_text = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
-        const patient_perc = round(response['data']['patient_percentage'], 1);
-        const c_patient_perc = round(compare_response['data']['patient_percentage'], 1);
+        const patient_perc = melvin_round(response['data']['patient_percentage'], 1);
+        const c_patient_perc = melvin_round(compare_response['data']['patient_percentage'], 1);
         const freq_adj = (c_patient_perc > patient_perc) ? "more" : "less";
 
         if (sate_diff['entity_type'] === MelvinAttributes.GENE_NAME) {
@@ -188,8 +146,8 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
         const gene_text = get_gene_speech_text(Object.keys(response['data'])[0]);
         const c_gene_text = get_gene_speech_text(Object.keys(compare_response['data'])[0]);
 
-        const gene_perc = round(response['data'][Object.keys(response['data'])[0]], 1);
-        const c_gene_perc = round(compare_response['data'][Object.keys(compare_response['data'])[0]], 1);
+        const gene_perc = melvin_round(response['data'][Object.keys(response['data'])[0]], 1);
+        const c_gene_perc = melvin_round(compare_response['data'][Object.keys(compare_response['data'])[0]], 1);
 
         speech
             .sayWithSSML(`Among ${study_text} patients, ${gene_text}`)
@@ -204,7 +162,7 @@ async function build_mutations_compare_tcga_response(handlerInput, params, compa
         throw melvin_error(
             `[build_mutations_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 
@@ -223,21 +181,21 @@ function _populate_domain_response(params, records_list, speech, gene_speech_tex
         speech
             .say(`${records_list[0]['domain']} and ${records_list[1]['domain']}`)
             .say(`are the most affected domains containing`)
-            .say(round(records_list[0]['percentage'], 1))
+            .say(melvin_round(records_list[0]['percentage'], 1))
             .say('percent and')
-            .say(round(records_list[1]['percentage'], 1))
+            .say(melvin_round(records_list[1]['percentage'], 1))
             .say(`percent of mutations respectively.`);
 
     } else if (records_list.length > 1) {
         speech
             .say(`${records_list[0]['domain']} is the most affected domain containing`)
-            .say(round(records_list[0]['percentage'], 1))
+            .say(melvin_round(records_list[0]['percentage'], 1))
             .say(`percent of mutations.`);
 
     } else if (records_list.length == 1) {
         speech
             .say(`${records_list[0]['domain']} is the only affected domain containing`)
-            .say(round(records_list[0]['percentage'], 1))
+            .say(melvin_round(records_list[0]['percentage'], 1))
             .say(`percent of mutations.`);
 
     } else {
@@ -275,7 +233,7 @@ async function build_mutations_tcga_domain_response(handlerInput, params) {
         throw melvin_error(
             `[build_mutations_tcga_domain_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 

@@ -7,21 +7,21 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
-    CNVTypes,
+    DEFAULT_INVALID_STATE_RESPONSE,
+    CNATypes,
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
 } = require('../common.js');
 
-const { get_cnvs_tcga_stats } = require('../http_clients/cnvs_tcga_client.js');
+const { get_cna_tcga_stats } = require('../http_clients/cna_tcga_client.js');
 const { round, add_query_params } = require('../utils/response_builder_utils.js');
 
-function build_cnv_alterations_response(params, response, speech) {
+function build_cna_alterations_response(params, response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
-    if (params.cnv_change == CNVTypes.ALTERATIONS
+    if (params.cna_change == CNATypes.ALTERATIONS
         && response['data']['amplifications_percentage']
         && response['data']['deletions_percentage']) {
 
@@ -34,14 +34,14 @@ function build_cnv_alterations_response(params, response, speech) {
             .say(`and deleted ${deletions} percent.`);
 
     } else if (
-        params.cnv_change == CNVTypes.AMPLIFICATIONS && response['data']['amplifications_percentage']
+        params.cna_change == CNATypes.AMPLIFICATIONS && response['data']['amplifications_percentage']
     ) {
-        build_cnv_amplifications_response(params, response, speech)
+        build_cna_amplifications_response(params, response, speech)
 
     } else if (
-        params.cnv_change == CNVTypes.DELETIONS && response['data']['deletions_percentage']
+        params.cna_change == CNATypes.DELETIONS && response['data']['deletions_percentage']
     ) {
-        build_cnv_deletions_response(params, response, speech)
+        build_cna_deletions_response(params, response, speech)
 
     } else {
         speech
@@ -50,7 +50,7 @@ function build_cnv_alterations_response(params, response, speech) {
     }
 }
 
-function build_cnv_deletions_response(params, response, speech) {
+function build_cna_deletions_response(params, response, speech) {
     const deletions = round(response['data']['deletions_percentage'], 1);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
@@ -61,7 +61,7 @@ function build_cnv_deletions_response(params, response, speech) {
 
 }
 
-function build_cnv_amplifications_response(params, response, speech) {
+function build_cna_amplifications_response(params, response, speech) {
     const amplifications = round(response['data']['amplifications_percentage'], 1);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
@@ -71,7 +71,7 @@ function build_cnv_amplifications_response(params, response, speech) {
         .say(`is amplified ${amplifications} percent.`);
 }
 
-function build_cnv_by_gene_response(params, response, speech) {
+function build_cna_by_gene_response(params, response, speech) {
     const records_list = response['data']['records'];
     const gene_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
 
@@ -105,14 +105,14 @@ function build_cnv_by_gene_response(params, response, speech) {
 
     } else {
         throw melvin_error(
-            `[build_cnv_by_gene_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+            `[build_cna_by_gene_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
             `Sorry, I'm having trouble accessing copy number alteration records for ${gene_text}`
         );
     }
 }
 
-function build_cnv_by_study_response(params, response, speech) {
+function build_cna_by_study_response(params, response, speech) {
     const records_list = response['data']['records'];
     const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
 
@@ -146,43 +146,43 @@ function build_cnv_by_study_response(params, response, speech) {
 
     } else {
         throw melvin_error(
-            `[build_cnv_by_study_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+            `[build_cna_by_study_response] Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
             `Sorry, I'm having trouble accessing copy number alteration records for ${study}`
         );
     }
 }
 
-async function build_cnvs_tcga_response(handlerInput, params) {
+async function build_cna_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
-    const response = await get_cnvs_tcga_stats(params);
+    const response = await get_cna_tcga_stats(params);
 
     if (response['error']) {
         throw melvin_error(
-            `[build_cnvs_compare_tcga_response] invalid response | response: ${JSON.stringify(response)}`,
+            `[build_cna_compare_tcga_response] invalid response | response: ${JSON.stringify(response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
             "Sorry, there was a problem while performing the copy number alterations analysis. Please try again later."
         );
     }
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_cnvs_tcga_plot(image_list, params);
-        build_cnv_by_gene_response(params, response, speech);
+        add_cna_tcga_plot(image_list, params);
+        build_cna_by_gene_response(params, response, speech);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_cnvs_tcga_plot(image_list, params);
-        build_cnv_by_study_response(params, response, speech);
+        add_cna_tcga_plot(image_list, params);
+        build_cna_by_study_response(params, response, speech);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_cnvs_tcga_plot(image_list, params);
-        build_cnv_alterations_response(params, response, speech);
+        add_cna_tcga_plot(image_list, params);
+        build_cna_alterations_response(params, response, speech);
 
     } else {
         throw melvin_error(
-            `[build_cnvs_tcga_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_cna_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 
@@ -192,15 +192,15 @@ async function build_cnvs_tcga_response(handlerInput, params) {
     }
 }
 
-async function build_cnvs_compare_tcga_response(handlerInput, params, compare_params, sate_diff) {
+async function build_cna_compare_tcga_response(handlerInput, params, compare_params, sate_diff) {
     const speech = new Speech();
     const image_list = [];
-    const response = await get_cnvs_tcga_stats(params);
-    const compare_response = await get_cnvs_tcga_stats(compare_params);
+    const response = await get_cna_tcga_stats(params);
+    const compare_response = await get_cna_tcga_stats(compare_params);
 
     if (response['error'] || compare_response['error']) {
         throw melvin_error(
-            `[build_cnvs_compare_tcga_response] invalid response | response: ${JSON.stringify(response)}, `
+            `[build_cna_compare_tcga_response] invalid response | response: ${JSON.stringify(response)}, `
             + `compare_response: ${JSON.stringify(compare_response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
             "Sorry, there was a problem while performing the comparison analysis. Please try again later."
@@ -224,12 +224,12 @@ async function build_cnvs_compare_tcga_response(handlerInput, params, compare_pa
                 .sayWithSSML(`while ${c_gene_text} has the greatest number of copy number alterations in`)
                 .say(`${c_study_text} at ${c_cna_perc}`);
 
-            add_cnvs_tcga_plot(image_list, params);
-            add_cnvs_tcga_plot(image_list, compare_params);
+            add_cna_tcga_plot(image_list, params);
+            add_cna_tcga_plot(image_list, compare_params);
 
         } else {
             throw melvin_error(
-                `[build_cnvs_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+                `[build_cna_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
                 MelvinIntentErrors.INVALID_STATE,
                 "Sorry, I need a gene name to make a comparison."
             );
@@ -260,14 +260,14 @@ async function build_cnvs_compare_tcga_response(handlerInput, params, compare_pa
 
         } else {
             throw melvin_error(
-                `[build_cnvs_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+                `[build_cna_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
                 MelvinIntentErrors.INVALID_STATE,
                 "Sorry, something went wrong while performing the comparison analysis."
             );
         }
 
-        add_cnvs_tcga_plot(image_list, params);
-        add_cnvs_tcga_plot(image_list, compare_params);
+        add_cna_tcga_plot(image_list, params);
+        add_cna_tcga_plot(image_list, compare_params);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         const study_text = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
@@ -285,14 +285,14 @@ async function build_cnvs_compare_tcga_response(handlerInput, params, compare_pa
             .sayWithSSML(`while ${c_gene_text} has the greatest number of copy number alterations in ${c_study_text}`)
             .say(`at ${c_cna_perc}`);
 
-        add_cnvs_tcga_plot(image_list, params);
-        add_cnvs_tcga_plot(image_list, compare_params);
+        add_cna_tcga_plot(image_list, params);
+        add_cna_tcga_plot(image_list, compare_params);
 
     } else {
         throw melvin_error(
-            `[build_cnvs_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_cna_compare_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 
@@ -302,13 +302,13 @@ async function build_cnvs_compare_tcga_response(handlerInput, params, compare_pa
     }
 }
 
-const add_cnvs_tcga_plot = function (image_list, params) {
-    const cnv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/tcga/plot`);
-    add_query_params(cnv_url, params);
-    image_list.push(cnv_url);
+const add_cna_tcga_plot = function (image_list, params) {
+    const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/plot`);
+    add_query_params(cna_url, params);
+    image_list.push(cna_url);
 }
 
 module.exports = {
-    build_cnvs_tcga_response,
-    build_cnvs_compare_tcga_response
+    build_cna_tcga_response,
+    build_cna_compare_tcga_response
 }

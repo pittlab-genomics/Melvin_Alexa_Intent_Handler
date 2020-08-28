@@ -8,7 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "BRCA1"
+                "gene_name": "TP53",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {
@@ -79,12 +80,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNAIntent",
+            "name": "NavigateCompareIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "ovarian cancer",
+                    "value": "mutations",
                     "confirmationStatus": "NONE"
                 }
             }

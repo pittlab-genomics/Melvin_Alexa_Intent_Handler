@@ -8,8 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53",
-                "data_type": "CNV_ALTERATIONS"
+                "study_abbreviation": "BRCA",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {
@@ -85,7 +85,7 @@
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "braca one",
+                    "value": "ovarian cancer",
                     "confirmationStatus": "NONE"
                 }
             }

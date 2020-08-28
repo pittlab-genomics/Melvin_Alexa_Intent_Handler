@@ -9,7 +9,8 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53",
-                "data_type": "CNV_ALTERATIONS"
+                "study_abbreviation": "BRCA",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {

@@ -89,7 +89,7 @@
         "timestamp": "2019-08-13T09:10:18Z",
         "locale": "en-US",
         "intent": {
-            "name": "CNVAmplificationGeneIntent",
+            "name": "CNAAmplificationGeneIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "gene": {

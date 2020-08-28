@@ -79,7 +79,7 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNVIntent",
+            "name": "NavigateCNAIntent",
             "confirmationStatus": "NONE",
             "slots": {}
         }

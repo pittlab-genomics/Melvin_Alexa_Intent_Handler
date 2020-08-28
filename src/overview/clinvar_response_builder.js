@@ -8,7 +8,7 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    DEFAULT_INVALID_STATE_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
@@ -142,7 +142,7 @@ async function build_overview_clinvar_response(handlerInput, params) {
         throw melvin_error(
             `[build_overview_clinvar_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 

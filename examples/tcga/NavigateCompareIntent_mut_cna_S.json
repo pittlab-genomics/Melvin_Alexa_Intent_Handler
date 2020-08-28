@@ -8,9 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "BRCA1",
-                "study_abbreviation": "BRCA",
-                "data_type": "CNV_ALTERATIONS"
+                "study_abbreviation": "OV",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {
@@ -86,7 +85,7 @@
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "ovarian cancer",
+                    "value": "mutations",
                     "confirmationStatus": "NONE"
                 }
             }

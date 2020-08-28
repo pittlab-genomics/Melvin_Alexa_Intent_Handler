@@ -2,21 +2,21 @@ const {
     MelvinAttributes,
     DataTypes,
     DataSources,
-    CNVTypes,
+    CNATypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require('../common.js');
 
-const { build_navigate_cnv_response } = require('../cnvs/cnv_helper.js');
+const { build_navigate_cna_response } = require('../cna/response_builder.js');
 
 const {
     validate_action_intent_state,
     update_melvin_state
 } = require('../navigation/navigation_helper.js');
 
-const CNVAmplificationGeneIntentHandler = {
+const CNAAmplificationGeneIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'CNVAmplificationGeneIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'CNAAmplificationGeneIntent';
     },
     async handle(handlerInput) {
         const params = {
@@ -24,10 +24,10 @@ const CNVAmplificationGeneIntentHandler = {
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cnv_change: CNVTypes.AMPLIFICATIONS
+            cna_change: CNATypes.AMPLIFICATIONS
         };
-        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-        speechText = cnv_response['speech_text'];
+        const cna_response = await build_navigate_cna_response(handlerInput, params);
+        const speechText = cna_response['speech_text'];
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -36,20 +36,20 @@ const CNVAmplificationGeneIntentHandler = {
     }
 };
 
-const CNVDeletionGeneIntent = {
+const CNADeletionGeneIntent = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'CNVDeletionGeneIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'CNADeletionGeneIntent';
     },
     async handle(handlerInput) {
         const params = {
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cnv_change: CNVTypes.DELETIONS
+            cna_change: CNATypes.DELETIONS
         };
-        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-        speechText = cnv_response['speech_text'];
+        const cna_response = await build_navigate_cna_response(handlerInput, params);
+        const speechText = cna_response['speech_text'];
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -58,20 +58,20 @@ const CNVDeletionGeneIntent = {
     }
 };
 
-const CNVAlterationGeneIntent = {
+const CNAAlterationGeneIntent = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'CNVAlterationGeneIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'CNAAlterationGeneIntent';
     },
     async handle(handlerInput) {
         const params = {
             [MelvinAttributes.GENE_NAME]: handlerInput.requestEnvelope.request.intent.slots.gene.value,
             [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
                 .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cnv_change: CNVTypes.ALTERATIONS
+            cna_change: CNATypes.ALTERATIONS
         };
-        const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-        speechText = cnv_response['speech_text'];
+        const cna_response = await build_navigate_cna_response(handlerInput, params);
+        const speechText = cna_response['speech_text'];
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -81,23 +81,23 @@ const CNVAlterationGeneIntent = {
 };
 
 
-const NavigateCNVIntentHandler = {
+const NavigateCNAIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNVIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNAIntent';
     },
     async handle(handlerInput) {
         let speechText = '';
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNV_ALTERATIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_ALTERATIONS);
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.ALTERATIONS
+                cna_change: CNATypes.ALTERATIONS
             };
-            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-            speechText = cnv_response['speech_text'];
+            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            speechText = cna_response['speech_text'];
 
         } catch (error) {
             if (error['speech']) {
@@ -105,7 +105,7 @@ const NavigateCNVIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error(`Error in NavigateCNVIntentHandler`, error);
+            console.error(`Error in NavigateCNAIntentHandler`, error);
         }
 
         return handlerInput.responseBuilder
@@ -115,23 +115,23 @@ const NavigateCNVIntentHandler = {
     }
 };
 
-const NavigateCNVAmplificationsIntentHandler = {
+const NavigateCNAAmplificationsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNVAmplificationsIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNAAmplificationsIntent';
     },
     async handle(handlerInput) {
         let speechText = '';
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNV_AMPLIFICATIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_AMPLIFICATIONS);
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.AMPLIFICATIONS
+                cna_change: CNATypes.AMPLIFICATIONS
             };
-            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-            speechText = cnv_response['speech_text'];
+            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            speechText = cna_response['speech_text'];
 
         } catch (error) {
             if (error['speech']) {
@@ -139,7 +139,7 @@ const NavigateCNVAmplificationsIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error(`Error in NavigateCNVAmplificationsIntent`, error);
+            console.error(`Error in NavigateCNAAmplificationsIntent`, error);
         }
 
         return handlerInput.responseBuilder
@@ -149,23 +149,23 @@ const NavigateCNVAmplificationsIntentHandler = {
     }
 };
 
-const NavigateCNVDeletionsIntentHandler = {
+const NavigateCNADeletionsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNVDeletionsIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateCNADeletionsIntent';
     },
     async handle(handlerInput) {
         let speechText = '';
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNV_DELETIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_DELETIONS);
             const params = {
                 ...melvin_state,
-                cnv_change: CNVTypes.DELETIONS
+                cna_change: CNATypes.DELETIONS
             };
-            const cnv_response = await build_navigate_cnv_response(handlerInput, params);
-            speechText = cnv_response['speech_text'];
+            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            speechText = cna_response['speech_text'];
 
         } catch (error) {
             if (error['speech']) {
@@ -173,7 +173,7 @@ const NavigateCNVDeletionsIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error(`Error in NavigateCNVDeletionsIntent`, error);
+            console.error(`Error in NavigateCNADeletionsIntent`, error);
         }
 
         return handlerInput.responseBuilder
@@ -185,10 +185,10 @@ const NavigateCNVDeletionsIntentHandler = {
 
 
 module.exports = {
-    CNVAmplificationGeneIntentHandler,
-    CNVDeletionGeneIntent,
-    CNVAlterationGeneIntent,
-    NavigateCNVIntentHandler,
-    NavigateCNVAmplificationsIntentHandler,
-    NavigateCNVDeletionsIntentHandler
+    CNAAmplificationGeneIntentHandler,
+    CNADeletionGeneIntent,
+    CNAAlterationGeneIntent,
+    NavigateCNAIntentHandler,
+    NavigateCNAAmplificationsIntentHandler,
+    NavigateCNADeletionsIntentHandler
 }

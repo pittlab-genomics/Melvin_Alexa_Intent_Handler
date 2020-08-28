@@ -19,7 +19,7 @@ const {
 const {
     build_mutations_response,
     build_mutations_domain_response
-} = require('../mutations/mutations_helper.js');
+} = require('../mutations/response_builder.js');
 
 
 const MutationCountIntentHandler = {
