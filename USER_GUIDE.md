@@ -40,7 +40,7 @@ how about breast cancer
 compare with TP53
 
 
-## Compare CNV
+## Compare CNA
 
 open Melvin
 
@@ -57,7 +57,7 @@ compare with ovarian cancer
 send last ten results
 
 
-## Compare CNV vs Mutations
+## Compare CNA vs Mutations
 
 open Mel vin
 

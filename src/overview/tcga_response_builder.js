@@ -8,7 +8,7 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT,
+    DEFAULT_INVALID_STATE_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
@@ -19,11 +19,11 @@ const {
 } = require('../http_clients/mutations_tcga_client.js');
 
 const {
-    get_cnvs_tcga_stats
-} = require('../http_clients/cnvs_tcga_client.js');
+    get_cna_tcga_stats
+} = require('../http_clients/cna_tcga_client.js');
 
 
-function _populate_overview_by_gene_response(params, mut_response, cnvs_response, speech) {
+function _populate_overview_by_gene_response(params, mut_response, cna_response, speech) {
     const mutated_cancer_type_count = mut_response['data']['cancer_types_with_mutated_gene'];
     const total_cancer_types = mut_response['data']['total_cancer_types'];
     const records_list = mut_response['data']['records'];
@@ -66,7 +66,7 @@ function _populate_overview_by_gene_response(params, mut_response, cnvs_response
 
 }
 
-function _populate_overview_by_study_gene_response(params, mut_response, cnvs_response, speech) {
+function _populate_overview_by_study_gene_response(params, mut_response, cna_response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
     const recc_positions = mut_response['data']['recurrent_positions'];
 
@@ -77,7 +77,7 @@ function _populate_overview_by_study_gene_response(params, mut_response, cnvs_re
         .say(`with ${recc_positions} amino acid residues recurrently mutated.`);
 }
 
-function _populate_overview_by_study_response(params, mut_response, cnvs_response, speech) {
+function _populate_overview_by_study_response(params, mut_response, cna_response, speech) {
     const gene_1_text = get_gene_speech_text(Object.keys(mut_response['data'])[0]);
     const gene_2_text = get_gene_speech_text(Object.keys(mut_response['data'])[1]);
     const gene_1_perc = mut_response['data'][Object.keys(mut_response['data'])[0]];
@@ -94,25 +94,25 @@ async function build_overview_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const mut_response = await get_mutations_tcga_stats(params);
-    const cnvs_response = ''; // await get_cnvs_tcga_stats(params);
+    const cna_response = ''; // await get_cna_tcga_stats(params);
 
 
     add_overview_tcga_plots(image_list, params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_gene_response(params, mut_response, cnvs_response, speech);
+        _populate_overview_by_gene_response(params, mut_response, cna_response, speech);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_study_gene_response(params, mut_response, cnvs_response, speech);
+        _populate_overview_by_study_gene_response(params, mut_response, cna_response, speech);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_study_response(params, mut_response, cnvs_response, speech);
+        _populate_overview_by_study_response(params, mut_response, cna_response, speech);
 
     } else {
         throw melvin_error(
             `[build_overview_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
 
@@ -124,9 +124,9 @@ async function build_overview_tcga_response(handlerInput, params) {
 
 
 const add_overview_tcga_plots = function (image_list, params) {
-    const cnvs_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cnvs/tcga/plot`);
-    add_query_params(cnvs_plot_url, params);
-    image_list.push(cnvs_plot_url);
+    const cna_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/plot`);
+    add_query_params(cna_plot_url, params);
+    image_list.push(cna_plot_url);
 
     const mutations_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
     add_query_params(mutations_plot_url, params);

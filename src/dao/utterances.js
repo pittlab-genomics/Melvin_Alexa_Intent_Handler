@@ -85,7 +85,7 @@ utterances_doc.prototype.getMostRecentUtterance = async function (user_id, sessi
     var query_params = {
         TableName: process.env.DYNAMODB_TABLE_USER_UTTERANCE,
         ProjectionExpression: "utterance_id, melvin_history, melvin_state",
-        KeyConditionExpression: "#user_id = :uid AND begins_with(#utterance_id, :sid)",
+        KeyConditionExpression: "#user_id = :uid AND contains(#utterance_id, :sid)",
         ExpressionAttributeNames: {
             "#user_id": "user_id",
             "#utterance_id": "utterance_id"

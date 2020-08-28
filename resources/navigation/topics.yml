@@ -7,19 +7,19 @@ data_types:
       domains:
         intents:
           - "NavigateMutationsDomainIntent"
-  cnv:
+  cna:
     intents:
-      - "NavigateCNVIntent"
+      - "NavigateCNAIntent"
 
     subtopics:
       amplifications:
         intents:
-          - "NavigateCNVAmplifications"
+          - "NavigateCNAAmplifications"
 
       deletions:
         intents:
-          - "NavigateCNVDeletions"
+          - "NavigateCNADeletions"
 
       alterations:
         intents:
-          - "NavigateCNVAlterations"
+          - "NavigateCNAAlterations"

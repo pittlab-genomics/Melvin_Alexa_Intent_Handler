@@ -8,8 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "study_abbreviation": "OV",
-                "data_type": "CNV_ALTERATIONS"
+                "gene_name": "TP53",
+                "data_type": "CNA_ALTERATIONS"
             }
         },
         "user": {
@@ -76,16 +76,22 @@
     },
     "request": {
         "type": "IntentRequest",
+        "dialogState": "COMPLETED",
         "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCompareIntent",
+            "name": "NavigateSplitbyIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
                     "value": "mutations",
+                    "confirmationStatus": "NONE"
+                },
+                "splitby_query": {
+                    "name": "splitby_query",
+                    "value": "CDH1",
                     "confirmationStatus": "NONE"
                 }
             }

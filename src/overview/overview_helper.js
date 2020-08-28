@@ -3,7 +3,7 @@ const {
     MelvinIntentErrors,
     DataSources,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+    DEFAULT_INVALID_STATE_RESPONSE
 } = require('../common.js');
 
 const {
@@ -27,7 +27,7 @@ async function build_overview_response(handlerInput, params) {
         throw melvin_error(
             `[build_overview_response] invalid state: ${JSON.stringify(handlerInput, params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
     return response;

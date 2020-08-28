@@ -12,13 +12,16 @@
     "lodash": "^4.17.15",
     "js-yaml": "3.13.1",
     "moment": "^2.24.0",
-    "iso8601-duration": "^1.2.0"
+    "iso8601-duration": "^1.2.0",
+    "nunjucks": "^3.2.1"
   },
   "devDependencies": {
-    "serverless": "^1.57.0",
+    "eslint": "^7.7.0",
+    "eslint-config-google": "^0.14.0",
+    "serverless": "^1.78.1",
+    "serverless-plugin-aws-alerts": "^1.4.0",
     "serverless-plugin-include-dependencies": "^3.2.1",
     "serverless-prune-plugin": "^1.4.0",
-    "serverless-pseudo-parameters": "^2.5.0",
-    "serverless-plugin-aws-alerts": "^1.4.0"
+    "serverless-pseudo-parameters": "^2.5.0"
   }
 }

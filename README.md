@@ -20,7 +20,7 @@ serverless deploy
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_query_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/CNVAmplificationGeneIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/CNAAmplificationGeneIntent_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_payload.json
 serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_study_payload.json
@@ -42,6 +42,7 @@ serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateMut
 
 
 ### Mutation Domains
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_GS.json
 
 
@@ -61,6 +62,10 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADel
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_GS.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_S.json
+
+
+### Expressions
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateExpressionsIntent_GS.json
 
 
 ### Structural Variants
@@ -83,23 +88,23 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 
 
 ### Compare - CNA
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_G_vs_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_S_vs_S.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cnvs_GS_vs_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_S_vs_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_GS_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_GS_vs_S.json
 
 
-### Compare - MUTATIONS vs CNV
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_GS.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_S.json
+### Compare - MUTATIONS vs CNA
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cna_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cna_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cna_S.json
 
 
-### Splitby - MUTATIONS vs CNV
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cnvs.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cnvs_G.json
-
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_mut_cnvs_S.json
+### Splitby - MUTATIONS vs CNA
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_S.json
 
 
 ### Clinical Trials

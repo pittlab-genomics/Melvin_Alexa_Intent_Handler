@@ -6,18 +6,18 @@ const {
     MelvinIntentErrors,
     DataSources,
     melvin_error,
-    DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+    DEFAULT_INVALID_STATE_RESPONSE
 } = require('../common.js');
 
 const {
-    build_mut_cnv_compare_tcga_response
-} = require('../comparison/tcga_mut_cnv_response_builder.js');
+    build_mut_cna_compare_tcga_response
+} = require('../comparison/tcga_mut_cna_response_builder.js');
 
-async function build_mut_cnv_compare_response(handlerInput, params, sate_diff) {
-    console.info(`[build_mut_cnv_compare_response] params: ${JSON.stringify(params)}`);
+async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
+    console.info(`[build_mut_cna_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mut_cnv_compare_tcga_response(handlerInput, params, sate_diff);
+        response = await build_mut_cna_compare_tcga_response(handlerInput, params, sate_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         response = {
@@ -26,14 +26,14 @@ async function build_mut_cnv_compare_response(handlerInput, params, sate_diff) {
 
     } else {
         throw melvin_error(
-            `[build_mut_cnv_compare_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_mut_cna_compare_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_MELVIN_ERROR_SPEECH_TEXT
+            DEFAULT_INVALID_STATE_RESPONSE
         );
     }
     return response;
 }
 
 module.exports = {
-    build_mut_cnv_compare_response
+    build_mut_cna_compare_response
 }

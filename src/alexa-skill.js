@@ -34,13 +34,13 @@ const {
 } = require('./skill_handlers/navigation_handler.js');
 
 const {
-    CNVAmplificationGeneIntentHandler,
-    CNVDeletionGeneIntent,
-    CNVAlterationGeneIntent,
-    NavigateCNVIntentHandler,
-    NavigateCNVAmplificationsIntentHandler,
-    NavigateCNVDeletionsIntentHandler
-} = require('./skill_handlers/cnv_handler.js');
+    CNAAmplificationGeneIntentHandler,
+    CNADeletionGeneIntent,
+    CNAAlterationGeneIntent,
+    NavigateCNAIntentHandler,
+    NavigateCNAAmplificationsIntentHandler,
+    NavigateCNADeletionsIntentHandler
+} = require('./skill_handlers/cna_handler.js');
 
 const {
     MutationCountIntentHandler,
@@ -48,6 +48,10 @@ const {
     NavigateMutationsIntentHandler,
     NavigateMutationsDomainIntentHandler
 } = require('./skill_handlers/mutations_handler.js');
+
+const {
+    NavigateExpressionsIntentHandler
+} = require('./skill_handlers/gene_expression_handler.js');
 
 const { NavigateOverviewIntentHandler } = require('./skill_handlers/overview_handler.js');
 
@@ -206,9 +210,9 @@ const ErrorHandler = {
 };
 
 add_event_configuration("SearchGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, SearchGeneIntentHandler);
-add_event_configuration("CNVAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVAmplificationGeneIntentHandler);
-add_event_configuration("CNVDeletionGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVDeletionGeneIntent);
-add_event_configuration("CNVAlterationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNVAlterationGeneIntent);
+add_event_configuration("CNAAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNAAmplificationGeneIntentHandler);
+add_event_configuration("CNADeletionGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNADeletionGeneIntent);
+add_event_configuration("CNAAlterationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNAAlterationGeneIntent);
 add_event_configuration("MutationCountIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationCountIntentHandler);
 add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationPercentageIntentHandler);
 add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateGeneDefinitionIntentHandler);
@@ -218,9 +222,10 @@ add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
 add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
-add_event_configuration("NavigateCNVIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVIntentHandler);
-add_event_configuration("NavigateCNVAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVAmplificationsIntentHandler);
-add_event_configuration("NavigateCNVDeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNVDeletionsIntentHandler);
+add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
+add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAAmplificationsIntentHandler);
+add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNADeletionsIntentHandler);
+add_event_configuration("NavigateExpressionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionsIntentHandler);
 add_event_configuration("NavigateStartIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateStartIntentHandler);
 
 add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsNearbyIntentHandler);
@@ -249,9 +254,9 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SearchGeneIntentHandler,
-        CNVAmplificationGeneIntentHandler,
-        CNVDeletionGeneIntent,
-        CNVAlterationGeneIntent,
+        CNAAmplificationGeneIntentHandler,
+        CNADeletionGeneIntent,
+        CNAAlterationGeneIntent,
         MutationCountIntentHandler,
         MutationPercentageIntentHandler,
         HelpIntentHandler,
@@ -273,9 +278,10 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateSplitbyIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationsDomainIntentHandler,
-        NavigateCNVIntentHandler,
-        NavigateCNVAmplificationsIntentHandler,
-        NavigateCNVDeletionsIntentHandler,
+        NavigateCNAIntentHandler,
+        NavigateCNAAmplificationsIntentHandler,
+        NavigateCNADeletionsIntentHandler,
+        NavigateExpressionsIntentHandler,
         NavigateEmailIntentHandler,
 
         ClinicalTrialsNearbyIntentHandler,
