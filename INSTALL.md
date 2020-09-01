@@ -78,7 +78,7 @@ Install the Serverless Framework via npm which was already installed when you in
 https://www.serverless.com/framework/docs/providers/aws/guide/installation/
 
 ```
-npm install -g serverless
+sudo npm install -g serverless
 ```
 
 To see which version of serverless you have installed run:
