@@ -50,7 +50,7 @@ const {
 } = require('./skill_handlers/mutations_handler.js');
 
 const {
-    NavigateExpressionsIntentHandler
+    NavigateExpressionIntentHandler
 } = require('./skill_handlers/gene_expression_handler.js');
 
 const { NavigateOverviewIntentHandler } = require('./skill_handlers/overview_handler.js');
@@ -225,7 +225,7 @@ add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYS
 add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
 add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAAmplificationsIntentHandler);
 add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNADeletionsIntentHandler);
-add_event_configuration("NavigateExpressionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionsIntentHandler);
+add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
 add_event_configuration("NavigateStartIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateStartIntentHandler);
 
 add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsNearbyIntentHandler);
@@ -281,7 +281,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateCNAIntentHandler,
         NavigateCNAAmplificationsIntentHandler,
         NavigateCNADeletionsIntentHandler,
-        NavigateExpressionsIntentHandler,
+        NavigateExpressionIntentHandler,
         NavigateEmailIntentHandler,
 
         ClinicalTrialsNearbyIntentHandler,

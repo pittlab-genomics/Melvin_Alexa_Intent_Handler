@@ -181,7 +181,7 @@ const update_melvin_history = async function (handlerInput) {
 
 
 function validate_required_attributes(melvin_state) {
-    console.log(`[validate_required_attributes] | melvin_state: ${JSON.stringify(melvin_state)}`);
+    console.log(`[validate_required_attributes] melvin_state: ${JSON.stringify(melvin_state)}`);
     if (_.isEmpty(melvin_state['data_type'])) {
         return;
     }
@@ -218,6 +218,8 @@ function validate_required_attributes(melvin_state) {
         code += 1;
     }
     const is_valid = required_attributes.includes(code);
+    console.debug(`[validate_required_attributes] required_attributes: ${JSON.stringify(required_attributes)}, `
+        + `code: ${JSON.stringify(code)}`);
 
     if (!is_valid && !has_gene) {
         let error = new Error('Error while validating required attributes in melvin_state', melvin_state);
@@ -277,7 +279,7 @@ const validate_splitby_aux_state = function (handlerInput, melvin_state, state_c
 }
 
 const validate_action_intent_state = function (handlerInput, state_change, intent_data_type) {
-    console.log(`[validate_action_intent_state] | state_change: ${JSON.stringify(state_change)}`);
+    console.log(`[validate_action_intent_state] state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     // merge the previous state and new state. Overwrite with the latest
@@ -472,7 +474,7 @@ const build_navigation_response = async function (handlerInput, melvin_state, st
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
             response = await build_sv_response(handlerInput, melvin_state);
  
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.EXPRESSIONS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
             response = await build_gene_expression_response(handlerInput, melvin_state);
 
         } else {

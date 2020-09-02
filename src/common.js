@@ -59,7 +59,7 @@ const DataTypes = {
     GENE_DEFINITION: "GENE_DEFINITION",
     MUTATIONS: "MUTATIONS",
     MUTATION_DOMAINS: "MUTATION_DOMAINS",
-    EXPRESSIONS: "EXPRESSIONS",
+    GENE_EXPRESSION: "GENE_EXPRESSION",
     CNA_ALTERATIONS: "CNA_ALTERATIONS",
     CNA_AMPLIFICATIONS: "CNA_AMPLIFICATIONS",
     CNA_DELETIONS: "CNA_DELETIONS",
@@ -102,7 +102,7 @@ RequiredAttributesTCGA[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', '
 RequiredAttributesTCGA[DataTypes.CNA_ALTERATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.CNA_AMPLIFICATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.CNA_DELETIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
-RequiredAttributesTCGA[DataTypes.EXPRESSIONS] = [3]; // ['GC'];
+RequiredAttributesTCGA[DataTypes.GENE_EXPRESSION] = [2, 3, 1]; // ['G', 'GC', 'C'];
 
 const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];

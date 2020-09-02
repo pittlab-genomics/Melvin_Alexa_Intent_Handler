@@ -1,0 +1,89 @@
+{
+    "version": "1.0",
+    "session": {
+        "new": false,
+        "sessionId": "amzn1.echo-api.session.cf3db16c-15f7-42f9-b3a9-23047a14ad9f",
+        "application": {
+            "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
+        },
+        "attributes": {
+            "MELVIN.STATE": {
+                "gene_name": "TP53"
+            }
+        },
+        "user": {
+            "userId": "xxx"
+        }
+    },
+    "context": {
+        "AudioPlayer": {
+            "playerActivity": "IDLE"
+        },
+        "Display": {
+            "token": ""
+        },
+        "System": {
+            "application": {
+                "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
+            },
+            "user": {
+                "userId": "xxx"
+            },
+            "device": {
+                "deviceId": "ddd",
+                "supportedInterfaces": {
+                    "AudioPlayer": {},
+                    "Display": {
+                        "templateVersion": "1.0",
+                        "markupVersion": "1.0"
+                    },
+                    "Alexa.Presentation.APL": {
+                        "runtime": {
+                            "maxVersion": "1.0"
+                        }
+                    }
+                }
+            },
+            "apiEndpoint": "https://api.amazonalexa.com",
+            "apiAccessToken": "ttt"
+        },
+        "Viewport": {
+            "experiences": [
+                {
+                    "arcMinuteWidth": 246,
+                    "arcMinuteHeight": 144,
+                    "canRotate": false,
+                    "canResize": false
+                }
+            ],
+            "shape": "RECTANGLE",
+            "pixelWidth": 1024,
+            "pixelHeight": 600,
+            "dpi": 160,
+            "currentPixelWidth": 1024,
+            "currentPixelHeight": 600,
+            "touch": [
+                "SINGLE"
+            ],
+            "video": {
+                "codecs": [
+                    "H_264_42",
+                    "H_264_41"
+                ]
+            }
+        }
+    },
+    "request": {
+        "type": "IntentRequest",
+        "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
+        "timestamp": "2019-10-09T00:34:12Z",
+        "locale": "en-US",
+        "intent": {
+            "name": "NavigateExpressionIntent",
+            "confirmationStatus": "NONE",
+            "slots": {
+                "query": {}
+            }
+        }
+    }
+}

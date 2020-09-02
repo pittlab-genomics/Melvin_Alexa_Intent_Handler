@@ -11,17 +11,17 @@ const {
 const { build_gene_expression_response } = require('../gene_expression/response_builder.js');
 
 
-const NavigateExpressionsIntentHandler = {
+const NavigateExpressionIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateExpressionsIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'NavigateExpressionIntent';
     },
     async handle(handlerInput) {
         let speechText = '';
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.EXPRESSIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_EXPRESSION);
             const response = await build_gene_expression_response(handlerInput, melvin_state);
             speechText = response['speech_text'];
 
@@ -31,7 +31,7 @@ const NavigateExpressionsIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error(`NavigateExpressionsIntentHandler: message: ${error.message}`, error);
+            console.error(`NavigateExpressionIntentHandler: message: ${error.message}`, error);
         }
 
         console.log("SPEECH TEXT = " + speechText);
@@ -43,5 +43,5 @@ const NavigateExpressionsIntentHandler = {
 };
 
 module.exports = {
-    NavigateExpressionsIntentHandler
+    NavigateExpressionIntentHandler
 }
