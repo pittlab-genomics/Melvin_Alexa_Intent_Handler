@@ -78,10 +78,18 @@ Install the Serverless Framework via npm which was already installed when you in
 https://www.serverless.com/framework/docs/providers/aws/guide/installation/
 
 ```
-sudo npm install -g serverless
+npm install -g serverless
 ```
 
-To see which version of serverless you have installed run:
+- Install npm modules without sudo permissions
+Do not use `sudo` when running/installing npm packages. Read the following blog to understand why. Trust me, it's bad
+https://medium.com/@ExplosionPills/dont-use-sudo-with-npm-still-66e609f5f92
+
+- Set npm `PREFIX` param to set a target directory for global installations
+`npm config set prefix ~/.npm`
+
+
+- To see which version of serverless you have installed run:
 ```
 serverless --version
 ```
