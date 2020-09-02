@@ -64,8 +64,10 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmp
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_S.json
 
 
-### Expressions
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateExpressionsIntent_GS.json
+### Gene Expression
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGeneExpressionIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGeneExpressionIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGeneExpressionIntent_S.json
 
 
 ### Structural Variants

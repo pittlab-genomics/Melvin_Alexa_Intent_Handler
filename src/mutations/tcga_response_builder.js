@@ -41,7 +41,7 @@ async function build_mutations_tcga_response(handlerInput, params) {
         
     if (nunjucks_res == MelvinIntentErrors.INVALID_STATE) {
         throw melvin_error(
-            `[build_expressions_tcga_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_mutations_tcga_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
             "Sorry, I need a gene name to make a comparison."
         );

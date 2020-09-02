@@ -7,9 +7,7 @@
             "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
         },
         "attributes": {
-            "MELVIN.STATE": {
-                "gene_name": "TP53"
-            }
+            "MELVIN.STATE": {}
         },
         "user": {
             "userId": "xxx"
@@ -79,12 +77,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateExpressionsIntent",
+            "name": "NavigateExpressionIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "breast cancer",
+                    "value": "ovarian cancer",
                     "confirmationStatus": "NONE"
                 }
             }

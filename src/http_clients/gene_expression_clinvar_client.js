@@ -17,7 +17,7 @@ const get_gene_expression_clinvar_stats = function (params) {
 
     return new Promise(function (resolve, reject) {
         https(gene_expression_url.href, options, function (error, response, body) {
-            console.info(`[get_expressions_clinvar_stats] url: ${gene_expression_url.href}, `
+            console.info(`[get_gene_expression_clinvar_stats] url: ${gene_expression_url.href}, `
                 + `response: ${JSON.stringify(response)}`);
             if (error) {
                 return reject(new Error("Error retrieving data from Melvin Explorer service", error));
@@ -31,7 +31,7 @@ const get_gene_expression_clinvar_stats = function (params) {
             if (!body['data'] && !body['error']) {
                 reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPOSE,
-                    "Sorry, I'm having trouble accessing expressions data."));
+                    "Sorry, I'm having trouble accessing expression data."));
             }
             resolve(body);
         });
