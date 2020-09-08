@@ -10,7 +10,7 @@
             "MELVIN.STATE": {
                 "gene_name": "BRCA1",
                 "study_abbreviation": "BRCA",
-                "data_type": "CNA_ALTERATIONS"
+                "data_type": "CNA"
             }
         },
         "user": {

@@ -91,7 +91,7 @@ const NavigateCNAIntentHandler = {
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_ALTERATIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA);
             const params = {
                 ...melvin_state,
                 cna_change: CNATypes.ALTERATIONS
@@ -125,7 +125,7 @@ const NavigateCNAAmplificationsIntentHandler = {
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_AMPLIFICATIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GAIN);
             const params = {
                 ...melvin_state,
                 cna_change: CNATypes.AMPLIFICATIONS
@@ -159,7 +159,7 @@ const NavigateCNADeletionsIntentHandler = {
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.CNA_DELETIONS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.LOSS);
             const params = {
                 ...melvin_state,
                 cna_change: CNATypes.DELETIONS

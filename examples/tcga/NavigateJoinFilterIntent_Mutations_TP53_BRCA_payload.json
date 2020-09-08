@@ -8,9 +8,9 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "data_source": "CLINVAR",
+                "data_source": "TCGA",
                 "gene_name": "TP53",
-                "data_type": "MUTATIONS"
+                "study_abbreviation": "BRCA"
             }
         },
         "user": {
@@ -86,7 +86,7 @@
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "breast cancer",
+                    "value": "mutations",
                     "confirmationStatus": "NONE"
                 }
             }

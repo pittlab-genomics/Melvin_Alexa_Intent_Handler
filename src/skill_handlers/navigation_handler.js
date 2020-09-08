@@ -1,59 +1,29 @@
-const Speech = require('ssml-builder');
 const _ = require('lodash');
 
 const {
     MelvinEventTypes,
     MELVIN_WELCOME_GREETING,
     MELVIN_APP_NAME,
-    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
+    MelvinAttributes,
+    MelvinIntentErrors
 } = require('../common.js');
 
 const {
     update_melvin_state,
     update_melvin_aux_state,
-    validate_navigation_intent_state,
     validate_splitby_aux_state,
     get_melvin_history,
     get_melvin_state,
     get_prev_melvin_state,
     build_navigation_response,
-    build_compare_response,
-    build_splitby_response,
-    ack_attribute_change
+    build_compare_response
 } = require('../navigation/navigation_helper.js');
 
+const { build_splitby_response } = require('../splitby/response_builder.js');
 const { get_state_change_diff } = require('../utils/response_builder_utils.js');
 const sessions_doc = require('../dao/sessions.js');
 const utterances_doc = require('../dao/utterances.js');
-
-const NavigateStartIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'NavigateStartIntent';
-    },
-    async handle(handlerInput) {
-        let speechText = '';
-        try {
-            const state_change = await update_melvin_state(handlerInput);
-            validate_navigation_intent_state(handlerInput, state_change);
-            const response = ack_attribute_change(handlerInput, state_change);
-            speechText = response['speech_text'];
-
-        } catch (error) {
-            if (error['speech']) {
-                speechText = error['speech'];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error(`Error in NavigateStartIntentHandler`, error);
-        }
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
 
 
 const NavigateJoinFilterIntentHandler = {
@@ -65,8 +35,7 @@ const NavigateJoinFilterIntentHandler = {
         let speechText = '';
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_navigation_intent_state(handlerInput, state_change);
-            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
+            let response = await build_navigation_response(handlerInput, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -126,9 +95,18 @@ const NavigateSplitbyIntentHandler = {
     async handle(handlerInput) {
         let speechText = '';
         try {
+            // update melvin_aux state with splitby data type
             const melvin_state = get_melvin_state(handlerInput);
-            const state_change = await update_melvin_state(handlerInput);
-            validate_splitby_aux_state(handlerInput, melvin_state, state_change);
+            const updated_query_aux_res = await update_melvin_aux_state(handlerInput);
+            if (_.isEmpty(updated_query_aux_res['updated_state'][MelvinAttributes.DTYPE])) {
+                let error = new Error('Error while validating required attributes in splitby_state', 
+                    updated_query_aux_res['updated_state']);
+                error.type = MelvinIntentErrors.INVALID_DATA_TYPE;
+                error.speech = "I need to know a data type to split by.";
+                throw error;
+            }
+
+            validate_splitby_aux_state(handlerInput, melvin_state, updated_query_aux_res['updated_state']);
 
             // trigger dialog management to complete slot elicitation process
             if (handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED') {
@@ -137,19 +115,11 @@ const NavigateSplitbyIntentHandler = {
                     .getResponse();
             }
 
-            const splitby_state_change = await update_melvin_aux_state(handlerInput,
+            const updated_splitby_query_aux_res = await update_melvin_aux_state(handlerInput,
                 'requestEnvelope.request.intent.slots.splitby_query.value');
-            const splitby_state_diff = get_state_change_diff(splitby_state_change);
-            const splitby_state = validate_splitby_aux_state(handlerInput, melvin_state, splitby_state_change);
-
-            console.log(`[NavigateSplitbyIntentHandler] melvin_state: ${JSON.stringify(melvin_state)}, `
-                + `splitby_state_change: ${JSON.stringify(splitby_state_change)}, `
-                + `splitby_state_diff: ${JSON.stringify(splitby_state_diff)}, `
-                + `splitby_state: ${splitby_state}`);
-
-            let response = await build_splitby_response(handlerInput, melvin_state, splitby_state, splitby_state_diff);
+            let response = await build_splitby_response(handlerInput, melvin_state, 
+                updated_splitby_query_aux_res['updated_state']);
             speechText = response['speech_text'];
-
         } catch (error) {
             if (error['speech']) {
                 speechText = error['speech'];
@@ -257,8 +227,8 @@ const NavigateRepeatIntentHandler = {
                 "prev_melvin_state": prev_melvin_state,
                 "new_melvin_state": melvin_state
             };
-            validate_navigation_intent_state(handlerInput, state_change);
-            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
+
+            let response = await build_navigation_response(handlerInput, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -338,8 +308,7 @@ const NavigateGoBackIntentHandler = {
 
         let speechText = '';
         try {
-            validate_navigation_intent_state(handlerInput, state_change);
-            let response = await build_navigation_response(handlerInput, melvin_state, state_change);
+            let response = await build_navigation_response(handlerInput, state_change);
             speechText = response['speech_text'];
 
         } catch (error) {
@@ -362,7 +331,6 @@ const NavigateGoBackIntentHandler = {
 
 
 module.exports = {
-    NavigateStartIntentHandler,
     NavigateResetIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateJoinFilterIntentHandler,

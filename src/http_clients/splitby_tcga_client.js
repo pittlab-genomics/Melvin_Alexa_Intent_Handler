@@ -7,8 +7,6 @@ const {
     melvin_error
 } = require('../common.js');
 
-const { add_query_params } = require('../utils/response_builder_utils.js');
-
 
 const get_splitby_tcga_stats = function (melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
@@ -30,7 +28,7 @@ const get_splitby_tcga_stats = function (melvin_state, splitby_state) {
                     + ` Invalid response.statusCode: ${response.statusCode}`));
             }
 
-            if (!body['data'] && !body['error']) {
+            if (!body['data'] && body['error']) {
                 reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPOSE,
                     "Sorry, I'm having trouble performing splitby analysis."));

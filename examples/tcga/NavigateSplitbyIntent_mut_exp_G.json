@@ -9,7 +9,12 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53",
-                "data_type": "CNA_ALTERATIONS"
+                "study_abbreviation": "BRCA",
+                "data_type": "MUTATIONS",
+                "data_source":"TCGA"
+            },
+            "MELVIN.AUX.STATE": {
+                "data_type": "GENE_EXPRESSION"
             }
         },
         "user": {
@@ -84,11 +89,6 @@
             "name": "NavigateSplitbyIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "query": {
-                    "name": "query",
-                    "value": "mutations",
-                    "confirmationStatus": "NONE"
-                },
                 "splitby_query": {
                     "name": "splitby_query",
                     "value": "CDH1",
