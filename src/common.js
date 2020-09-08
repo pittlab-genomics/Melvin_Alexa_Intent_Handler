@@ -3,6 +3,7 @@ const nunjucks = require('nunjucks');
 
 const { GeneSSMLMappings } = require('./utils/gene_pronunciation_mappings.js');
 const { CANCER_TYPES } = require('./utils/cancer_types.js')
+const { DATA_TYPES } = require('./utils/data_types.js')
 
 // common types
 
@@ -58,11 +59,11 @@ const DataTypes = {
     OVERVIEW: "OVERVIEW",
     GENE_DEFINITION: "GENE_DEFINITION",
     MUTATIONS: "MUTATIONS",
-    MUTATION_DOMAINS: "MUTATION_DOMAINS",
+    PROTEIN_DOMAINS: "PROTEIN_DOMAINS",
     GENE_EXPRESSION: "GENE_EXPRESSION",
-    CNA_ALTERATIONS: "CNA_ALTERATIONS",
-    CNA_AMPLIFICATIONS: "CNA_AMPLIFICATIONS",
-    CNA_DELETIONS: "CNA_DELETIONS",
+    CNA: "CNA",
+    GAIN: "GAIN",
+    LOSS: "LOSS",
     STRUCTURAL_VARIANTS: "STRUCTURAL_VARIANTS"
 };
 
@@ -85,6 +86,10 @@ const get_study_name_text = function (study_abbrv) {
     return (_.has(CANCER_TYPES, study_abbrv) ? CANCER_TYPES[study_abbrv] : study_abbrv);
 }
 
+const get_dtype_name_text = function (dtype) {
+    return (_.has(DATA_TYPES, dtype) ? DATA_TYPES[dtype] : dtype);
+}
+
 const melvin_round = function (value, precision) {
     var multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
@@ -98,10 +103,10 @@ const RequiredAttributesTCGA = {};
 RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
-RequiredAttributesTCGA[DataTypes.MUTATION_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
-RequiredAttributesTCGA[DataTypes.CNA_ALTERATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
-RequiredAttributesTCGA[DataTypes.CNA_AMPLIFICATIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
-RequiredAttributesTCGA[DataTypes.CNA_DELETIONS] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.PROTEIN_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributesTCGA[DataTypes.CNA] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.GAIN] = [3, 1, 2]; // ['GC', 'C', 'G'];
+RequiredAttributesTCGA[DataTypes.LOSS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.GENE_EXPRESSION] = [2, 3, 1]; // ['G', 'GC', 'C'];
 
 const RequiredAttributesClinvar = {};
@@ -136,6 +141,7 @@ nunjucks_env.addGlobal('MelvinAttributes', MelvinAttributes);
 nunjucks_env.addGlobal('MelvinIntentErrors', MelvinIntentErrors);
 nunjucks_env.addGlobal('get_gene_speech_text', get_gene_speech_text);
 nunjucks_env.addGlobal('get_study_name_text', get_study_name_text);
+nunjucks_env.addGlobal('get_dtype_name_text', get_dtype_name_text);
 nunjucks_env.addGlobal('melvin_round', melvin_round);
 
 module.exports = {
@@ -151,6 +157,7 @@ module.exports = {
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     get_gene_speech_text,
     get_study_name_text,
+    get_dtype_name_text,
     melvin_round,
     OOVEntityTypes,
     DataTypes,

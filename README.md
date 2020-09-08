@@ -75,6 +75,7 @@ serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateJoi
 
 
 ### Navigation
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_MUT_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_TP53_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateJoinFilterIntent_Mutations_TP53_BRCA_payload.json
@@ -103,10 +104,10 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 
 
 ### Splitby - MUTATIONS vs CNA
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_GS.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_cna_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_mut_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_exp_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss.json
 
 
 ### Clinical Trials

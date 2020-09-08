@@ -8,9 +8,6 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "BRCA1",
-                "study_abbreviation": "BRCA",
-                "data_type": "CNA"
             }
         },
         "user": {
@@ -81,12 +78,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCompareIntent",
+            "name": "NavigateJoinFilterIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "TP53",
+                    "value": "mutations",
                     "confirmationStatus": "NONE"
                 }
             }

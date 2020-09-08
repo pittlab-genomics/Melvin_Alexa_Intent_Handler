@@ -179,7 +179,7 @@ const NavigateMutationsDomainIntentHandler = {
         let speechText = '';
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATION_DOMAINS);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.PROTEIN_DOMAINS);
             const domain_response = await build_mutations_domain_response(handlerInput, melvin_state);
             speechText = domain_response['speech_text'];
 

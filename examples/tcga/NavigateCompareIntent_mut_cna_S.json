@@ -9,7 +9,7 @@
         "attributes": {
             "MELVIN.STATE": {
                 "study_abbreviation": "OV",
-                "data_type": "CNA_ALTERATIONS"
+                "data_type": "CNA"
             }
         },
         "user": {

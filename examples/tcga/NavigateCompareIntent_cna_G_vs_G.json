@@ -9,7 +9,7 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53",
-                "data_type": "CNA_ALTERATIONS"
+                "data_type": "CNA"
             }
         },
         "user": {

@@ -6,7 +6,12 @@
         "application": {
             "applicationId": "amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d"
         },
-        "attributes": {},
+        "attributes": {
+            "MELVIN.STATE": {
+                "gene_name": "TP53",
+                "data_type": "LOSS"
+            }
+        },
         "user": {
             "userId": "xxx"
         }
@@ -75,12 +80,12 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateStartIntent",
+            "name": "NavigateSplitbyIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {
                     "name": "query",
-                    "value": "Hif one alpha",
+                    "value": "mutations",
                     "confirmationStatus": "NONE"
                 }
             }

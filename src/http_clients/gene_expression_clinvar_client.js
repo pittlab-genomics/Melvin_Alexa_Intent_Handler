@@ -28,7 +28,7 @@ const get_gene_expression_clinvar_stats = function (params) {
                     + ` Invalid response.statusCode: ${response.statusCode}`));
             }
 
-            if (!body['data'] && !body['error']) {
+            if (!body['data'] && body['error']) {
                 reject(melvin_error(`Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPOSE,
                     "Sorry, I'm having trouble accessing expression data."));

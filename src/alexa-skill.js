@@ -23,7 +23,6 @@ const {
 } = require('./skill_handlers/gene_handler.js');
 
 const {
-    NavigateStartIntentHandler,
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler,
     NavigateCompareIntentHandler,
@@ -226,7 +225,6 @@ add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, Na
 add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAAmplificationsIntentHandler);
 add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNADeletionsIntentHandler);
 add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
-add_event_configuration("NavigateStartIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateStartIntentHandler);
 
 add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsNearbyIntentHandler);
 add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsWithinIntentHandler);
@@ -264,7 +262,6 @@ exports.handler = Alexa.SkillBuilders.custom()
         SessionEndedRequestHandler,
 
         // Navigation handlers - system
-        NavigateStartIntentHandler,
         NavigateResetIntentHandler,
         NavigateRestoreSessionIntentHandler,
         NavigateGoBackIntentHandler,
