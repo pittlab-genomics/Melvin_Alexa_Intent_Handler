@@ -106,8 +106,8 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 ### Splitby - MUTATIONS vs CNA
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_mut_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_exp_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_splitby_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_splitby_MUT.json
 
 
 ### Clinical Trials
@@ -119,6 +119,7 @@ serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialCloses
 ### Navigation
 serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_1_payload.json
 serverless invoke local --function alexa-skill -p ./examples/LaunchRequest_2_payload.json
+serverless invoke local --function alexa-skill -p ./examples/NavigateBRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/TestMelvinHistory_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateRestoreSessionIntent_payload.json
@@ -126,8 +127,6 @@ serverless invoke local --function alexa-skill -p ./examples/NavigateRestoreSess
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_1_payload.json
 serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
 
-
-### Overview
 serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_BRCA_payload.json

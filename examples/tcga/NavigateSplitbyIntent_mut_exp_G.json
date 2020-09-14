@@ -89,8 +89,8 @@
             "name": "NavigateSplitbyIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "splitby_query": {
-                    "name": "splitby_query",
+                "gene_query": {
+                    "name": "gene_query",
                     "value": "CDH1",
                     "confirmationStatus": "NONE"
                 }

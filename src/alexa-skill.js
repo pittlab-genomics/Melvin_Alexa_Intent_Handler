@@ -1,36 +1,45 @@
-'use strict';
+"use strict";
 
-const Alexa = require('ask-sdk-core');
-const moment = require('moment');
+const Alexa = require("ask-sdk-core");
+const moment = require("moment");
 
-const { MELVIN_WELCOME_GREETING, MELVIN_APP_NAME, MelvinEventTypes } = require('./common.js');
-const { add_event_configuration } = require('./navigation/handler_configuration.js');
+const {
+    MELVIN_WELCOME_GREETING, MELVIN_APP_NAME, MelvinEventTypes 
+} = require("./common.js");
+const {
+    add_event_configuration 
+} = require("./navigation/handler_configuration.js");
 
 const APLDocs = {
-    welcome: require('../resources/APL/welcome.json'),
+    welcome: require("../resources/APL/welcome.json"),
 };
-const { supportsAPL } = require('./utils/APL_utils.js');
+const {
+    supportsAPL 
+} = require("./utils/APL_utils.js");
 
 const {
     RequestLogInterceptor,
     ResponseLogInterceptor,
     UserUtteranceTrackInterceptor
-} = require('./interceptors.js');
+} = require("./interceptors.js");
 
 const {
     SearchGeneIntentHandler,
     NavigateGeneDefinitionIntentHandler
-} = require('./skill_handlers/gene_handler.js');
+} = require("./skill_handlers/gene_handler.js");
 
 const {
     NavigateResetIntentHandler,
     NavigateJoinFilterIntentHandler,
     NavigateCompareIntentHandler,
-    NavigateSplitbyIntentHandler,
     NavigateRestoreSessionIntentHandler,
     NavigateGoBackIntentHandler,
     NavigateRepeatIntentHandler
-} = require('./skill_handlers/navigation_handler.js');
+} = require("./skill_handlers/navigation_handler.js");
+
+const {
+    NavigateSplitbyIntentHandler 
+} = require("./skill_handlers/splitby_handler.js");
 
 const {
     CNAAmplificationGeneIntentHandler,
@@ -39,54 +48,58 @@ const {
     NavigateCNAIntentHandler,
     NavigateCNAAmplificationsIntentHandler,
     NavigateCNADeletionsIntentHandler
-} = require('./skill_handlers/cna_handler.js');
+} = require("./skill_handlers/cna_handler.js");
 
 const {
     MutationCountIntentHandler,
     MutationPercentageIntentHandler,
     NavigateMutationsIntentHandler,
     NavigateMutationsDomainIntentHandler
-} = require('./skill_handlers/mutations_handler.js');
+} = require("./skill_handlers/mutations_handler.js");
 
 const {
     NavigateExpressionIntentHandler
-} = require('./skill_handlers/gene_expression_handler.js');
+} = require("./skill_handlers/gene_expression_handler.js");
 
-const { NavigateOverviewIntentHandler } = require('./skill_handlers/overview_handler.js');
+const {
+    NavigateOverviewIntentHandler 
+} = require("./skill_handlers/overview_handler.js");
 
-const { NavigateEmailIntentHandler } = require('./skill_handlers/email_handler.js');
+const {
+    NavigateEmailIntentHandler 
+} = require("./skill_handlers/email_handler.js");
 
 const {
     ClinicalTrialsNearbyIntentHandler,
     ClinicalTrialsWithinIntentHandler,
     ClinicalTrialClosestIntentHandler
-} = require('./skill_handlers/clinical_trials_handler.js');
+} = require("./skill_handlers/clinical_trials_handler.js");
 
-const sessions_doc = require('./dao/sessions.js');
+const sessions_doc = require("./dao/sessions.js");
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+        return handlerInput.requestEnvelope.request.type === "LaunchRequest";
     },
     async handle(handlerInput) {
         if (handlerInput.requestEnvelope.session.new) {
             const new_session_rec = {
-                'user_id': handlerInput.requestEnvelope.session.user.userId,
-                'session_start': moment(handlerInput.requestEnvelope.request.timestamp).valueOf(),
-                'session_id': handlerInput.requestEnvelope.session.sessionId,
-                'request': handlerInput.requestEnvelope.request,
-                'device': handlerInput.requestEnvelope.context.System.device
+                "user_id": handlerInput.requestEnvelope.session.user.userId,
+                "session_start": moment(handlerInput.requestEnvelope.request.timestamp).valueOf(),
+                "session_id": handlerInput.requestEnvelope.session.sessionId,
+                "request": handlerInput.requestEnvelope.request,
+                "device": handlerInput.requestEnvelope.context.System.device
             };
             await sessions_doc.addUserSession(new_session_rec);
         }
 
-        const reprompt_text = 'What would you like to know? You can ask me about a gene or cancer type.'
+        const reprompt_text = "What would you like to know? You can ask me about a gene or cancer type.";
 
         if (supportsAPL(handlerInput)) {
             handlerInput.responseBuilder.addDirective({
-                type: 'Alexa.Presentation.APL.RenderDocument',
-                token: 'welcomeToken',
-                version: '1.0',
+                type: "Alexa.Presentation.APL.RenderDocument",
+                token: "welcomeToken",
+                version: "1.0",
                 document: APLDocs.welcome,
                 datasources: {
                     "bodyTemplate2Data": {
@@ -118,7 +131,7 @@ const LaunchRequestHandler = {
 
         } else {
             handlerInput.responseBuilder
-                .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, 'You can start with a gene or cancer type.')
+                .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, "You can start with a gene or cancer type.");
         }
 
         return handlerInput.responseBuilder
@@ -130,11 +143,11 @@ const LaunchRequestHandler = {
 
 const HelpIntentHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
+        return handlerInput.requestEnvelope.request.type === "IntentRequest"
+            && handlerInput.requestEnvelope.request.intent.name === "AMAZON.HelpIntent";
     },
     handle(handlerInput) {
-        const speechText = 'You can say hello to me! How can I help?';
+        const speechText = "You can say hello to me! How can I help?";
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -145,12 +158,12 @@ const HelpIntentHandler = {
 
 const CancelAndStopIntentHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
-                || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+        return handlerInput.requestEnvelope.request.type === "IntentRequest"
+            && (handlerInput.requestEnvelope.request.intent.name === "AMAZON.CancelIntent"
+                || handlerInput.requestEnvelope.request.intent.name === "AMAZON.StopIntent");
     },
     handle(handlerInput) {
-        const speechText = 'Goodbye!';
+        const speechText = "Goodbye!";
         return handlerInput.responseBuilder
             .speak(speechText)
             .getResponse();
@@ -159,7 +172,7 @@ const CancelAndStopIntentHandler = {
 
 const SessionEndedRequestHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+        return handlerInput.requestEnvelope.request.type === "SessionEndedRequest";
     },
     handle(handlerInput) {
         // Any cleanup logic goes here.
@@ -173,7 +186,7 @@ const SessionEndedRequestHandler = {
 // handler chain below.
 const IntentReflectorHandler = {
     canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest';
+        return handlerInput.requestEnvelope.request.type === "IntentRequest";
     },
     handle(handlerInput) {
         const intentName = handlerInput.requestEnvelope.request.intent.name;
@@ -199,7 +212,7 @@ const ErrorHandler = {
     },
     handle(handlerInput, error) {
         console.log(`~~~~ Error handled: ${error.message}`, error);
-        const speechText = `Sorry, I'm unable to process that request for the moment. Please try again later.`;
+        const speechText = "Sorry, I'm unable to process that request for the moment. Please try again later.";
 
         return handlerInput.responseBuilder
             .speak(speechText)

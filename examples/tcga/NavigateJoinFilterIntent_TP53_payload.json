@@ -8,7 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "data_source": "CLINVAR"
+                "data_source": "TCGA"
             }
         },
         "user": {
