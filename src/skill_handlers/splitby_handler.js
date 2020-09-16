@@ -16,9 +16,7 @@ const {
     resolve_oov_entity
 } = require("../navigation/navigation_helper.js");
 
-const {
-    build_splitby_response 
-} = require("../splitby/response_builder.js");
+const { build_splitby_response } = require("../splitby/response_builder.js");
 
 const NavigateSplitbyIntentHandler = {
     canHandle(handlerInput) {
@@ -32,7 +30,7 @@ const NavigateSplitbyIntentHandler = {
             const melvin_state = get_melvin_state(handlerInput);
             validate_splitby_melvin_state(melvin_state);
 
-            // cleanup whenever a new dialog flow is initiated
+            // cleanup splitby state whenever a new dialog flow is initiated
             if (_.get(handlerInput, "requestEnvelope.request.dialogState") === "STARTED") {
                 clean_splitby_aux_state(handlerInput);
             }
@@ -40,7 +38,8 @@ const NavigateSplitbyIntentHandler = {
             // resolve slot values provided in this turn
             const melvin_aux_state = await resolve_splitby_query(handlerInput);
 
-            // check whether melvin_aux state contains required attributes
+            // check whether melvin_aux state contains required attributes, if not then elicit 
+            // those via Alexa dialog management flow
             if (_.isEmpty(melvin_aux_state[MelvinAttributes.DTYPE])
                 || _.isEmpty(melvin_aux_state[MelvinAttributes.GENE_NAME])) {
                 return elicit_splitby_slots(handlerInput, melvin_aux_state);
@@ -52,7 +51,7 @@ const NavigateSplitbyIntentHandler = {
             };
 
             // check whether requested split-by analysis is supported
-            validate_splitby_aux_state(handlerInput, melvin_state, splitby_state);
+            validate_splitby_aux_state(melvin_state, splitby_state);
 
             // generate the response for the requested split-by analysis
             let response = await build_splitby_response(handlerInput, melvin_state, splitby_state);
@@ -100,7 +99,7 @@ const resolve_splitby_query = async function(handlerInput) {
         }
     }
     
-    // update melvin_aux_state with slot values provided in this turn
+    // update and store melvin_aux_state with slot values provided in this turn
     let melvin_aux_state = get_melvin_aux_state(handlerInput);
     melvin_aux_state = {
         ...melvin_aux_state, ...oov_entity
@@ -163,32 +162,40 @@ const elicit_splitby_slots = async function (handlerInput, melvin_aux_state, pre
     }
 };
 
-const is_splitby_supported = function (melvin_state, splitby_state) {
-    if (
-        (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.LOSS)
-        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.LOSS
-            && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
-        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION
-                && splitby_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS)
-        || (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-                && splitby_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION)
-    ) {
-        return true;
+const is_splitby_supported = function (query_dtypes) {
+    const supported_dtypes = [
+        [DataTypes.MUTATIONS, DataTypes.LOSS],
+        [DataTypes.MUTATIONS, DataTypes.GAIN],
+        [DataTypes.MUTATIONS, DataTypes.MUTATIONS],
+        [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
+        [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
+        [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
+        [DataTypes.GENE_EXPRESSION, DataTypes.GENE_EXPRESSION]
+    ];
+
+    for (var index = 0; index < supported_dtypes.length; index++) {
+        if ((query_dtypes[0] === supported_dtypes[index][0] && query_dtypes[1] === supported_dtypes[index][1])
+            || (query_dtypes[0] === supported_dtypes[index][1] && query_dtypes[1] === supported_dtypes[index][0])
+        ) {
+            return true;
+        }
     }
-    console.log(`[is_splitby_supported] splitby not supported for melvin_state: ${JSON.stringify(melvin_state)}, `
-        + `splitby_state: ${JSON.stringify(splitby_state)}`);
+
+    console.log(`[is_splitby_supported] splitby not supported for query_dtypes: ${JSON.stringify(query_dtypes)}`);
     return false;
 };
 
-const validate_splitby_aux_state = function (handlerInput, melvin_state, melvin_aux_state) {
-    if (!is_splitby_supported(melvin_state, melvin_aux_state,)) {
-        const error = new Error("Error while validating required attributes "
+const validate_splitby_aux_state = function (melvin_state, splitby_state) {
+    const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], splitby_state[MelvinAttributes.DTYPE]];
+
+    if (!is_splitby_supported(query_dtypes)) {
+        throw melvin_error(
+            "Error while validating required attributes "
             + `in melvin_state: ${JSON.stringify(melvin_state,)}, `
-            + `melvin_aux_state: ${JSON.stringify(melvin_aux_state,)}`);
-        error.type = MelvinIntentErrors.INVALID_STATE;
-        error.speech = "Sorry, this split-by operation is not supported yet";
-        throw error;
+            + `splitby_state: ${JSON.stringify(splitby_state,)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            "Sorry, this split-by operation is not supported."
+        );
     }
 };
 
@@ -196,8 +203,6 @@ const clean_splitby_aux_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     sessionAttributes["MELVIN.AUX.STATE"] = {};
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-}
-
-module.exports = {
-    NavigateSplitbyIntentHandler
 };
+
+module.exports = { NavigateSplitbyIntentHandler };

@@ -7,8 +7,8 @@ const queryEntireTable = async function (docClient, query_params) {
     do {
         let data = await docClient.query(query_params).promise();
 
-        if (data['Items'].length > 0) {
-            result = [...result, ...data['Items']];
+        if (data["Items"].length > 0) {
+            result = [...result, ...data["Items"]];
         }
 
         if (data.LastEvaluatedKey) {
@@ -19,7 +19,7 @@ const queryEntireTable = async function (docClient, query_params) {
         }
     } while (hasMorePages);
     return result;
-}
+};
 
 const scanEntireTable = async function (docClient, scan_params) {
     console.debug("Scanning entire table with params: ", scan_params);
@@ -28,8 +28,8 @@ const scanEntireTable = async function (docClient, scan_params) {
     do {
         let data = await docClient.scan(scan_params).promise();
 
-        if (data['Items'].length > 0) {
-            result = [...result, ...data['Items']];
+        if (data["Items"].length > 0) {
+            result = [...result, ...data["Items"]];
         }
 
         if (data.LastEvaluatedKey) {
@@ -40,9 +40,9 @@ const scanEntireTable = async function (docClient, scan_params) {
         }
     } while (hasMorePages);
     return result;
-}
+};
 
 module.exports = {
     queryEntireTable,
     scanEntireTable
-}
+};

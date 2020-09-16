@@ -32,8 +32,7 @@ const add_query_params = function (url, params) {
 const get_state_change_diff = function (state_change) {
     const prev_s = state_change["prev_state"];
     const new_s = state_change["updated_state"];
-    const diff_s = {
-    };
+    const diff_s = {};
     console.debug(`[get_state_change_diff] state_change: ${JSON.stringify(state_change)}`);
 
     for (let [_ignore, value] of Object.entries(MelvinAttributes)) {

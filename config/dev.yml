@@ -1,4 +1,6 @@
 environment:
+  STAGE: ${self:provider.stage}
+  WARMUP_RULE_LABEL: "melvin-alexa-intent-handlers-${self:provider.stage}-warmup_service"
   MELVIN_WELCOME_GREETING: "Welcome to Melvin development version."
   MELVIN_APP_NAME: "Melvin develop"
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}

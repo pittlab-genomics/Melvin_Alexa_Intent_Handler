@@ -1,15 +1,9 @@
 const _ = require("lodash");
 const nunjucks = require("nunjucks");
 
-const {
-    GeneSSMLMappings 
-} = require("./utils/gene_pronunciation_mappings.js");
-const {
-    CANCER_TYPES 
-} = require("./utils/cancer_types.js");
-const {
-    DATA_TYPES 
-} = require("./utils/data_types.js");
+const { GeneSSMLMappings } = require("./utils/gene_pronunciation_mappings.js");
+const { CANCER_TYPES } = require("./utils/cancer_types.js");
+const { DATA_TYPES } = require("./utils/data_types.js");
 
 // common types
 
@@ -86,7 +80,13 @@ const CNATypes = {
 };
 
 const get_gene_speech_text = function (gene_name) {
-    return (_.has(GeneSSMLMappings, gene_name) ? GeneSSMLMappings[gene_name] : gene_name);
+    let gene_speech_text = gene_name;
+    if (_.has(GeneSSMLMappings, gene_name)) {
+        gene_speech_text = GeneSSMLMappings[gene_name];
+        console.debug(`[get_gene_speech_text] gene_name: ${gene_name}, gene_speech_text: ${gene_speech_text}`);
+    }
+    
+    return gene_speech_text;
 };
 
 const get_study_name_text = function (study_abbrv) {
@@ -106,8 +106,7 @@ const melvin_round = function (value, precision) {
  * G (Gene) | C (CancerType)
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
 */
-const RequiredAttributesTCGA = {
-};
+const RequiredAttributesTCGA = {};
 RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
@@ -117,8 +116,7 @@ RequiredAttributesTCGA[DataTypes.GAIN] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.LOSS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.GENE_EXPRESSION] = [2, 3, 1]; // ['G', 'GC', 'C'];
 
-const RequiredAttributesClinvar = {
-};
+const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
@@ -140,7 +138,7 @@ const melvin_error = function (message, type, speech = null) {
 // configure Nunjucks
 const RESPONSE_TEMPLATES_PATH = __dirname + "/../resources/response_templates";
 const nunjucks_env = nunjucks.configure(RESPONSE_TEMPLATES_PATH, {
-    autoescape: true,
+    autoescape: false, // do not escape HTML tags (including SSML tags)
     cache:      false
 });
 

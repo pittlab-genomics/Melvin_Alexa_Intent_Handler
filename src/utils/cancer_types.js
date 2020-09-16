@@ -1,8 +1,8 @@
 const CANCER_TYPES = {
     "LAML": "Acute Myeloid Leukemia",
-    "ACC": "Adrenocortical carcinoma",
+    "ACC":  "Adrenocortical carcinoma",
     "BLCA": "Bladder Urothelial Carcinoma",
-    "LGG": "Brain Lower Grade Glioma",
+    "LGG":  "Brain Lower Grade Glioma",
     "BRCA": "Breast invasive carcinoma",
     "CESC": "Cervical squamous cell carcinoma and endocervical adenocarcinoma",
     "CHOL": "Cholangiocarcinoma",
@@ -11,7 +11,7 @@ const CANCER_TYPES = {
     "CNTL": "Controls",
     "ESCA": "Esophageal carcinoma",
     "FPPP": "FFPE Pilot Phase II",
-    "GBM": "Glioblastoma multiforme",
+    "GBM":  "Glioblastoma multiforme",
     "HNSC": "Head and Neck squamous cell carcinoma",
     "KICH": "Kidney Chromophobe",
     "KIRC": "Kidney renal clear cell carcinoma",
@@ -22,7 +22,7 @@ const CANCER_TYPES = {
     "DLBC": "Lymphoid Neoplasm Diffuse Large B-cell Lymphoma",
     "MESO": "Mesothelioma",
     "MISC": "Miscellaneous",
-    "OV": "Ovarian serous cystadenocarcinoma",
+    "OV":   "Ovarian serous cystadenocarcinoma",
     "PAAD": "Pancreatic adenocarcinoma",
     "PCPG": "Pheochromocytoma and Paraganglioma",
     "PRAD": "Prostate adenocarcinoma",
@@ -33,11 +33,9 @@ const CANCER_TYPES = {
     "TGCT": "Testicular Germ Cell Tumors",
     "THYM": "Thymoma",
     "THCA": "Thyroid carcinoma",
-    "UCS": "Uterine Carcinosarcoma",
+    "UCS":  "Uterine Carcinosarcoma",
     "UCEC": "Uterine Corpus Endometrial Carcinoma",
-    "UVM": "Uveal Melanoma"
+    "UVM":  "Uveal Melanoma"
 };
 
-module.exports = {
-    CANCER_TYPES
-}
+module.exports = { CANCER_TYPES };

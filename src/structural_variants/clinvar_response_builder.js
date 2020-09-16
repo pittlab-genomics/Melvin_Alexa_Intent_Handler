@@ -1,8 +1,8 @@
-const URL = require('url').URL;
-const Speech = require('ssml-builder');
-const _ = require('lodash');
-const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
-const { add_query_params } = require('../utils/response_builder_utils.js');
+const URL = require("url").URL;
+const Speech = require("ssml-builder");
+const _ = require("lodash");
+const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
+const { add_query_params } = require("../utils/response_builder_utils.js");
 
 const {
     MelvinAttributes,
@@ -13,11 +13,9 @@ const {
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
-} = require('../common.js');
+} = require("../common.js");
 
-const {
-    get_sv_clinvar_stats
-} = require('../http_clients/structural_variants_clinvar_client.js');
+const { get_sv_clinvar_stats } = require("../http_clients/structural_variants_clinvar_client.js");
 
 async function build_sv_clinvar_response(handlerInput, params) {
     const speech = new Speech();
@@ -31,17 +29,17 @@ async function build_sv_clinvar_response(handlerInput, params) {
         add_sv_clinvar_plot(image_list, params);
         const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
         const study = get_study_name_text(params[MelvinAttributes.STUDY_ABBRV]);
-        const data = response['data'];
+        const data = response["data"];
         const sv_types_count = Object.keys(data).length;
         const top_sv = Object.keys(data)[0];
-        const top_sv_count = data[top_sv]
+        const top_sv_count = data[top_sv];
         if (sv_types_count > 1) {
             speech
                 .sayWithSSML(`In ${gene_speech_text},`)
                 .say(`there are ${sv_types_count} types of structural variants`)
                 .say(`for ${study} with the most frequent one being`)
                 .say(`${top_sv} with ${top_sv_count}`);
-            (top_sv_count == 1) ? speech.say(`variant`) : speech.say(`variants`);
+            (top_sv_count == 1) ? speech.say("variant") : speech.say("variants");
 
         } else if (sv_types_count == 1) {
             speech
@@ -50,7 +48,7 @@ async function build_sv_clinvar_response(handlerInput, params) {
                 .say(`for ${study}`);
         } else {
             speech
-                .say(`There are no structural variants at`)
+                .say("There are no structural variants at")
                 .sayWithSSML(gene_speech_text)
                 .say(`for ${study}`);
         }
@@ -67,17 +65,13 @@ async function build_sv_clinvar_response(handlerInput, params) {
     }
 
     add_to_APL_image_pager(handlerInput, image_list);
-    return {
-        'speech_text': speech.ssml()
-    }
+    return { "speech_text": speech.ssml() };
 }
 
 const add_sv_clinvar_plot = function (image_list, params) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/structural_variants/clinvar/plot`);
     add_query_params(count_plot_url, params);
     image_list.push(count_plot_url);
-}
+};
 
-module.exports = {
-    build_sv_clinvar_response
-}
+module.exports = { build_sv_clinvar_response };

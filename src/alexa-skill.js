@@ -1,21 +1,16 @@
 "use strict";
-
+const AWS = require("aws-sdk");
 const Alexa = require("ask-sdk-core");
 const moment = require("moment");
+const _ = require("lodash");
 
 const {
     MELVIN_WELCOME_GREETING, MELVIN_APP_NAME, MelvinEventTypes 
 } = require("./common.js");
-const {
-    add_event_configuration 
-} = require("./navigation/handler_configuration.js");
+const { add_event_configuration } = require("./navigation/handler_configuration.js");
 
-const APLDocs = {
-    welcome: require("../resources/APL/welcome.json"),
-};
-const {
-    supportsAPL 
-} = require("./utils/APL_utils.js");
+const APLDocs = { welcome: require("../resources/APL/welcome.json"), };
+const { supportsAPL } = require("./utils/APL_utils.js");
 
 const {
     RequestLogInterceptor,
@@ -37,9 +32,7 @@ const {
     NavigateRepeatIntentHandler
 } = require("./skill_handlers/navigation_handler.js");
 
-const {
-    NavigateSplitbyIntentHandler 
-} = require("./skill_handlers/splitby_handler.js");
+const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handler.js");
 
 const {
     CNAAmplificationGeneIntentHandler,
@@ -57,17 +50,11 @@ const {
     NavigateMutationsDomainIntentHandler
 } = require("./skill_handlers/mutations_handler.js");
 
-const {
-    NavigateExpressionIntentHandler
-} = require("./skill_handlers/gene_expression_handler.js");
+const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
 
-const {
-    NavigateOverviewIntentHandler 
-} = require("./skill_handlers/overview_handler.js");
+const { NavigateOverviewIntentHandler } = require("./skill_handlers/overview_handler.js");
 
-const {
-    NavigateEmailIntentHandler 
-} = require("./skill_handlers/email_handler.js");
+const { NavigateEmailIntentHandler } = require("./skill_handlers/email_handler.js");
 
 const {
     ClinicalTrialsNearbyIntentHandler,
@@ -84,49 +71,90 @@ const LaunchRequestHandler = {
     async handle(handlerInput) {
         if (handlerInput.requestEnvelope.session.new) {
             const new_session_rec = {
-                "user_id": handlerInput.requestEnvelope.session.user.userId,
+                "user_id":       handlerInput.requestEnvelope.session.user.userId,
                 "session_start": moment(handlerInput.requestEnvelope.request.timestamp).valueOf(),
-                "session_id": handlerInput.requestEnvelope.session.sessionId,
-                "request": handlerInput.requestEnvelope.request,
-                "device": handlerInput.requestEnvelope.context.System.device
+                "session_id":    handlerInput.requestEnvelope.session.sessionId,
+                "request":       handlerInput.requestEnvelope.request,
+                "device":        handlerInput.requestEnvelope.context.System.device
             };
             await sessions_doc.addUserSession(new_session_rec);
         }
+        const cloudwatchevents = new AWS.CloudWatchEvents();
+        var params = {
+            NamePrefix: "melvin",
+            Limit:      10,
+        };
+
+        try {
+            const list_result = await cloudwatchevents.listRules(params).promise();
+            console.log(`[LaunchRequestHandler] listRules | success: ${JSON.stringify(list_result)}`);
+
+            const rule_list = list_result["Rules"];
+            let warmup_rule_name = null;
+            for (const rule_item of rule_list) {
+                console.log(`[LaunchRequestHandler] rule_item | success: ${JSON.stringify(rule_item)}`);
+                var tag_params = { ResourceARN: rule_item["Arn"] };
+                const tag_result = await cloudwatchevents.listTagsForResource(tag_params).promise();
+                console.log(`[LaunchRequestHandler] tag_result | success: ${JSON.stringify(tag_result)}`);
+                const tag_list = tag_result["Tags"];
+                for (const tag_item of tag_list) {
+                    if (tag_item["Key"] === "label" && tag_item["Value"] === process.env.WARMUP_RULE_LABEL) {
+                        warmup_rule_name = rule_item["Name"];
+                    }
+                }
+            }
+            if (!_.isEmpty(warmup_rule_name)) {
+                const cloudwatchevent_params = {
+                    Name:               warmup_rule_name,
+                    ScheduleExpression: "rate(1 minute)",
+                    State:              "ENABLED",
+                    Tags:               [
+                        {
+                            Key:   "last_updated",
+                            Value: moment().valueOf().toString()
+                        }
+                    ]
+                };
+                const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
+                console.log(`[LaunchRequestHandler] putRule | success: ${JSON.stringify(update_result)}`);
+            } else {
+                console.log("[LaunchRequestHandler] failed to find warmup event rule");
+            }
+        } catch(err) {
+            console.log(`[LaunchRequestHandler] event error: ${JSON.stringify(err)}`, err.stack);
+        }
 
         const reprompt_text = "What would you like to know? You can ask me about a gene or cancer type.";
-
         if (supportsAPL(handlerInput)) {
+            const melvin_img_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png";
+            const melvin_logo_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_smallIconUri.png";
             handlerInput.responseBuilder.addDirective({
-                type: "Alexa.Presentation.APL.RenderDocument",
-                token: "welcomeToken",
-                version: "1.0",
-                document: APLDocs.welcome,
-                datasources: {
-                    "bodyTemplate2Data": {
-                        "type": "object",
-                        "objectId": "bt2Sample",
-                        "title": "Melvin",
-                        "textContent": {
-                            "title": {
-                                "type": "PlainText",
-                                "text": "Melvin"
-                            },
-                            "line1": {
-                                "type": "PlainText",
-                                "text": "Tell me about {cancer type}"
-                            },
-                            "line2": {
-                                "type": "PlainText",
-                                "text": "Tell me about {gene}"
-                            }
+                type:        "Alexa.Presentation.APL.RenderDocument",
+                token:       "welcomeToken",
+                version:     "1.0",
+                document:    APLDocs.welcome,
+                datasources: { "bodyTemplate2Data": {
+                    "type":        "object",
+                    "objectId":    "bt2Sample",
+                    "title":       "Melvin",
+                    "textContent": {
+                        "title": {
+                            "type": "PlainText",
+                            "text": "Melvin"
                         },
-                        "imageContent": {
-                            "URL": "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png"
+                        "line1": {
+                            "type": "PlainText",
+                            "text": "Tell me about {cancer type}"
                         },
-                        "logoUrl": "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_smallIconUri.png",
-                        "hintText": "Try, \"Alexa, tell me about TP53\""
-                    }
-                },
+                        "line2": {
+                            "type": "PlainText",
+                            "text": "Tell me about {gene}"
+                        }
+                    },
+                    "imageContent": { "URL": melvin_img_url },
+                    "logoUrl":      melvin_logo_url,
+                    "hintText":     "Try, \"Alexa, tell me about TP53\""
+                }},
             });
 
         } else {
@@ -222,32 +250,41 @@ const ErrorHandler = {
 };
 
 add_event_configuration("SearchGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, SearchGeneIntentHandler);
-add_event_configuration("CNAAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNAAmplificationGeneIntentHandler);
+add_event_configuration("CNAAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    CNAAmplificationGeneIntentHandler);
 add_event_configuration("CNADeletionGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNADeletionGeneIntent);
 add_event_configuration("CNAAlterationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNAAlterationGeneIntent);
 add_event_configuration("MutationCountIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationCountIntentHandler);
 add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationPercentageIntentHandler);
-add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateGeneDefinitionIntentHandler);
+add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateGeneDefinitionIntentHandler);
 add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
-add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsDomainIntentHandler);
+add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateMutationsDomainIntentHandler);
 add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
-add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAAmplificationsIntentHandler);
-add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNADeletionsIntentHandler);
+add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateCNAAmplificationsIntentHandler);
+add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateCNADeletionsIntentHandler);
 add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
 
-add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsNearbyIntentHandler);
-add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialsWithinIntentHandler);
-add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_EVENT, ClinicalTrialClosestIntentHandler);
+add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    ClinicalTrialsNearbyIntentHandler);
+add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    ClinicalTrialsWithinIntentHandler);
+add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    ClinicalTrialClosestIntentHandler);
 
 
 add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_RESET_EVENT, NavigateResetIntentHandler);
 add_event_configuration("NavigateGoBackIntent", MelvinEventTypes.NAVIGATION_REVERT_EVENT, NavigateGoBackIntentHandler);
 
-add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRestoreSessionIntentHandler);
+add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, 
+    NavigateRestoreSessionIntentHandler);
 add_event_configuration("NavigateRepeatIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRepeatIntentHandler);
 
 

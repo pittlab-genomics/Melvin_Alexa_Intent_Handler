@@ -1,8 +1,10 @@
-const URL = require('url').URL;
-const Speech = require('ssml-builder');
-const _ = require('lodash');
-const { add_to_APL_image_pager } = require('../utils/APL_utils.js');
-const { round, add_query_params } = require('../utils/response_builder_utils.js');
+const URL = require("url").URL;
+const Speech = require("ssml-builder");
+const _ = require("lodash");
+const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
+const {
+    round, add_query_params 
+} = require("../utils/response_builder_utils.js");
 
 const {
     MelvinAttributes,
@@ -12,21 +14,17 @@ const {
     get_gene_speech_text,
     get_study_name_text,
     MELVIN_EXPLORER_ENDPOINT
-} = require('../common.js');
+} = require("../common.js");
 
-const {
-    get_mutations_tcga_stats
-} = require('../http_clients/mutations_tcga_client.js');
+const { get_mutations_tcga_stats } = require("../http_clients/mutations_tcga_client.js");
 
-const {
-    get_cna_tcga_stats
-} = require('../http_clients/cna_tcga_client.js');
+const { get_cna_tcga_stats } = require("../http_clients/cna_tcga_client.js");
 
 
 function _populate_overview_by_gene_response(params, mut_response, cna_response, speech) {
-    const mutated_cancer_type_count = mut_response['data']['cancer_types_with_mutated_gene'];
-    const total_cancer_types = mut_response['data']['total_cancer_types'];
-    const records_list = mut_response['data']['records'];
+    const mutated_cancer_type_count = mut_response["data"]["cancer_types_with_mutated_gene"];
+    const total_cancer_types = mut_response["data"]["total_cancer_types"];
+    const records_list = mut_response["data"]["records"];
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
 
     if (Array.isArray(records_list)) {
@@ -38,10 +36,10 @@ function _populate_overview_by_gene_response(params, mut_response, cna_response,
         if (records_list.length >= 2) {
             speech
                 .say(`It is most mutated in ${get_study_name_text(records_list[0][MelvinAttributes.STUDY_ABBRV])} at `)
-                .say(round(records_list[0]['percent_cancer_patients_with_mutgene'], 1))
+                .say(round(records_list[0]["percent_cancer_patients_with_mutgene"], 1))
                 .say(`percent, followed by ${get_study_name_text(records_list[1][MelvinAttributes.STUDY_ABBRV])} at `)
-                .say(round(records_list[1]['percent_cancer_patients_with_mutgene'], 1))
-                .say('percent.')
+                .say(round(records_list[1]["percent_cancer_patients_with_mutgene"], 1))
+                .say("percent.");
 
         } else if (records_list.length >= 1) {
             speech
@@ -49,7 +47,7 @@ function _populate_overview_by_gene_response(params, mut_response, cna_response,
                 .say(`mutations are found in ${mutated_cancer_type_count}`)
                 .say(`out of ${total_cancer_types} cancer types.`)
                 .say(`It is most mutated in ${get_study_name_text(records_list[0][MelvinAttributes.STUDY_ABBRV])} at `)
-                .say(`${round(records_list[0]['percent_cancer_patients_with_mutgene'], 1)} percent.`)
+                .say(`${round(records_list[0]["percent_cancer_patients_with_mutgene"], 1)} percent.`);
 
         } else {
             speech
@@ -68,25 +66,25 @@ function _populate_overview_by_gene_response(params, mut_response, cna_response,
 
 function _populate_overview_by_study_gene_response(params, mut_response, cna_response, speech) {
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const recc_positions = mut_response['data']['recurrent_positions'];
+    const recc_positions = mut_response["data"]["recurrent_positions"];
 
     speech
         .sayWithSSML(`${gene_speech_text} mutations are found in`)
-        .say(round(mut_response['data']['patient_percentage'], 1))
+        .say(round(mut_response["data"]["patient_percentage"], 1))
         .say(`percent of ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])} patients`)
         .say(`with ${recc_positions} amino acid residues recurrently mutated.`);
 }
 
 function _populate_overview_by_study_response(params, mut_response, cna_response, speech) {
-    const gene_1_text = get_gene_speech_text(Object.keys(mut_response['data'])[0]);
-    const gene_2_text = get_gene_speech_text(Object.keys(mut_response['data'])[1]);
-    const gene_1_perc = mut_response['data'][Object.keys(mut_response['data'])[0]];
-    const gene_2_perc = mut_response['data'][Object.keys(mut_response['data'])[1]];
+    const gene_1_text = get_gene_speech_text(Object.keys(mut_response["data"])[0]);
+    const gene_2_text = get_gene_speech_text(Object.keys(mut_response["data"])[1]);
+    const gene_1_perc = mut_response["data"][Object.keys(mut_response["data"])[0]];
+    const gene_2_perc = mut_response["data"][Object.keys(mut_response["data"])[1]];
     speech
         .say(`In ${get_study_name_text(params[MelvinAttributes.STUDY_ABBRV])},`)
         .say(`${gene_1_text} and ${gene_2_text} are the top 2 mutated genes found in`)
         .say(`${round(gene_1_perc, 1)} percent and ${round(gene_2_perc, 1)}`)
-        .say(`percent of the patients respectively.`);
+        .say("percent of the patients respectively.");
 }
 
 
@@ -94,7 +92,7 @@ async function build_overview_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
     const mut_response = await get_mutations_tcga_stats(params);
-    const cna_response = ''; // await get_cna_tcga_stats(params);
+    const cna_response = ""; // await get_cna_tcga_stats(params);
 
 
     add_overview_tcga_plots(image_list, params);
@@ -117,9 +115,7 @@ async function build_overview_tcga_response(handlerInput, params) {
     }
 
     add_to_APL_image_pager(handlerInput, image_list);
-    return {
-        'speech_text': speech.ssml()
-    }
+    return { "speech_text": speech.ssml() };
 }
 
 
@@ -131,8 +127,6 @@ const add_overview_tcga_plots = function (image_list, params) {
     const mutations_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
     add_query_params(mutations_plot_url, params);
     image_list.push(mutations_plot_url);
-}
+};
 
-module.exports = {
-    build_overview_tcga_response
-}
+module.exports = { build_overview_tcga_response };

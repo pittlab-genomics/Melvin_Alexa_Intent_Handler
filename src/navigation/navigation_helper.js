@@ -3,13 +3,9 @@ const _ = require("lodash",);
 const yaml = require("js-yaml",);
 const moment = require("moment",);
 
-const {
-    get_state_change_diff, 
-} = require("../utils/response_builder_utils.js",);
+const { get_state_change_diff, } = require("../utils/response_builder_utils.js",);
 const utterances_doc = require("../dao/utterances.js",);
-const {
-    get_oov_mapping_by_query, 
-} = require("../http_clients/oov_mapper_client.js",);
+const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js",);
 const {
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
@@ -29,27 +25,15 @@ const {
     MELVIN_APP_NAME,
 } = require("../common.js",);
 
-const {
-    get_event_type, 
-} = require("./handler_configuration.js",);
+const { get_event_type, } = require("./handler_configuration.js",);
 const {
     build_navigate_cna_response, build_cna_compare_response, 
 } = require("../cna/response_builder.js",);
-const {
-    build_gene_definition_response, 
-} = require("../gene/gene_definition_response_builder.js",);
-const {
-    build_sv_response, 
-} = require("../structural_variants/sv_helper.js",);
-const {
-    build_overview_response, 
-} = require("../overview/overview_helper.js",);
-const {
-    build_gene_expression_response, 
-} = require("../gene_expression/response_builder.js",);
-const {
-    build_mut_cna_compare_response, 
-} = require("../comparison/mut_cna_helper.js",);
+const { build_gene_definition_response, } = require("../gene/gene_definition_response_builder.js",);
+const { build_sv_response, } = require("../structural_variants/sv_helper.js",);
+const { build_overview_response, } = require("../overview/overview_helper.js",);
+const { build_gene_expression_response, } = require("../gene_expression/response_builder.js",);
+const { build_mut_cna_compare_response, } = require("../comparison/mut_cna_helper.js",);
 const {
     build_mutations_response,
     build_mutations_domain_response,
@@ -60,8 +44,7 @@ const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml",);
 
 const get_melvin_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let melvin_state = {
-    };
+    let melvin_state = {};
     if (sessionAttributes["MELVIN.STATE"]) {
         melvin_state = sessionAttributes["MELVIN.STATE"];
     }
@@ -70,8 +53,7 @@ const get_melvin_state = function (handlerInput) {
 
 const get_melvin_aux_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let melvin_aux_state = {
-    };
+    let melvin_aux_state = {};
     if (sessionAttributes["MELVIN.AUX.STATE"]) {
         melvin_aux_state = sessionAttributes["MELVIN.AUX.STATE"];
     }
@@ -80,8 +62,7 @@ const get_melvin_aux_state = function (handlerInput) {
 
 const get_prev_melvin_state = function (handlerInput) {
     const melvin_history = get_melvin_history(handlerInput);
-    let prev_melvin_state = {
-    };
+    let prev_melvin_state = {};
     if (melvin_history.length > 0) {
         prev_melvin_state = melvin_history.melvin_state;
     }
@@ -122,8 +103,7 @@ const update_melvin_state = async function (
     session_path = "MELVIN.STATE",
 ) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let prev_state = {
-    };
+    let prev_state = {};
     if (_.has(sessionAttributes, session_path)) {
         prev_state = sessionAttributes[session_path];
     }
@@ -132,10 +112,8 @@ const update_melvin_state = async function (
         prev_state[MelvinAttributes.DSOURCE] = DataSources.TCGA;
     }
 
-    const oov_entity = {
-    };
-    let updated_state = {
-    };
+    const oov_entity = {};
+    let updated_state = {};
     const query = _.get(handlerInput, query_path);
     if (!_.isEmpty(query)) { // empty query is valid for direct intent invocations
         // resolve out-of-vocabulary entity using OOV Mapper API
@@ -302,9 +280,7 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
 function add_followup_text(handlerInput, speech) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     if (Object.keys(sessionAttributes["MELVIN.STATE"]).length <= FOLLOW_UP_TEXT_THRESHOLD) {
-        speech.prosody({
-            rate: "110%" 
-        }, "What would you like to know?");
+        speech.prosody({ rate: "110%" }, "What would you like to know?");
     }
 }
 
@@ -339,14 +315,11 @@ const ack_attribute_change = function (handlerInput, state_change) {
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, `${dtype}`);
     }
 
-    return {
-        "speech_text": speech.ssml()
-    };
+    return { "speech_text": speech.ssml() };
 };
 
 const build_compare_response = async function (handlerInput, melvin_state, compare_state, state_diff) {
-    let response = {
-    };
+    let response = {};
     console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
         + `compare_state: ${JSON.stringify(compare_state)}, state_diff: ${JSON.stringify(state_diff)}`);
 
@@ -356,16 +329,12 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
             response = await build_mut_cna_compare_response(handlerInput, melvin_state, state_diff);
 
         } else {
-            return {
-                "speech_text": "This data type comparison analysis is not yet supported"
-            };
+            return { "speech_text": "This data type comparison analysis is not yet supported" };
         }
 
 
     } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE) {
-        return {
-            "speech_text": "comparisons across data sources are not yet supported"
-        };
+        return { "speech_text": "comparisons across data sources are not yet supported" };
 
     } else {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {

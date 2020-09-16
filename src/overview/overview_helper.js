@@ -4,15 +4,11 @@ const {
     DataSources,
     melvin_error,
     DEFAULT_INVALID_STATE_RESPONSE
-} = require('../common.js');
+} = require("../common.js");
 
-const {
-    build_overview_clinvar_response
-} = require('../overview/clinvar_response_builder.js');
+const { build_overview_clinvar_response } = require("../overview/clinvar_response_builder.js");
 
-const {
-    build_overview_tcga_response
-} = require('../overview/tcga_response_builder.js');
+const { build_overview_tcga_response } = require("../overview/tcga_response_builder.js");
 
 async function build_overview_response(handlerInput, params) {
     console.info(`[build_overview_response] params: ${JSON.stringify(params)}`);
@@ -33,6 +29,4 @@ async function build_overview_response(handlerInput, params) {
     return response;
 }
 
-module.exports = {
-    build_overview_response
-}
+module.exports = { build_overview_response };
