@@ -65,16 +65,24 @@ functions:
     events:
       - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
 
-  sqs_warmup_consumer:
-    handler: src/sqs/warmup_consumer.handler
+  warmup_service:
+    handler: src/warmup_service/warmup_service.handler
     events:
-      - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_WARMUP}
+      - schedule:
+          description: 'warmup service scheduled event rule'
+          rate: rate(1 minute)
+          enabled: false
+          input:
+            stage: ${self:custom.stage}
+          tags:
+            label: "melvin-alexa-intent-handlers-${self:provider.stage}-warmup_service"
 
 plugins:
   - serverless-plugin-aws-alerts
   - serverless-plugin-include-dependencies
   - serverless-prune-plugin
   - serverless-pseudo-parameters
+  - serverless-plugin-tag-events
 
 package:
   exclude:

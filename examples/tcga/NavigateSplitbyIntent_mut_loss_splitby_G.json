@@ -9,12 +9,7 @@
         "attributes": {
             "MELVIN.STATE": {
                 "gene_name": "TP53",
-                "study_abbreviation": "BRCA",
-                "data_type": "GENE_EXPRESSION",
-                "data_source":"TCGA"
-            },
-            "MELVIN.AUX.STATE": {
-                "data_type": "MUTATIONS"
+                "data_type": "LOSS"
             }
         },
         "user": {
@@ -81,7 +76,6 @@
     },
     "request": {
         "type": "IntentRequest",
-        "dialogState": "COMPLETED",
         "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
@@ -89,9 +83,9 @@
             "name": "NavigateSplitbyIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "gene_query": {
-                    "name": "gene_query",
-                    "value": "CDH1",
+                "query": {
+                    "name": "query",
+                    "value": "BRCA1",
                     "confirmationStatus": "NONE"
                 }
             }

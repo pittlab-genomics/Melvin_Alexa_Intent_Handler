@@ -8,13 +8,13 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53",
+                "gene_name": "AFF3",
                 "study_abbreviation": "BRCA",
-                "data_type": "GENE_EXPRESSION",
+                "data_type": "MUTATIONS",
                 "data_source":"TCGA"
             },
             "MELVIN.AUX.STATE": {
-                "data_type": "MUTATIONS"
+                "data_type": "GENE_EXPRESSION"
             }
         },
         "user": {

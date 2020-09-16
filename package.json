@@ -16,12 +16,15 @@
     "nunjucks": "^3.2.1"
   },
   "devDependencies": {
-    "eslint": "^7.7.0",
-    "eslint-config-google": "^0.14.0",
+    "eslint": "^7.8.1",
     "serverless": "^1.78.1",
     "serverless-plugin-aws-alerts": "^1.4.0",
     "serverless-plugin-include-dependencies": "^3.2.1",
+    "serverless-plugin-tag-events": "^1.1.0",
     "serverless-prune-plugin": "^1.4.0",
     "serverless-pseudo-parameters": "^2.5.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.1.3"
   }
 }

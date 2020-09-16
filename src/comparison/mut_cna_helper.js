@@ -1,5 +1,5 @@
-const Speech = require('ssml-builder');
-const _ = require('lodash');
+const Speech = require("ssml-builder");
+const _ = require("lodash");
 
 const {
     MelvinAttributes,
@@ -7,11 +7,9 @@ const {
     DataSources,
     melvin_error,
     DEFAULT_INVALID_STATE_RESPONSE
-} = require('../common.js');
+} = require("../common.js");
 
-const {
-    build_mut_cna_compare_tcga_response
-} = require('../comparison/tcga_mut_cna_response_builder.js');
+const { build_mut_cna_compare_tcga_response } = require("../comparison/tcga_mut_cna_response_builder.js");
 
 async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
     console.info(`[build_mut_cna_compare_response] params: ${JSON.stringify(params)}`);
@@ -20,9 +18,7 @@ async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
         response = await build_mut_cna_compare_tcga_response(handlerInput, params, sate_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = {
-            'speech_text': "Mutations and copy number alterations comparison analysis is not supported in clinvar."
-        };
+        response = { "speech_text": "Mutations and copy number alterations comparison analysis is not supported in clinvar." };
 
     } else {
         throw melvin_error(
@@ -34,6 +30,4 @@ async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
     return response;
 }
 
-module.exports = {
-    build_mut_cna_compare_response
-}
+module.exports = { build_mut_cna_compare_response };

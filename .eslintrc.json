@@ -1,14 +1,88 @@
 {
-    "extends": "eslint:recommended",
     "env": {
-        "browser": false,
-        "node": true,
+        "commonjs": true,
         "es6": true,
-        "mocha": false
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 10
+        "ecmaVersion": 2018
     },
     "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "no-cond-assign": [
+            "error",
+            "always"
+        ],
+        "max-len": [
+            "error",
+            {
+                "code": 120,
+                "tabWidth": 4,
+                "ignorePattern": "^\\s*const\\s.+=\\s*require\\s*\\("
+            }
+        ],
+        "object-curly-newline": [
+            "error",
+            {
+                "minProperties": 2
+            }
+        ],
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "no-multi-spaces": [
+            "error",
+            {
+                "exceptions": {
+                    "Property": true
+                }
+            }
+        ],
+        "key-spacing": [
+            "error",
+            {
+                "align": "value"
+            }
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_",
+                "caughtErrorsIgnorePattern": "^_ignore",
+                "varsIgnorePattern": "[iI]gnore"
+            }
+        ],
+        "object-curly-spacing": [
+            "error",
+            "always",
+            {
+                "arraysInObjects": false,
+                "objectsInObjects": false
+            }
+        ]
     }
 }
