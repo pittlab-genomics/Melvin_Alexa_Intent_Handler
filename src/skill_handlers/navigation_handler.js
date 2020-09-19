@@ -9,6 +9,7 @@ const {
 
 const {
     update_melvin_state,
+    update_melvin_aux_state,
     get_melvin_history,
     get_melvin_state,
     get_prev_melvin_state,
@@ -58,7 +59,7 @@ const NavigateCompareIntentHandler = {
     async handle(handlerInput) {
         let speechText = "";
         try {
-            const state_change = await update_melvin_state(handlerInput);
+            const state_change = await update_melvin_aux_state(handlerInput);
             const melvin_state = get_melvin_state(handlerInput);
             const compare_state = {
                 ...state_change["prev_state"], ...state_change["updated_state"] 

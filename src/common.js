@@ -79,6 +79,18 @@ const CNATypes = {
     ALTERATIONS:    "alterations"
 };
 
+const SUPPORTED_SPLITBY_DTYPES = [
+    [DataTypes.MUTATIONS, DataTypes.LOSS],
+    [DataTypes.MUTATIONS, DataTypes.GAIN],
+    [DataTypes.MUTATIONS, DataTypes.MUTATIONS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
+    [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.GENE_EXPRESSION],
+    [DataTypes.GAIN, DataTypes.GAIN],
+    [DataTypes.LOSS, DataTypes.LOSS],
+];
+
 const get_gene_speech_text = function (gene_name) {
     let gene_speech_text = gene_name;
     if (_.has(GeneSSMLMappings, gene_name)) {
@@ -162,6 +174,7 @@ module.exports = {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,
+    SUPPORTED_SPLITBY_DTYPES,
     get_gene_speech_text,
     get_study_name_text,
     get_dtype_name_text,

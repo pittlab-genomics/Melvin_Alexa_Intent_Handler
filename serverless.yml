@@ -8,6 +8,7 @@ provider:
   stage: ${self:custom.stage}
   region: eu-west-1
   memorySize: 2048
+  reservedConcurrency: 1
   tracing:
     lambda: true
     apiGateway: true
@@ -50,6 +51,14 @@ provider:
     - Effect: Allow
       Action:
         - ses:SendEmail
+      Resource: "*"
+
+    - Effect: Allow
+      Action:
+        - events:ListRules
+        - events:putRule
+        - events:listTagsForResource
+        - events:TagResource
       Resource: "*"
 
 functions:

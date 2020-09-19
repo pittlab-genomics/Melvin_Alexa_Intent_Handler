@@ -72,7 +72,7 @@
     "request": {
         "type": "LaunchRequest",
         "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
-        "timestamp": "2019-10-09T00:34:12Z",
+        "timestamp": "2020-09-19T14:34:12Z",
         "locale": "en-US",
         "intent": {}
     }
