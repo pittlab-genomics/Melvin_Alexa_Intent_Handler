@@ -5,15 +5,18 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "ask-sdk-core": "^2.7.0",
     "ask-sdk-model": "^1.18.0",
-    "request": "^2.88.0",
-    "ssml-builder": "^0.4.3",
-    "lodash": "^4.17.15",
-    "js-yaml": "3.13.1",
-    "moment": "^2.24.0",
     "iso8601-duration": "^1.2.0",
-    "nunjucks": "^3.2.1"
+    "js-yaml": "3.13.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.6.1",
+    "nunjucks": "^3.2.1",
+    "promise.allsettled": "^1.0.2",
+    "request": "^2.88.0",
+    "ssml-builder": "^0.4.3"
   },
   "devDependencies": {
     "eslint": "^7.8.1",

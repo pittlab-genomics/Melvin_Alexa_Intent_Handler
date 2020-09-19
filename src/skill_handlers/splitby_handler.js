@@ -3,7 +3,7 @@ const _ = require("lodash");
 const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     MelvinAttributes,
-    DataTypes,
+    SUPPORTED_SPLITBY_DTYPES,
     OOVEntityTypes,
     MelvinIntentErrors,
     melvin_error,
@@ -163,19 +163,11 @@ const elicit_splitby_slots = async function (handlerInput, melvin_aux_state, pre
 };
 
 const is_splitby_supported = function (query_dtypes) {
-    const supported_dtypes = [
-        [DataTypes.MUTATIONS, DataTypes.LOSS],
-        [DataTypes.MUTATIONS, DataTypes.GAIN],
-        [DataTypes.MUTATIONS, DataTypes.MUTATIONS],
-        [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
-        [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
-        [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
-        [DataTypes.GENE_EXPRESSION, DataTypes.GENE_EXPRESSION]
-    ];
-
-    for (var index = 0; index < supported_dtypes.length; index++) {
-        if ((query_dtypes[0] === supported_dtypes[index][0] && query_dtypes[1] === supported_dtypes[index][1])
-            || (query_dtypes[0] === supported_dtypes[index][1] && query_dtypes[1] === supported_dtypes[index][0])
+    for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
+        if ((query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][0] 
+            && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][1])
+            || (query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][1] 
+                && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][0])
         ) {
             return true;
         }

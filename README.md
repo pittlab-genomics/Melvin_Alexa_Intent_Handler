@@ -138,3 +138,6 @@ serverless invoke local --function alexa-skill -p ./examples/irs/email_count.jso
 serverless invoke local --function alexa-skill -p ./examples/irs/email_duration.json
 serverless invoke local --function sqs_irs_subscriber --path ./examples/irs/ses_payload_1.json
 serverless invoke local --function sqs_irs_subscriber --path ./examples/irs/ses_payload_2.json
+
+### Warmup service
+serverless invoke local --function warmup_service

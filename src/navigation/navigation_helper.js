@@ -146,6 +146,14 @@ const update_melvin_state = async function (
     };
 };
 
+const update_melvin_aux_state = async function (
+    handlerInput,
+    query_path = "requestEnvelope.request.intent.slots.query.value",
+    session_path = "MELVIN.AUX.STATE",
+) {
+    return update_melvin_state(handlerInput, query_path, session_path);
+};
+
 const update_melvin_history = async function (handlerInput) {
     const event_type = get_event_type(handlerInput);
     if (event_type === MelvinEventTypes.LAUNCH_EVENT || event_type === MelvinEventTypes.SESSION_ENDED_EVENT) {
@@ -448,6 +456,7 @@ module.exports = {
     get_prev_melvin_state,
     get_melvin_history,
     update_melvin_state,
+    update_melvin_aux_state,
     update_melvin_history,
     resolve_oov_entity,
     validate_navigation_intent_state,
