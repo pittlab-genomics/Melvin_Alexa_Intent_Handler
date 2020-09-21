@@ -62,7 +62,7 @@ const NavigateCompareIntentHandler = {
             const state_change = await update_melvin_aux_state(handlerInput);
             const melvin_state = get_melvin_state(handlerInput);
             const compare_state = {
-                ...state_change["prev_state"], ...state_change["updated_state"] 
+                ...melvin_state, ...state_change["updated_state"] 
             };
             const state_diff = get_state_change_diff(state_change);
             let response = await build_compare_response(handlerInput, melvin_state, compare_state, state_diff);
@@ -156,7 +156,7 @@ const NavigateRestoreSessionIntentHandler = {
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)
-            .withSimpleCard(MELVIN_APP_NAME, card_text_list.join(" | "))
+            .withSimpleCard(MELVIN_APP_NAME, card_text_list.join("\n"))
             .getResponse();
     }
 };

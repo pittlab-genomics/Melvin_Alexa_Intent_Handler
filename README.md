@@ -104,9 +104,19 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompar
 
 
 ### Splitby - MUTATIONS vs CNA
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_mut_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_exp_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_exp_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_mut_G1_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_exp_G1_G2.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_gain_G1_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_exp_loss_G1_G2.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_G1_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_gain_G1_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_mut_G1_G2.json
+
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_loss_loss_G1_G2.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_gain_gain_G1_G2.json
+
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_splitby_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateSplitbyIntent_mut_loss_splitby_MUT.json
 

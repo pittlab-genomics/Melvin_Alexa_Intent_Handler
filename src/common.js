@@ -86,7 +86,6 @@ const SUPPORTED_SPLITBY_DTYPES = [
     [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
     [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
     [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
-    [DataTypes.GENE_EXPRESSION, DataTypes.GENE_EXPRESSION],
     [DataTypes.GAIN, DataTypes.GAIN],
     [DataTypes.LOSS, DataTypes.LOSS],
 ];
@@ -169,6 +168,7 @@ module.exports = {
     MELVIN_EXPLORER_ENDPOINT: process.env.MELVIN_EXPLORER_ENDPOINT,
     OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
+    STAGE:                    process.env.STAGE,
     MelvinAttributes,
     MelvinEventTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,

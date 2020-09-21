@@ -29,12 +29,15 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context);
 
-    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_stats_plot(image_list, melvin_state);
         add_mutations_tcga_treemap_plot(image_list, melvin_state);
-    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_stats_plot(image_list, melvin_state);
-    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_profile_plot(image_list, melvin_state);
     }    
     add_to_APL_image_pager(handlerInput, image_list);
@@ -54,10 +57,12 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutation_domain_tcga.njk", nunjucks_context);
 
-    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_domain_pie_plot(image_list, melvin_state);
         add_mutations_tcga_domain_stack_plot(image_list, melvin_state);
-    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_domain_pie_plot(image_list, melvin_state);
         add_mutations_tcga_domain_stack_plot(image_list, melvin_state);
     }
@@ -68,26 +73,34 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
 
 async function build_mutations_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
     const image_list = [];
-    const response = await get_mutations_tcga_stats(melvin_state);
-    const compare_response = await get_mutations_tcga_stats(compare_params);
+    const results = await Promise.all([
+        get_mutations_tcga_stats(melvin_state),
+        get_mutations_tcga_stats(compare_params)
+    ]);
     const nunjucks_context = {
         melvin_state:     melvin_state,
         compare_params:   compare_params,
         sate_diff:        sate_diff,
-        response:         response,
-        compare_response: compare_response
+        response:         results[0],
+        compare_response: results[1]
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context);
 
-    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_stats_plot(image_list, melvin_state);
+    if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_stats_plot(image_list, melvin_state);        
         add_mutations_tcga_treemap_plot(image_list, melvin_state);
+
         add_mutations_tcga_stats_plot(image_list, compare_params);
         add_mutations_tcga_treemap_plot(image_list, compare_params);
-    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_stats_plot(image_list, melvin_state);
-    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+        add_mutations_tcga_stats_plot(image_list, compare_params);
+    } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
+        && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         add_mutations_tcga_profile_plot(image_list, melvin_state);
+        add_mutations_tcga_profile_plot(image_list, compare_params);
     }    
     add_to_APL_image_pager(handlerInput, image_list);
 

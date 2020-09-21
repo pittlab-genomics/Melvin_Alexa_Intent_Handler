@@ -16,10 +16,7 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
-const {
-    get_mutations_tcga_stats,
-    get_mutations_tcga_domain_stats
-} = require("../http_clients/mutations_tcga_client.js");
+const { get_mutations_tcga_stats } = require("../http_clients/mutations_tcga_client.js");
 
 const { get_cna_tcga_stats } = require("../http_clients/cna_tcga_client.js");
 

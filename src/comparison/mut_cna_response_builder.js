@@ -9,7 +9,7 @@ const {
     DEFAULT_INVALID_STATE_RESPONSE
 } = require("../common.js");
 
-const { build_mut_cna_compare_tcga_response } = require("../comparison/tcga_mut_cna_response_builder.js");
+const { build_mut_cna_compare_tcga_response } = require("./tcga_mut_cna_response_builder.js");
 
 async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
     console.info(`[build_mut_cna_compare_response] params: ${JSON.stringify(params)}`);
@@ -18,7 +18,11 @@ async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
         response = await build_mut_cna_compare_tcga_response(handlerInput, params, sate_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = { "speech_text": "Mutations and copy number alterations comparison analysis is not supported in clinvar." };
+        throw melvin_error(
+            `[build_mut_cna_compare_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            "Mutations and copy number alterations comparison analysis is not supported in clinvar."
+        );
 
     } else {
         throw melvin_error(
