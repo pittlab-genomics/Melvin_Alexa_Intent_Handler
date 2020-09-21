@@ -12,7 +12,7 @@ const { get_mutations_tcga_stats } = require("../http_clients/mutations_tcga_cli
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const {
     build_mutations_response,

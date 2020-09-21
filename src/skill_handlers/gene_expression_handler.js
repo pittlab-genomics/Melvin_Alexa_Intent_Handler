@@ -6,7 +6,7 @@ const {
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
 
