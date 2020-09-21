@@ -2,7 +2,7 @@
 const Alexa = require("ask-sdk-core");
 
 const { MelvinEventTypes } = require("./common.js");
-const { add_event_configuration } = require("./navigation/handler_configuration.js");
+const { add_event_configuration } = require("./utils/handler_configuration.js");
 
 const {
     RequestLogInterceptor,

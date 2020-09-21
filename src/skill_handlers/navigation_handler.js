@@ -7,15 +7,18 @@ const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require("../common.js");
 
-const {
-    update_melvin_state,
-    update_melvin_aux_state,
-    get_melvin_history,
-    get_melvin_state,
-    get_prev_melvin_state,
+const {    
     build_navigation_response,
     build_compare_response
 } = require("../navigation/navigation_helper.js");
+
+const {
+    get_melvin_state, 
+    update_melvin_state,
+    update_melvin_aux_state,
+    get_melvin_history,
+    get_prev_melvin_state, 
+} = require("../utils/navigation_utils.js",);
 
 const { get_state_change_diff } = require("../utils/response_builder_utils.js");
 const sessions_doc = require("../dao/sessions.js");
