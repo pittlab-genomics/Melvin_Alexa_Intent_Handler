@@ -4,7 +4,9 @@ const moment = require("moment");
 const _ = require("lodash");
 
 const {
-    MELVIN_WELCOME_GREETING, MELVIN_APP_NAME 
+    MELVIN_WELCOME_GREETING,
+    MELVIN_APP_NAME,
+    STAGE 
 } = require("../common.js");
 
 const APLDocs = { welcome: require("../../resources/APL/welcome.json"), };
@@ -75,15 +77,20 @@ async function update_cloudwatch_events() {
                 }
             }
         }
+        
         if (!_.isEmpty(warmup_rule_name)) {
+            const timestamp = moment().valueOf().toString();
+            const description = "warmup service cloudwatch rule | " + 
+                `stage: ${STAGE}, last_updated: ${timestamp}`;
             const cloudwatchevent_params = {
                 Name:               warmup_rule_name,
+                Description:        description,
                 ScheduleExpression: "rate(1 minute)",
                 State:              "ENABLED",
                 Tags:               [
                     {
                         Key:   "last_updated",
-                        Value: moment().valueOf().toString()
+                        Value: timestamp
                     }
                 ]
             };

@@ -16,7 +16,8 @@ AWS.config.update({ httpOptions: { agent: agent }});
 const {
     MelvinAttributes,
     SUPPORTED_SPLITBY_DTYPES,
-    MELVIN_EXPLORER_ENDPOINT 
+    MELVIN_EXPLORER_ENDPOINT,
+    STAGE
 } = require("../common.js");
 
 const controller_short = new AbortController();
@@ -29,7 +30,7 @@ const controller_medium = new AbortController();
 const signal_medium = controller_medium.signal;
 setTimeout(() => { 
     controller_medium.abort();
-}, 2000);
+}, 2500);
 
 const controller_long = new AbortController();
 const signal_long = controller_long.signal;
@@ -214,15 +215,20 @@ async function disable_warmup_cloudwatch_rule() {
                 }
             }
         }
+        
         if (!_.isEmpty(warmup_rule_name)) {
+            const timestamp = moment().valueOf().toString();
+            const description = "warmup service cloudwatch rule | " + 
+                `stage: ${STAGE}, last_updated: ${timestamp}`;
             const cloudwatchevent_params = {
                 Name:               warmup_rule_name,
+                Description:        description,
                 ScheduleExpression: "rate(1 minute)",
                 State:              "DISABLED",
                 Tags:               [
                     {
                         Key:   "last_updated",
-                        Value: moment().valueOf().toString()
+                        Value: timestamp
                     }
                 ]
             };
