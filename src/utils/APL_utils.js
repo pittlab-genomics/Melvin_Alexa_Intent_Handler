@@ -44,7 +44,10 @@ function build_APL_footer_text(handlerInput) {
         .map(k => `${melvin_aux_state[k]}`)
         .join(" | ");
 
-    const footer_text = melvin_state_text + " vs " + melvin_aux_state_text;
+    let footer_text = melvin_state_text;
+    if (melvin_aux_state_text !== "") {
+        footer_text += " vs " + melvin_aux_state_text;
+    }
     return footer_text;
 }
 

@@ -11,7 +11,7 @@ const { build_navigate_cna_response } = require("../cna/response_builder.js");
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const CNAAmplificationGeneIntentHandler = {
     canHandle(handlerInput) {

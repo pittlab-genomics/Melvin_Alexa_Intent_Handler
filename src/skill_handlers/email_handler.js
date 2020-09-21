@@ -20,7 +20,7 @@ const {
 const {
     validate_navigation_intent_state,
     update_melvin_state
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 
 const NavigateEmailIntentHandler = {

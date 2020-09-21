@@ -8,7 +8,7 @@ const { build_overview_response } = require("../overview/overview_helper.js");
 const {
     validate_action_intent_state,
     update_melvin_state
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const NavigateOverviewIntentHandler = {
     canHandle(handlerInput) {
