@@ -2,6 +2,10 @@ const _ = require("lodash");
 const { MelvinAttributes } = require("../common.js");
 
 const APLDocs = { image_pager: require("../../resources/APL/image_pager.json"), };
+const {
+    get_melvin_state,
+    get_melvin_aux_state
+} = require("../utils/navigation_utils.js");
 
 const MelvinAttributesLabels = {
     [MelvinAttributes.GENE_NAME]:   "Gene",
@@ -28,15 +32,19 @@ function build_APL_datasource_properties(url_list) {
 }
 
 function build_APL_footer_text(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let melvin_state = {};
-    let footer_text = "";
-    if (_.has(sessionAttributes, "MELVIN.STATE")) {
-        melvin_state = sessionAttributes["MELVIN.STATE"];
-        footer_text = Object.keys(melvin_state).filter(k => (k in MelvinAttributesLabels)).map(
-            k => `${melvin_state[k]}`
-        ).join(" | ");
-    }
+    const melvin_state = get_melvin_state(handlerInput);
+    const melvin_state_text = Object.keys(melvin_state)
+        .filter(k => (k in MelvinAttributesLabels))
+        .map(k => `${melvin_state[k]}`)
+        .join(" | ");
+
+    const melvin_aux_state = get_melvin_aux_state(handlerInput);
+    const melvin_aux_state_text = Object.keys(melvin_aux_state)
+        .filter(k => (_.without(Object.keys(MelvinAttributesLabels), MelvinAttributes.DSOURCE).includes(k)))
+        .map(k => `${melvin_aux_state[k]}`)
+        .join(" | ");
+
+    const footer_text = melvin_state_text + " vs " + melvin_aux_state_text;
     return footer_text;
 }
 

@@ -1,6 +1,4 @@
-const {
-    update_melvin_history, get_melvin_history 
-} = require("./navigation/navigation_helper.js");
+const { update_melvin_history } = require("./utils/navigation_utils.js");
 
 const RequestLogInterceptor = { process(handlerInput) {
     console.log("ASP REQUEST ENVELOPE = " + JSON.stringify(handlerInput.requestEnvelope));

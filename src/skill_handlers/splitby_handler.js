@@ -14,7 +14,7 @@ const {
     get_melvin_state,
     get_melvin_aux_state,
     resolve_oov_entity
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const { build_splitby_response } = require("../splitby/response_builder.js");
 
