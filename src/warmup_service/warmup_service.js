@@ -24,7 +24,7 @@ const controller_short = new AbortController();
 const signal_short = controller_short.signal;
 setTimeout(() => { 
     controller_short.abort();
-}, 1500);
+}, 2000);
 
 const controller_medium = new AbortController();
 const signal_medium = controller_medium.signal;

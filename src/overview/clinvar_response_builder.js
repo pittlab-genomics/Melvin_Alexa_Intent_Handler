@@ -14,7 +14,7 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
-const { get_overview_clinvar_stats } = require("../http_clients/overview_clinvar_client.js");
+const { get_overview_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 function _populate_overview_by_study_gene_response(params, data, speech) {
     const mutation_count = data["mutation"];
@@ -113,7 +113,7 @@ function _populate_overview_by_study_response(params, gene_mut_list, speech) {
 async function build_overview_clinvar_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
-    const response = await get_overview_clinvar_stats(params);
+    const response = await get_overview_clinvar_stats(handlerInput, params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         add_overview_clinvar_plot(image_list, params);

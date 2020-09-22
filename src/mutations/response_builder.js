@@ -16,13 +16,13 @@ const {
 const {
     get_mutations_tcga_stats,
     get_mutations_tcga_domain_stats
-} = require("../http_clients/mutations_tcga_client.js");
-const { get_mutations_clinvar_stats } = require("../http_clients/mutations_clinvar_client.js");
+} = require("../http_clients/melvin_explorer_client.js");
+const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 async function build_mutations_tcga_response(handlerInput, melvin_state) {
     const image_list = [];
-    const response = await get_mutations_tcga_stats(melvin_state);
+    const response = await get_mutations_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
         response:     response
@@ -48,7 +48,7 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
 
 async function build_mutations_tcga_domain_response(handlerInput, melvin_state) {
     const image_list = [];
-    const response = await get_mutations_tcga_domain_stats(melvin_state);
+    const response = await get_mutations_tcga_domain_stats(handlerInput, melvin_state);
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
     const nunjucks_context = {
         melvin_state: melvin_state,
@@ -74,8 +74,8 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
 async function build_mutations_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
     const image_list = [];
     const results = await Promise.all([
-        get_mutations_tcga_stats(melvin_state),
-        get_mutations_tcga_stats(compare_params)
+        get_mutations_tcga_stats(handlerInput, melvin_state),
+        get_mutations_tcga_stats(handlerInput, compare_params)
     ]);
     const nunjucks_context = {
         melvin_state:     melvin_state,
@@ -109,7 +109,7 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
 
 async function build_mutations_clinvar_response(handlerInput, params) {
     const image_list = [];
-    const response = await get_mutations_clinvar_stats(params);
+    const response = await get_mutations_clinvar_stats(handlerInput, params);
     const nunjucks_context = {
         melvin_state: params,
         response:     response

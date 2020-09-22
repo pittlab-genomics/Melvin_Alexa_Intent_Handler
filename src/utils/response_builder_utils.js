@@ -86,10 +86,29 @@ const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_
     return speech.ssml();
 };
 
+const call_directive_service = async function(handlerInput, speech) {
+    const { requestEnvelope } = handlerInput;
+    const directiveServiceClient = handlerInput.serviceClientFactory.getDirectiveServiceClient();
+    
+    const directive = {
+        header:    { requestId: requestEnvelope.request.requestId },
+        directive: {
+            type:   "VoicePlayer.Speak",
+            speech: speech
+        }
+    };
+    return directiveServiceClient.enqueue(
+        directive, 
+        requestEnvelope.context.System.apiEndpoint, 
+        requestEnvelope.context.System.apiAccessToken
+    );
+};
+
 module.exports = {
     round,
     add_query_params,
     add_query_list_params,
     get_state_change_diff,
-    build_ssml_response_from_nunjucks
+    build_ssml_response_from_nunjucks,
+    call_directive_service
 };

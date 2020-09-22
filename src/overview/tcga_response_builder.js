@@ -16,9 +16,7 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
-const { get_mutations_tcga_stats } = require("../http_clients/mutations_tcga_client.js");
-
-const { get_cna_tcga_stats } = require("../http_clients/cna_tcga_client.js");
+const { get_mutations_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 function _populate_overview_by_gene_response(params, mut_response, cna_response, speech) {
@@ -56,7 +54,7 @@ function _populate_overview_by_gene_response(params, mut_response, cna_response,
 
     } else {
         throw melvin_error(
-            `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(response)}`,
+            `Invalid response from MELVIN_EXPLORER: ${JSON.stringify(mut_response)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
             `Sorry, I'm having trouble accessing mutations records for ${gene_speech_text}`
         );
@@ -91,20 +89,18 @@ function _populate_overview_by_study_response(params, mut_response, cna_response
 async function build_overview_tcga_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
-    const mut_response = await get_mutations_tcga_stats(params);
-    const cna_response = ""; // await get_cna_tcga_stats(params);
-
+    const mut_response = await get_mutations_tcga_stats(handlerInput, params);
 
     add_overview_tcga_plots(image_list, params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_gene_response(params, mut_response, cna_response, speech);
+        _populate_overview_by_gene_response(params, mut_response, null, speech);
 
     } else if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_study_gene_response(params, mut_response, cna_response, speech);
+        _populate_overview_by_study_gene_response(params, mut_response, null, speech);
 
     } else if (_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        _populate_overview_by_study_response(params, mut_response, cna_response, speech);
+        _populate_overview_by_study_response(params, mut_response, null, speech);
 
     } else {
         throw melvin_error(
