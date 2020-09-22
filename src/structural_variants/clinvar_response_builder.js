@@ -15,12 +15,12 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
-const { get_sv_clinvar_stats } = require("../http_clients/structural_variants_clinvar_client.js");
+const { get_sv_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 async function build_sv_clinvar_response(handlerInput, params) {
     const speech = new Speech();
     const image_list = [];
-    const response = await get_sv_clinvar_stats(params);
+    const response = await get_sv_clinvar_stats(handlerInput, params);
 
     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && _.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
         speech.say(DEFAULT_NOT_IMPLEMENTED_RESPONSE);

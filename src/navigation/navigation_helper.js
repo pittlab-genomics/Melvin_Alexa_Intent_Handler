@@ -17,17 +17,17 @@ const {
 const { get_melvin_state } = require("../utils/navigation_utils.js");
 
 const {
-    build_navigate_cna_response, build_cna_compare_response, 
+    build_navigate_cna_response, build_cna_compare_response
 } = require("../cna/response_builder.js",);
-const { build_gene_definition_response, } = require("../gene/gene_definition_response_builder.js");
-const { build_sv_response, } = require("../structural_variants/sv_helper.js");
-const { build_overview_response, } = require("../overview/overview_helper.js");
-const { build_gene_expression_response, } = require("../gene_expression/response_builder.js");
-const { build_mut_cna_compare_response, } = require("../comparison/mut_cna_response_builder.js");
+const { build_gene_definition_response } = require("../gene/gene_definition_response_builder.js");
+const { build_sv_response } = require("../structural_variants/sv_helper.js");
+const { build_overview_response } = require("../overview/overview_helper.js");
+const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
+const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");
 const {
     build_mutations_response,
     build_mutations_domain_response,
-    build_mutations_compare_response,
+    build_mutations_compare_response
 } = require("../mutations/response_builder.js");
 
 
@@ -145,7 +145,7 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_overview_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
-            response = await build_gene_definition_response(melvin_state);
+            response = await build_gene_definition_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
             response = await build_mutations_response(handlerInput, melvin_state);

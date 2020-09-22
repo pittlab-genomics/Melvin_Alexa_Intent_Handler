@@ -1,7 +1,7 @@
 const Speech = require("ssml-builder");
 const _ = require("lodash");
 
-const { get_gene_by_name } = require("../http_clients/gene_client.js");
+const { get_gene_by_name } = require("../http_clients/melvin_explorer_client.js");
 
 const {
     MelvinExplorerErrors,
@@ -13,7 +13,7 @@ const { build_gene_definition_response } = require("../gene/gene_definition_resp
 
 const {
     validate_action_intent_state, update_melvin_state 
-} = require("../navigation/navigation_helper.js");
+} = require("../utils/navigation_utils.js");
 
 const SearchGeneIntentHandler = {
     canHandle(handlerInput) {
@@ -32,7 +32,7 @@ const SearchGeneIntentHandler = {
         let params = { gene_name };
 
         try {
-            const response = await get_gene_by_name(params);
+            const response = await get_gene_by_name(handlerInput, params);
             if (response["data"] && response["data"]["location"] && response["data"]["summary"]) {
                 speech.say(`${gene_name} is at ${response.data.location}`);
                 speech.pause("100ms");
@@ -74,7 +74,7 @@ const NavigateGeneDefinitionIntentHandler = {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_DEFINITION);
             const params = { ...melvin_state };
-            const response = await build_gene_definition_response(params);
+            const response = await build_gene_definition_response(handlerInput, params);
             speechText = response["speech_text"];
 
         } catch (error) {

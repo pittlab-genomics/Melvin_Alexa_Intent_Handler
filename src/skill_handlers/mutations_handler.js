@@ -7,7 +7,7 @@ const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require("../common.js");
 
-const { get_mutations_tcga_stats } = require("../http_clients/mutations_tcga_client.js");
+const { get_mutations_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 const {
     validate_action_intent_state,
@@ -40,7 +40,7 @@ const MutationCountIntentHandler = {
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
 
-            let response = await get_mutations_tcga_stats(params);
+            let response = await get_mutations_tcga_stats(handlerInput, params);
             if (response["data"]["patient_count"] && !_.isNil(study)) {
                 speech.say(`${response.data.patient_count} ${study} cancer patients have ${gene_name} mutation.`);
                 speechText = speech.ssml();
@@ -96,7 +96,7 @@ const MutationPercentageIntentHandler = {
                     .study.resolutions.resolutionsPerAuthority[0].values[0].value.id;
             }
 
-            let response = await get_mutations_tcga_stats(params);
+            let response = await get_mutations_tcga_stats(handlerInput, params);
             if (response["data"]["patient_percentage"] && !_.isNil(study)) {
                 speech
                     .sayAs({

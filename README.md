@@ -17,16 +17,13 @@ serverless deploy
 
 ## Test Locally
 
-serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/SearchGeneIntent_query_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/SearchGeneIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/SearchGeneIntent_query_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/CNAAmplificationGeneIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/legacy/MutationCountIntent_gene_payload.json
+serverless invoke local --function alexa-skill -p ./examples/legacy/MutationCountIntent_gene_study_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_payload.json
-serverless invoke local --function alexa-skill -p ./examples/MutationCountIntent_gene_study_payload.json
-
-serverless invoke local --function alexa-skill -p ./examples/NavigateGene_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateGeneDefinition_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateGeneDefinition_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_payload.json
 serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_gene_payload.json
@@ -128,13 +125,12 @@ serverless invoke local --function alexa-skill -p ./examples/ClinicalTrialCloses
 ### Navigation
 serverless invoke local --function alexa-skill -p ./examples/other/LaunchRequest_1_payload.json
 serverless invoke local --function alexa-skill -p ./examples/other/LaunchRequest_2_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateBRCA_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateResetIntent_payload.json
-serverless invoke local --function alexa-skill -p ./examples/TestMelvinHistory_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateRestoreSessionIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateResetIntent_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/TestMelvinHistory_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateRestoreSessionIntent_payload.json
 
-serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_1_payload.json
-serverless invoke local --function alexa-skill -p ./examples/NavigateGoBackHandler_2_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateGoBackHandler_1_payload.json
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateGoBackHandler_2_payload.json
 
 serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_payload.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_BRCA_payload.json

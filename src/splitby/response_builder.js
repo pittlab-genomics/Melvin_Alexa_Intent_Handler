@@ -9,7 +9,7 @@ const {
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
-const { get_splitby_tcga_stats } = require("../http_clients/splitby_tcga_client.js");
+const { get_splitby_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
 const { build_ssml_response_from_nunjucks } = require("../utils/response_builder_utils.js");
@@ -23,7 +23,7 @@ const add_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_s
 
 async function build_splitby_tcga_response(handlerInput, melvin_state, splitby_state) {
     const image_list = [];
-    const response = await get_splitby_tcga_stats(melvin_state, splitby_state);
+    const response = await get_splitby_tcga_stats(handlerInput, melvin_state, splitby_state);
 
     const nunjucks_context = {
         MelvinAttributes,

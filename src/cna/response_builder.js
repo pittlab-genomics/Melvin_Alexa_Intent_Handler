@@ -14,12 +14,12 @@ const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
 const {
     add_query_params, build_ssml_response_from_nunjucks 
 } = require("../utils/response_builder_utils.js");
-const { get_cna_tcga_stats } = require("../http_clients/cna_tcga_client.js");
+const { get_cna_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 async function build_cna_tcga_response(handlerInput, melvin_state) {
     const image_list = [];
-    const response = await get_cna_tcga_stats(melvin_state);
+    const response = await get_cna_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
         response:     response
@@ -34,8 +34,8 @@ async function build_cna_tcga_response(handlerInput, melvin_state) {
 async function build_cna_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
     const image_list = [];
     const results = await Promise.all([
-        get_cna_tcga_stats(melvin_state),
-        get_cna_tcga_stats(compare_params)
+        get_cna_tcga_stats(handlerInput, melvin_state),
+        get_cna_tcga_stats(handlerInput, compare_params)
     ]);
     const nunjucks_context = {
         melvin_state:     melvin_state,
