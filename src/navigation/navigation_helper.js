@@ -21,7 +21,6 @@ const {
 } = require("../cna/response_builder.js",);
 const { build_gene_definition_response } = require("../gene/gene_definition_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
-const { build_overview_response } = require("../overview/overview_helper.js");
 const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
 const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");
 const {
@@ -141,10 +140,7 @@ const build_navigation_response = async function (handlerInput, state_change) {
         handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, card_text_list.join("\n"));
 
     } else {
-        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.OVERVIEW) {
-            response = await build_overview_response(handlerInput, melvin_state);
-
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
+        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
             response = await build_gene_definition_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {

@@ -7,7 +7,7 @@ provider:
   runtime: nodejs10.x
   stage: ${self:custom.stage}
   region: eu-west-1
-  memorySize: 2048
+  memorySize: 3008
   reservedConcurrency: 1
   tracing:
     lambda: true

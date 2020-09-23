@@ -1,11 +1,13 @@
-const _ = require("lodash",);
-const yaml = require("js-yaml",);
-const moment = require("moment",);
+const _ = require("lodash");
+const yaml = require("js-yaml");
+const moment = require("moment");
+const { performance } = require("perf_hooks");
 
-const utterances_doc = require("../dao/utterances.js",);
-const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js",);
+const utterances_doc = require("../dao/utterances.js");
+const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js");
 const {
     MELVIN_MAX_HISTORY_ITEMS,
+    DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
     MelvinAttributes,
     MelvinEventTypes,
     MelvinIntentErrors,
@@ -15,11 +17,11 @@ const {
     DataTypes,
     DataSources,
     melvin_error
-} = require("../common.js",);
+} = require("../common.js");
 
-const { get_event_type } = require("./handler_configuration.js",);
+const { get_event_type } = require("./handler_configuration.js");
 
-const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml",);
+const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml");
 
 const get_melvin_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -69,18 +71,22 @@ const get_melvin_history = function (handlerInput) {
 const resolve_oov_entity = async function(handlerInput, query) {
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
+    const t0 = performance.now();
     try {
         const params = {
             query, request_id, session_id, 
         };
         const query_response = await get_oov_mapping_by_query(params);
-        console.log(`[resolve_oov_entity] query_response: ${JSON.stringify(query_response)}`);
+        const t1 = performance.now();
+        console.log("[resolve_oov_entity] oov request took " + (t1 - t0) + " ms | " + 
+            `query_response: ${JSON.stringify(query_response)}`);
         return query_response;
     } catch (error) {
-        console.error(`[resolve_oov_entity] message: ${error.message}`, error);
+        const t2 = performance.now();
+        console.error("[resolve_oov_entity] oov request failed and took " + (t2 - t0) + " ms", error);
         throw melvin_error(`Error while mapping query: ${query}`,
             MelvinIntentErrors.OOV_ERROR,
-            "Sorry, something went wrong while resolving the query utterance. Please try again later.");
+            DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
     }
 };
 
@@ -278,6 +284,15 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
     return melvin_state;
 };
 
+const clean_melvin_state = function (handlerInput, session_path = "MELVIN.STATE") {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes[session_path] = {};
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+};
+
+const clean_melvin_aux_state = function (handlerInput, session_path = "MELVIN.AUX.STATE") {
+    clean_melvin_state(handlerInput, session_path);
+};
 
 module.exports = {
     NAVIGATION_TOPICS,
@@ -290,6 +305,8 @@ module.exports = {
     update_melvin_history,
     resolve_oov_entity,
     validate_navigation_intent_state,
-    validate_action_intent_state
+    validate_action_intent_state,
+    clean_melvin_state,
+    clean_melvin_aux_state
 };
 

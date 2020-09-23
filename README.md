@@ -19,15 +19,9 @@ serverless deploy
 
 serverless invoke local --function alexa-skill -p ./examples/other/SearchGeneIntent_payload.json
 serverless invoke local --function alexa-skill -p ./examples/other/SearchGeneIntent_query_payload.json
-
+serverless invoke local --function alexa-skill -p ./examples/other/NavigateGeneDefinition_payload.json
 serverless invoke local --function alexa-skill -p ./examples/legacy/MutationCountIntent_gene_payload.json
 serverless invoke local --function alexa-skill -p ./examples/legacy/MutationCountIntent_gene_study_payload.json
-
-serverless invoke local --function alexa-skill -p ./examples/other/NavigateGeneDefinition_payload.json
-
-serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_payload.json
-serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_gene_payload.json
-serverless invoke local --function alexa-skill -p ./examples/clinvar/NavigateOverviewIntent_study_gene_payload.json
 
 
 ### Mutations
@@ -131,10 +125,6 @@ serverless invoke local --function alexa-skill -p ./examples/other/NavigateResto
 
 serverless invoke local --function alexa-skill -p ./examples/other/NavigateGoBackHandler_1_payload.json
 serverless invoke local --function alexa-skill -p ./examples/other/NavigateGoBackHandler_2_payload.json
-
-serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_BRCA_payload.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/overview/NavigateJoinFilterIntent_TP53_BRCA_payload.json
 
 
 ### IRS

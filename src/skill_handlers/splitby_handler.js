@@ -13,7 +13,8 @@ const {
 const {
     get_melvin_state,
     get_melvin_aux_state,
-    resolve_oov_entity
+    resolve_oov_entity,
+    clean_melvin_aux_state
 } = require("../utils/navigation_utils.js");
 
 const { build_splitby_response } = require("../splitby/response_builder.js");
@@ -32,7 +33,7 @@ const NavigateSplitbyIntentHandler = {
 
             // cleanup splitby state whenever a new dialog flow is initiated
             if (_.get(handlerInput, "requestEnvelope.request.dialogState") === "STARTED") {
-                clean_splitby_aux_state(handlerInput);
+                clean_melvin_aux_state(handlerInput);
             }
 
             // resolve slot values provided in this turn
@@ -58,7 +59,7 @@ const NavigateSplitbyIntentHandler = {
             speechText = response["speech_text"];
 
             // cleanup splitby state after dialog management flow is complete
-            clean_splitby_aux_state(handlerInput);
+            clean_melvin_aux_state(handlerInput);
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -68,7 +69,6 @@ const NavigateSplitbyIntentHandler = {
             console.trace("[NavigateSplitbyIntentHandler] Error! except: ", error);
         }
 
-        console.log("[NavigateSplitbyIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -189,12 +189,6 @@ const validate_splitby_aux_state = function (melvin_state, splitby_state) {
             "Sorry, this split-by operation is not supported."
         );
     }
-};
-
-const clean_splitby_aux_state = function (handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    sessionAttributes["MELVIN.AUX.STATE"] = {};
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 };
 
 module.exports = { NavigateSplitbyIntentHandler };

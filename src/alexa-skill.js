@@ -10,10 +10,7 @@ const {
     UserUtteranceTrackInterceptor
 } = require("./interceptors.js");
 
-const {
-    SearchGeneIntentHandler,
-    NavigateGeneDefinitionIntentHandler
-} = require("./skill_handlers/gene_handler.js");
+const { NavigateGeneDefinitionIntentHandler } = require("./skill_handlers/gene_handler.js");
 
 const {
     NavigateResetIntentHandler,
@@ -28,24 +25,17 @@ const { LaunchRequestHandler } = require("./skill_handlers/launch_handler.js");
 const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handler.js");
 
 const {
-    CNAAmplificationGeneIntentHandler,
-    CNADeletionGeneIntent,
-    CNAAlterationGeneIntent,
     NavigateCNAIntentHandler,
     NavigateCNAAmplificationsIntentHandler,
     NavigateCNADeletionsIntentHandler
 } = require("./skill_handlers/cna_handler.js");
 
 const {
-    MutationCountIntentHandler,
-    MutationPercentageIntentHandler,
     NavigateMutationsIntentHandler,
     NavigateMutationsDomainIntentHandler
 } = require("./skill_handlers/mutations_handler.js");
 
 const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
-
-const { NavigateOverviewIntentHandler } = require("./skill_handlers/overview_handler.js");
 
 const { NavigateEmailIntentHandler } = require("./skill_handlers/email_handler.js");
 
@@ -136,16 +126,9 @@ const ErrorHandler = {
     }
 };
 
-add_event_configuration("SearchGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, SearchGeneIntentHandler);
-add_event_configuration("CNAAmplificationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    CNAAmplificationGeneIntentHandler);
-add_event_configuration("CNADeletionGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNADeletionGeneIntent);
-add_event_configuration("CNAAlterationGeneIntent", MelvinEventTypes.ANALYSIS_EVENT, CNAAlterationGeneIntent);
-add_event_configuration("MutationCountIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationCountIntentHandler);
-add_event_configuration("MutationPercentageIntent", MelvinEventTypes.ANALYSIS_EVENT, MutationPercentageIntentHandler);
+
 add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, 
     NavigateGeneDefinitionIntentHandler);
-add_event_configuration("NavigateOverviewIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateOverviewIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
@@ -188,12 +171,6 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addResponseInterceptors(UserUtteranceTrackInterceptor)
     .addRequestHandlers(
         LaunchRequestHandler,
-        SearchGeneIntentHandler,
-        CNAAmplificationGeneIntentHandler,
-        CNADeletionGeneIntent,
-        CNAAlterationGeneIntent,
-        MutationCountIntentHandler,
-        MutationPercentageIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
@@ -206,7 +183,6 @@ exports.handler = Alexa.SkillBuilders.custom()
 
         // Navigation handlers - analysis
         NavigateGeneDefinitionIntentHandler,
-        NavigateOverviewIntentHandler,
         NavigateJoinFilterIntentHandler,
         NavigateCompareIntentHandler,
         NavigateSplitbyIntentHandler,

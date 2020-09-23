@@ -34,7 +34,6 @@ const NavigateExpressionIntentHandler = {
             console.error(`NavigateExpressionIntentHandler: message: ${error.message}`, error);
         }
 
-        console.log("SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)

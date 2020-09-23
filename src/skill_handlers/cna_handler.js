@@ -1,7 +1,5 @@
 const {
-    MelvinAttributes,
     DataTypes,
-    DataSources,
     CNATypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require("../common.js");
@@ -12,73 +10,6 @@ const {
     validate_action_intent_state,
     update_melvin_state
 } = require("../utils/navigation_utils.js");
-
-const CNAAmplificationGeneIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNAAmplificationGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.DSOURCE]:     DataSources.TCGA,
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.AMPLIFICATIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
-
-const CNADeletionGeneIntent = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNADeletionGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.DELETIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
-
-const CNAAlterationGeneIntent = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNAAlterationGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.ALTERATIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
 
 
 const NavigateCNAIntentHandler = {
@@ -185,9 +116,6 @@ const NavigateCNADeletionsIntentHandler = {
 
 
 module.exports = {
-    CNAAmplificationGeneIntentHandler,
-    CNADeletionGeneIntent,
-    CNAAlterationGeneIntent,
     NavigateCNAIntentHandler,
     NavigateCNAAmplificationsIntentHandler,
     NavigateCNADeletionsIntentHandler

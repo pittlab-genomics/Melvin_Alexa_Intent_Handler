@@ -57,7 +57,6 @@ const OOVEntityTypes = {
 };
 
 const DataTypes = {
-    OVERVIEW:            "OVERVIEW",
     GENE_DEFINITION:     "GENE_DEFINITION",
     MUTATIONS:           "MUTATIONS",
     PROTEIN_DOMAINS:     "PROTEIN_DOMAINS",
@@ -118,7 +117,6 @@ const melvin_round = function (value, precision) {
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
 */
 const RequiredAttributesTCGA = {};
-RequiredAttributesTCGA[DataTypes.OVERVIEW] = [3, 2, 1];
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.PROTEIN_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
@@ -128,7 +126,6 @@ RequiredAttributesTCGA[DataTypes.LOSS] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.GENE_EXPRESSION] = [2, 3, 1]; // ['G', 'GC', 'C'];
 
 const RequiredAttributesClinvar = {};
-RequiredAttributesClinvar[DataTypes.OVERVIEW] = [1, 2]; // ['C', 'G'];
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
@@ -136,6 +133,13 @@ const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while pro
     " Please try again later.";
 const DEFAULT_INVALID_STATE_RESPONSE = "Sorry, I got lost during the conversation. Please start over.";
 const DEFAULT_NOT_IMPLEMENTED_RESPONSE = "I'm still working on implementing this analysis. Please try again later.";
+const DEFAULT_OOV_MAPPING_ERROR_RESPONSE = "Sorry, something went wrong while resolving the query utterance. " + 
+    "Please try again later.";
+const DEFAULT_OOV_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the mapper service. " + 
+    "Please try again later.";
+const DEFAULT_AE_ACCESS_ERROR_RESPONSE = "Sorry, I'm having trouble accessing the dataset. Please try again later.";
+const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " + 
+    "Please try again later.";
 
 const melvin_error = function (message, type, speech = null) {
     let error = new Error(message);
@@ -174,6 +178,10 @@ module.exports = {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,
+    DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
+    DEFAULT_OOV_CONNECT_ERROR_RESPONSE,
+    DEFAULT_AE_ACCESS_ERROR_RESPONSE,
+    DEFAULT_AE_CONNECT_ERROR_RESPONSE,
     SUPPORTED_SPLITBY_DTYPES,
     get_gene_speech_text,
     get_study_name_text,

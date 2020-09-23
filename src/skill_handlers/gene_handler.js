@@ -1,10 +1,4 @@
-const Speech = require("ssml-builder");
-const _ = require("lodash");
-
-const { get_gene_by_name } = require("../http_clients/melvin_explorer_client.js");
-
 const {
-    MelvinExplorerErrors,
     DataTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
 } = require("../common.js");
@@ -15,52 +9,6 @@ const {
     validate_action_intent_state, update_melvin_state 
 } = require("../utils/navigation_utils.js");
 
-const SearchGeneIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "SearchGeneIntent";
-    },
-    async handle(handlerInput) {
-
-        let gene_name = _.get(handlerInput, "requestEnvelope.request.intent.slots.gene.value");
-        if (_.isNil(gene_name)) {
-            gene_name = _.get(handlerInput, "requestEnvelope.request.intent.slots.query.value").replace(/\s/g, "");
-        }
-
-        let speechText = "";
-        let speech = new Speech();
-        let params = { gene_name };
-
-        try {
-            const response = await get_gene_by_name(handlerInput, params);
-            if (response["data"] && response["data"]["location"] && response["data"]["summary"]) {
-                speech.say(`${gene_name} is at ${response.data.location}`);
-                speech.pause("100ms");
-                const sentence_sum = response.data.summary.match(/\S.*?\."?(?=\s|$)/g)[0];
-                speech.say(sentence_sum);
-                speechText = speech.ssml();
-
-            } else if (response["error"] && response["error"] === MelvinExplorerErrors.UNIDENTIFIED_GENE) {
-                speech.say(`Sorry, I could not find a gene called ${gene_name}`);
-                speechText = speech.ssml();
-
-            } else {
-                speech.say("Sorry, there was a problem while fetching the data. Please try again.");
-                speechText = speech.ssml();
-            }
-
-        } catch (error) {
-            speech.say("Sorry, something went wrong while processing the request. Please try again later.");
-            speechText = speech.ssml();
-            console.error(`SearchGeneIntentHandler: message: ${error.message}`, error);
-        }
-
-        console.log("SPEECH TEXT = " + speechText);
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .getResponse();
-    }
-};
 
 const NavigateGeneDefinitionIntentHandler = {
     canHandle(handlerInput) {
@@ -93,7 +41,4 @@ const NavigateGeneDefinitionIntentHandler = {
     }
 };
 
-module.exports = {
-    SearchGeneIntentHandler,
-    NavigateGeneDefinitionIntentHandler
-};
+module.exports = { NavigateGeneDefinitionIntentHandler };
