@@ -26,13 +26,13 @@ const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handl
 
 const {
     NavigateCNAIntentHandler,
-    NavigateCNAAmplificationsIntentHandler,
-    NavigateCNADeletionsIntentHandler
+    NavigateGainIntentHandler,
+    NavigateLossIntentHandler
 } = require("./skill_handlers/cna_handler.js");
 
 const {
     NavigateMutationsIntentHandler,
-    NavigateMutationsDomainIntentHandler
+    NavigateMutationDomainsIntentHandler
 } = require("./skill_handlers/mutations_handler.js");
 
 const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
@@ -133,13 +133,13 @@ add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EV
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
-add_event_configuration("NavigateMutationsDomainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateMutationsDomainIntentHandler);
+add_event_configuration("NavigateMutationDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateMutationDomainsIntentHandler);
 add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
-add_event_configuration("NavigateCNAAmplificationsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateCNAAmplificationsIntentHandler);
-add_event_configuration("NavigateCNADeletionsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateCNADeletionsIntentHandler);
+add_event_configuration("NavigateGainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateGainIntentHandler);
+add_event_configuration("NavigateLossIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateLossIntentHandler);
 add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
 
 add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, 
@@ -187,10 +187,10 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateCompareIntentHandler,
         NavigateSplitbyIntentHandler,
         NavigateMutationsIntentHandler,
-        NavigateMutationsDomainIntentHandler,
+        NavigateMutationDomainsIntentHandler,
         NavigateCNAIntentHandler,
-        NavigateCNAAmplificationsIntentHandler,
-        NavigateCNADeletionsIntentHandler,
+        NavigateGainIntentHandler,
+        NavigateLossIntentHandler,
         NavigateExpressionIntentHandler,
         NavigateEmailIntentHandler,
 
@@ -201,4 +201,5 @@ exports.handler = Alexa.SkillBuilders.custom()
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)
     .addErrorHandlers(ErrorHandler)
+    .withApiClient(new Alexa.DefaultApiClient())
     .lambda();

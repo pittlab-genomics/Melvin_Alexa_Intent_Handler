@@ -22,7 +22,7 @@ const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
 const ae_timeout_1 = 2500;
-const ae_timeout_2 = 3500;
+const ae_timeout_2 = 5000;
 
 
 const send_request_async = function(url, signal) {
@@ -73,7 +73,7 @@ const process_repeat_requests = async function(handlerInput, url, timeout1=ae_ti
         await call_directive_service(handlerInput, pr_speech);
     } catch(err) {
         // ignore errors when invoking progressive response API
-        console.error(`[process_repeat_requests] failed to send PR | err: ${JSON.stringify(err)}`);
+        console.error("[process_repeat_requests] failed to send PR", err);
     }
     
     const controller_long = new AbortController();
@@ -134,9 +134,23 @@ const get_cna_clinvar_stats = async function (handlerInput, params) {
 };
 
 const get_cna_tcga_stats = async function (handlerInput, params) {
-    const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/stats`);
+    const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
     add_query_params(cna_url, params);
     const result = await process_repeat_requests(handlerInput, cna_url);
+    return result;
+};
+
+const get_gain_tcga_stats = async function (handlerInput, params) {
+    const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
+    add_query_params(gain_stats_url, params);
+    const result = await process_repeat_requests(handlerInput, gain_stats_url);
+    return result;
+};
+
+const get_loss_tcga_stats = async function (handlerInput, params) {
+    const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
+    add_query_params(loss_stats_url, params);
+    const result = await process_repeat_requests(handlerInput, loss_stats_url);
     return result;
 };
 
@@ -187,6 +201,8 @@ module.exports = {
     get_mutations_tcga_top_genes,
     get_mutations_tcga_domain_stats,
     get_cna_tcga_stats,
+    get_gain_tcga_stats,
+    get_loss_tcga_stats,
     get_gene_expression_tcga_stats,
     get_splitby_tcga_stats,
     get_mutations_clinvar_stats,

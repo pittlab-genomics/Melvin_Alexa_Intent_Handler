@@ -44,10 +44,10 @@ const NavigateMutationsIntentHandler = {
     }
 };
 
-const NavigateMutationsDomainIntentHandler = {
+const NavigateMutationDomainsIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "NavigateMutationsDomainIntent";
+            && handlerInput.requestEnvelope.request.intent.name === "NavigateMutationDomainsIntent";
     },
     async handle(handlerInput) {
         let speechText = "";
@@ -63,7 +63,7 @@ const NavigateMutationsDomainIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error("Error in NavigateMutationsDomainIntentHandler", error);
+            console.error("Error in NavigateMutationDomainsIntentHandler", error);
         }
 
         return handlerInput.responseBuilder
@@ -75,5 +75,5 @@ const NavigateMutationsDomainIntentHandler = {
 
 module.exports = {
     NavigateMutationsIntentHandler,
-    NavigateMutationsDomainIntentHandler
+    NavigateMutationDomainsIntentHandler
 };

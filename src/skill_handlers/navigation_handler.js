@@ -1,5 +1,3 @@
-const _ = require("lodash");
-
 const {
     MelvinEventTypes,
     MELVIN_WELCOME_GREETING,

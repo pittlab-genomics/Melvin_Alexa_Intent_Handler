@@ -20,25 +20,103 @@ const {
     STAGE
 } = require("../common.js");
 
-const controller_short = new AbortController();
-const signal_short = controller_short.signal;
-setTimeout(() => { 
-    controller_short.abort();
-}, 2000);
+const stats_ep_timeout = 2500;
+const plot_ep_timeout = 5000;
 
-const controller_medium = new AbortController();
-const signal_medium = controller_medium.signal;
-setTimeout(() => { 
-    controller_medium.abort();
-}, 2500);
+/*
+    make sure to include at least N number of entries for each unique path 
+    since Lambda functions will be provisioned for the speicified `reservedConcurrency` limit
+*/
+const parallel_request_count = 3;
 
-const controller_long = new AbortController();
-const signal_long = controller_long.signal;
-setTimeout(() => { 
-    controller_long.abort();
-}, 3500);
+const stats_ep_path_dict = {
+    "mutations": [
+        "/analysis/mutations/tcga/stats?gene=TP53",
+        "/analysis/mutations/tcga/stats?study=BRCA",
+        "/analysis/mutations/tcga/stats?gene=TP53&study=BRCA"
+    ],
+    "domains": [
+        "/analysis/mutations/tcga/domain_stats?gene=TP53&study=BRCA",
+        "/analysis/mutations/tcga/domain_stats?gene=CDH1",
+        "/analysis/mutations/tcga/domain_stats?study=BRCA"
+    ],
+    "cna": [
+        "/analysis/cna/tcga/cna_stats?gene=cdh17&study=BRCA",
+        "/analysis/cna/tcga/cna_stats?gene=TP53",
+        "/analysis/cna/tcga/cna_stats?study=BRCA"
+    ],
+    "gain": [
+        "/analysis/cna/tcga/gain_stats?gene=cdh17&study=BRCA",
+        "/analysis/cna/tcga/gain_stats?gene=TP53",
+        "/analysis/cna/tcga/gain_stats?study=BRCA"
+    ],
+    "loss": [
+        "/analysis/cna/tcga/loss_stats?gene=cdh17&study=BRCA",
+        "/analysis/cna/tcga/loss_stats?gene=TP53",
+        "/analysis/cna/tcga/loss_stats?study=BRCA"
+    ],
+    "gene_expression": [
+        "/analysis/gene_expression/tcga/stats?gene=TP53&study=BRCA",
+        "/analysis/gene_expression/tcga/stats?gene=BRCA1",
+        "/analysis/gene_expression/tcga/stats?study=OV"
+    ]
+};
 
-const request_async = function(url, signal) {
+const plots_ep_path_dict = {
+    "profile_plot": [
+        "/analysis/mutations/tcga/profile_plot?gene=BRCA1&study=BRCA",
+        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=BRCA",
+        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=OV"
+    ],
+    "domain_pie_plot": [
+        "/analysis/mutations/tcga/domain_pie_plot?gene=BRCA1&study=BRCA",
+        "/analysis/mutations/tcga/domain_pie_plot?gene=TP53&study=OV",
+        "/analysis/mutations/tcga/domain_pie_plot?gene=CDH1&study=BRCA"
+    ],
+    "domain_stack_plot": [
+        "/analysis/mutations/tcga/domain_stack_plot?gene=TP53&study=BRCA",
+        "/analysis/mutations/tcga/domain_stack_plot?gene=HIF1A&study=BRCA",
+        "/analysis/mutations/tcga/domain_stack_plot?gene=BRCA1&study=BRCA"
+    ],
+    "treemap_plot": [
+        "/analysis/mutations/tcga/treemap_plot?gene=TP53",
+        "/analysis/mutations/tcga/treemap_plot?gene=CDH1",
+        "/analysis/mutations/tcga/treemap_plot?gene=BRCA1&study=BRCA"
+    ],
+    "cna_plot": [
+        "/analysis/cna/tcga/cna_plot?gene=CDH17&study=BRCA",
+        "/analysis/cna/tcga/cna_plot?gene=TP53",
+        "/analysis/cna/tcga/cna_plot?study=OV"
+    ],
+    "gain_plot": [
+        "/analysis/cna/tcga/gain_plot?gene=CDH17&study=BRCA",
+        "/analysis/cna/tcga/gain_plot?gene=TP53",
+        "/analysis/cna/tcga/gain_plot?study=OV"
+    ],
+    "loss_plot": [
+        "/analysis/cna/tcga/loss_plot?gene=CDH17&study=BRCA",
+        "/analysis/cna/tcga/loss_plot?gene=TP53",
+        "/analysis/cna/tcga/loss_plot?study=OV"
+    ],
+    "gene_expression_plot": [
+        "/analysis/gene_expression/tcga/plot?gene=CDH1&study=OV",        
+        "/analysis/gene_expression/tcga/plot?gene=TP53",        
+        "/analysis/gene_expression/tcga/plot?study=BRCA"
+    ],
+    "mutations_cna_plot": [
+        "/analysis/comparison/tcga/mutations_cna_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/mutations_cna_plot?study=BRCA",
+        "/analysis/comparison/tcga/mutations_cna_plot?gene=TP53"
+    ]
+};
+
+const request_async = function(url, timeout) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    setTimeout(() => { 
+        controller.abort();
+    }, timeout);
+
     return fetch(url, {
         signal, agent 
     }).then((response) => {
@@ -115,55 +193,6 @@ function get_melvin_splitby_plot_urls() {
     return splitby_urls;
 }
 
-/*
-    make sure to include at least N number of entries for each unique path 
-    since Lambda functions will be provisioned for the speicified `reservedConcurrency` limit
-*/
-function get_melvin_stats_urls() {
-    const endpoint_paths = [
-        "/analysis/mutations/tcga/stats?gene=TP53",
-        "/analysis/mutations/tcga/stats?study=BRCA",
-        "/analysis/mutations/tcga/stats?gene=TP53&study=BRCA",
-        "/analysis/mutations/tcga/domain_stats?gene=TP53",
-        "/analysis/mutations/tcga/domain_stats?gene=CDH1",
-        "/analysis/mutations/tcga/domain_stats?gene=BRCA1",
-        "/analysis/cna/tcga/stats?gene=cdh17&study=BRCA",
-        "/analysis/cna/tcga/stats?gene=TP53",
-        "/analysis/cna/tcga/stats?study=BRCA",
-        "/analysis/gene_expression/tcga/stats?gene=TP53&study=BRCA",
-        "/analysis/gene_expression/tcga/stats?gene=BRCA1",
-        "/analysis/gene_expression/tcga/stats?study=OV"
-    ];
-    return generate_urls_from_paths(endpoint_paths);
-}
-
-function get_melvin_plot_urls() {
-    const endpoint_paths = [
-        "/analysis/mutations/tcga/profile_plot?gene=BRCA1&study=BRCA",
-        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=BRCA",
-        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=OV",
-        "/analysis/mutations/tcga/domain_pie_plot?gene=BRCA1&study=BRCA",
-        "/analysis/mutations/tcga/domain_pie_plot?gene=TP53&study=OV",
-        "/analysis/mutations/tcga/domain_pie_plot?gene=CDH1&study=BRCA",
-        "/analysis/mutations/tcga/domain_stack_plot?gene=TP53&study=BRCA",
-        "/analysis/mutations/tcga/domain_stack_plot?gene=HIF1A&study=BRCA",
-        "/analysis/mutations/tcga/domain_stack_plot?gene=BRCA1&study=BRCA",
-        "/analysis/mutations/tcga/treemap_plot?gene=TP53",
-        "/analysis/mutations/tcga/treemap_plot?gene=CDH1",
-        "/analysis/mutations/tcga/treemap_plot?gene=BRCA1&study=BRCA",
-        "/analysis/cna/tcga/plot?gene=CDH17&study=BRCA",
-        "/analysis/cna/tcga/plot?gene=TP53",
-        "/analysis/cna/tcga/plot?study=OV",
-        "/analysis/gene_expression/tcga/plot?gene=CDH1&study=OV",        
-        "/analysis/gene_expression/tcga/plot?gene=TP53",        
-        "/analysis/gene_expression/tcga/plot?study=BRCA",
-        "/analysis/comparison/tcga/mutations_cna_plot?gene=CDH17&study=BRCA",
-        "/analysis/comparison/tcga/mutations_cna_plot?study=BRCA",
-        "/analysis/comparison/tcga/mutations_cna_plot?gene=TP53",
-    ];
-    return generate_urls_from_paths(endpoint_paths);
-}
-
 
 const send_parallel_requests = async function() {
     const response = {};
@@ -174,18 +203,38 @@ const send_parallel_requests = async function() {
          hit all instances of a Lambda function 
          */
         const results = {};
-        results["melvin_stats"] = await allSettled(get_melvin_stats_urls().map(
-            (data) => request_async(data, signal_short)));
-        results["splitby_stats"] = await allSettled(get_melvin_splitby_stats_urls().map(
-            (data) => request_async(data, signal_medium)));
-        results["melvin_plots"] = await allSettled(get_melvin_plot_urls().map(
-            (data) => request_async(data, signal_long)));
-        results["splitby_plots"] = await allSettled(get_melvin_splitby_plot_urls().map(
-            (data) => request_async(data, signal_long)));
+
+        for (let cat_item in stats_ep_path_dict) {
+            let cat_url_list = generate_urls_from_paths(stats_ep_path_dict[cat_item]);
+            results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, stats_ep_timeout)));
+        }
+
+        for (let cat_item in plots_ep_path_dict) {
+            let cat_url_list = generate_urls_from_paths(plots_ep_path_dict[cat_item]);
+            results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, plot_ep_timeout)));
+        }
+
+        const splitby_stat_urls = get_melvin_splitby_stats_urls();
+        for (const [index, url_item] of splitby_stat_urls.entries()) {
+            let repeat_url_items = Array(parallel_request_count).fill(url_item);
+            let results_key = "splitby_stats_" + index;
+            results[results_key] = await allSettled(repeat_url_items.map(
+                (data) => request_async(data, stats_ep_timeout)));
+        }
+        
+
+        const splitby_plot_urls = get_melvin_splitby_plot_urls();
+        for (const [index, url_item] of splitby_plot_urls.entries()) {
+            let repeat_url_items = Array(parallel_request_count).fill(url_item);
+            let results_key = "splitby_plot_" + index;
+            results[results_key] = await allSettled(repeat_url_items.map(
+                (data) => request_async(data, plot_ep_timeout)));
+        }
+
         response["data"] = results;
     } catch (err) {
         response["error"] = err;
-        console.error(err);
+        console.error(`[send_parallel_requests] error: ${JSON.stringify(err)}`, err);
     }
     return response;
 };

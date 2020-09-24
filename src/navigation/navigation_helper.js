@@ -14,11 +14,20 @@ const {
     MELVIN_APP_NAME,
 } = require("../common.js");
 
-const { get_melvin_state } = require("../utils/navigation_utils.js");
+const {
+    get_melvin_state, match_compare_dtype 
+} = require("../utils/navigation_utils.js");
 
 const {
-    build_navigate_cna_response, build_cna_compare_response
-} = require("../cna/response_builder.js",);
+    build_cna_response, build_cna_compare_response
+} = require("../cna/cna_response_builder.js");
+const {
+    build_gain_response, build_gain_compare_response
+} = require("../cna/gain_response_builder.js");
+const {
+    build_loss_response, build_loss_compare_response
+} = require("../cna/loss_response_builder.js");
+
 const { build_gene_definition_response } = require("../gene/gene_definition_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
 const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
@@ -73,8 +82,8 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         + `compare_state: ${JSON.stringify(compare_state)}, state_diff: ${JSON.stringify(state_diff)}`);
 
     if (state_diff["entity_type"] === MelvinAttributes.DTYPE) {
-        if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS
-            || melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA) {
+        const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], state_diff["entity_value"]];
+        if (match_compare_dtype(query_dtypes, [DataTypes.MUTATIONS, DataTypes.CNA])) {
             response = await build_mut_cna_compare_response(handlerInput, melvin_state, state_diff);
 
         } else {
@@ -101,10 +110,10 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
             response = await build_mutations_domain_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GAIN) {
-            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+            response = await build_gain_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.LOSS) {
-            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+            response = await build_loss_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA) {
             response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
@@ -150,13 +159,13 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_mutations_domain_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GAIN) {
-            response = await build_navigate_cna_response(handlerInput, melvin_state);
+            response = await build_gain_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.LOSS) {
-            response = await build_navigate_cna_response(handlerInput, melvin_state);
+            response = await build_loss_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA) {
-            response = await build_navigate_cna_response(handlerInput, melvin_state);
+            response = await build_cna_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
             response = await build_sv_response(handlerInput, melvin_state);

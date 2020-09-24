@@ -8,7 +8,6 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53"
             }
         },
         "user": {
@@ -79,7 +78,7 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateCNADeletionsIntent",
+            "name": "NavigateLossIntent",
             "confirmationStatus": "NONE",
             "slots": {
                 "query": {

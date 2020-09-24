@@ -37,28 +37,43 @@ serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutati
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateMutationDomains_GS.json
 
 
-### CNA - changes
+### CNA
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_S.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAIntent_GS.json
 
 
-### CNA - deletions
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_GS.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNADeletionsIntent_S.json
+### CNA - LOSS
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateLossIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateLossIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateLossIntent_S.json
 
 
-### CNA - amplifications
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_GS.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_G.json
-serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCNAAmplificationsIntent_S.json
+### CNA - GAIN
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGainIntent_GS.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGainIntent_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGainIntent_S.json
 
-### Compare - CNA
+### Compare CNA
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_G_vs_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_S_vs_S.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_GS_vs_G.json
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_cna_GS_vs_S.json
+
+
+### Compare GAIN
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_gain_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_gain_S_vs_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_gain_GS_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_gain_GS_vs_S.json
+
+
+### Compare LOSS
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_loss_G_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_loss_S_vs_S.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_loss_GS_vs_G.json
+serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateCompareIntent_loss_GS_vs_S.json
+
 
 ### Gene Expression
 serverless invoke local --function alexa-skill -p ./examples/tcga/NavigateGeneExpressionIntent_G.json
