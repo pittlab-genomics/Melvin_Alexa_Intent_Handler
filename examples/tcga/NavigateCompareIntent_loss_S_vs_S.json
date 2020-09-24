@@ -8,7 +8,8 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "TP53"
+                "study_abbreviation": "BRCA",
+                "data_type": "LOSS"
             }
         },
         "user": {
@@ -79,9 +80,15 @@
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateMutationDomainsIntent",
+            "name": "NavigateCompareIntent",
             "confirmationStatus": "NONE",
-            "slots": {}
+            "slots": {
+                "query": {
+                    "name": "query",
+                    "value": "ovarian cancer",
+                    "confirmationStatus": "NONE"
+                }
+            }
         }
     }
 }

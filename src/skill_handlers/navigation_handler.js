@@ -1,5 +1,3 @@
-const _ = require("lodash");
-
 const {
     MelvinEventTypes,
     MELVIN_WELCOME_GREETING,
@@ -17,7 +15,9 @@ const {
     update_melvin_state,
     update_melvin_aux_state,
     get_melvin_history,
-    get_prev_melvin_state, 
+    get_prev_melvin_state,
+    clean_melvin_state,
+    clean_melvin_aux_state
 } = require("../utils/navigation_utils.js",);
 
 const { get_state_change_diff } = require("../utils/response_builder_utils.js");
@@ -46,7 +46,6 @@ const NavigateJoinFilterIntentHandler = {
             console.error("[NavigateJoinFilterIntentHandler] Error! except: ", error);
         }
 
-        console.log("[NavigateJoinFilterIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -70,6 +69,7 @@ const NavigateCompareIntentHandler = {
             const state_diff = get_state_change_diff(state_change);
             let response = await build_compare_response(handlerInput, melvin_state, compare_state, state_diff);
             speechText = response["speech_text"];
+            clean_melvin_aux_state(handlerInput);
 
         } catch (error) {
             if (error["speech"]) {
@@ -80,7 +80,6 @@ const NavigateCompareIntentHandler = {
             console.trace("[NavigateCompareIntentHandler] Error! except: ", error);
         }
 
-        console.log("[NavigateCompareIntentHandler] SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -94,11 +93,10 @@ const NavigateResetIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateResetIntent";
     },
     async handle(handlerInput) {
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
         const reprompt_text = "What would you like to know? You can ask me about a gene or a cancer type.";
-        sessionAttributes["MELVIN.STATE"] = {};
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        clean_melvin_state(handlerInput);
+        clean_melvin_aux_state(handlerInput);
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -191,7 +189,6 @@ const NavigateRepeatIntentHandler = {
             console.error("[NavigateRepeatIntentHandler] Error! except: ", error);
         }
 
-        console.log("SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
@@ -271,7 +268,6 @@ const NavigateGoBackIntentHandler = {
             console.error("[NavigateGoBackIntentHandler} Error! except: ", error);
         }
 
-        console.log("SPEECH TEXT = " + speechText);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)

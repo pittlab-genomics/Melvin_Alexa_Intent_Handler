@@ -1,6 +1,5 @@
 const Speech = require("ssml-builder");
 const _ = require("lodash");
-const URL = require("url").URL;
 
 const { get_clinical_trials } = require("../http_clients/melvin_explorer_client.js");
 const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
@@ -23,7 +22,7 @@ function build_clinical_trials_error_speech(params, response, speech) {
         speech.say(`Sorry, I could not find a place called ${params["location"]}`);
 
     } else if (response["error"] && response["error"] === MelvinExplorerErrors.NO_TRIAL_IN_VICINITY) {
-        speech.say(`Sorry, I could not find any clinical trials in ${location}.`);
+        speech.say(`Sorry, I could not find any clinical trials in ${params["location"]}.`);
 
     } else {
         speech.say("Sorry, there was a problem while fetching the data. Please try again.");

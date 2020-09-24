@@ -1,11 +1,16 @@
-const _ = require("lodash",);
-const yaml = require("js-yaml",);
-const moment = require("moment",);
+const _ = require("lodash");
+const yaml = require("js-yaml");
+const moment = require("moment");
+const { performance } = require("perf_hooks");
 
-const utterances_doc = require("../dao/utterances.js",);
-const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js",);
+const utterances_doc = require("../dao/utterances.js");
+const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js");
 const {
     MELVIN_MAX_HISTORY_ITEMS,
+    DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
+    DEFAULT_INVALID_STATE_RESPONSE,
+    SUPPORTED_SPLITBY_DTYPES,
+    SUPPORTED_COMPARE_DTYPES,
     MelvinAttributes,
     MelvinEventTypes,
     MelvinIntentErrors,
@@ -15,11 +20,11 @@ const {
     DataTypes,
     DataSources,
     melvin_error
-} = require("../common.js",);
+} = require("../common.js");
 
-const { get_event_type } = require("./handler_configuration.js",);
+const { get_event_type } = require("./handler_configuration.js");
 
-const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml",);
+const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml");
 
 const get_melvin_state = function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -69,18 +74,22 @@ const get_melvin_history = function (handlerInput) {
 const resolve_oov_entity = async function(handlerInput, query) {
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
+    const t0 = performance.now();
     try {
         const params = {
             query, request_id, session_id, 
         };
         const query_response = await get_oov_mapping_by_query(params);
-        console.log(`[resolve_oov_entity] query_response: ${JSON.stringify(query_response)}`);
+        const t1 = performance.now();
+        console.log("[resolve_oov_entity] oov request took " + (t1 - t0) + " ms | " + 
+            `query_response: ${JSON.stringify(query_response)}`);
         return query_response;
     } catch (error) {
-        console.error(`[resolve_oov_entity] message: ${error.message}`, error);
+        const t2 = performance.now();
+        console.error("[resolve_oov_entity] oov request failed and took " + (t2 - t0) + " ms", error);
         throw melvin_error(`Error while mapping query: ${query}`,
             MelvinIntentErrors.OOV_ERROR,
-            "Sorry, something went wrong while resolving the query utterance. Please try again later.");
+            DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
     }
 };
 
@@ -278,6 +287,140 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
     return melvin_state;
 };
 
+const clean_melvin_state = function (handlerInput, session_path = "MELVIN.STATE") {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes[session_path] = {};
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+};
+
+const clean_melvin_aux_state = function (handlerInput, session_path = "MELVIN.AUX.STATE") {
+    clean_melvin_state(handlerInput, session_path);
+};
+
+
+const resolve_splitby_query = async function(handlerInput) {
+    const splitby_queries = {
+        "splitby_query": _.get(handlerInput, "requestEnvelope.request.intent.slots.query.value"),
+        "dtype_query":   _.get(handlerInput, "requestEnvelope.request.intent.slots.dtype_query.value"),
+        "gene_query":    _.get(handlerInput, "requestEnvelope.request.intent.slots.gene_query.value")
+    };
+
+    const oov_entity = {};
+    for (const [key, query] of Object.entries(splitby_queries)) {
+        if (!_.isEmpty(query)) {
+            let query_response = await resolve_oov_entity(handlerInput, query);
+            if (query_response.data.entity_type === OOVEntityTypes.DTYPE && 
+                (key === "splitby_query" || key === "dtype_query")) {
+                oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.value");
+            }
+
+            if (query_response.data.entity_type === OOVEntityTypes.GENE && 
+                (key === "splitby_query" || key === "gene_query")) {
+                oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.entity_data.value");
+            }
+        }
+    }
+    
+    // update and store melvin_aux_state with slot values provided in this turn
+    let melvin_aux_state = get_melvin_aux_state(handlerInput);
+    melvin_aux_state = {
+        ...melvin_aux_state, ...oov_entity
+    };
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes["MELVIN.AUX.STATE"] = melvin_aux_state;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    console.log(`[resolve_splitby_query] updated melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
+
+    return melvin_aux_state;
+};
+
+const validate_splitby_melvin_state = function(melvin_state) {
+    if (_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+        throw melvin_error(
+            `[validate_splitby_melvin_state] missing cancer type | melvin_state: ${JSON.stringify(melvin_state)}`,
+            MelvinIntentErrors.MISSING_STUDY,
+            "I need to know a cancer type first. What cancer type are you interested in?"
+        );
+
+    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])) {
+        throw melvin_error(
+            `[validate_splitby_melvin_state] missing gene | melvin_state: ${JSON.stringify(melvin_state)}`,
+            MelvinIntentErrors.MISSING_GENE,
+            "I need to know a gene first. What gene are you interested in?"
+        );
+
+    } else if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
+        throw melvin_error(
+            `[validate_splitby_melvin_state] missing data type | melvin_state: ${JSON.stringify(melvin_state)}`,
+            MelvinIntentErrors.MISSING_DTYPE,
+            "I need to know a data type first. What data type are you interested in?"
+        );
+    }
+};
+
+const elicit_splitby_slots = async function (handlerInput, melvin_aux_state, pre_prompt = "") {
+    console.log(`[elicit_splitby_slots] melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
+
+    if (_.isEmpty(melvin_aux_state[MelvinAttributes.DTYPE])) {
+        return handlerInput.responseBuilder
+            .speak(pre_prompt + "Which data type would you like to split by?")
+            .reprompt("Which data type would you like to split by?")
+            .addElicitSlotDirective("dtype_query")
+            .getResponse();
+
+    } else if (_.isEmpty(melvin_aux_state[MelvinAttributes.GENE_NAME])) {
+        return handlerInput.responseBuilder
+            .speak(pre_prompt + "Which gene would you like to split by?")
+            .reprompt("Which gene would you like to split by?")
+            .addElicitSlotDirective("gene_query")
+            .getResponse();
+
+    } else {
+        throw melvin_error(
+            `[elicit_splitby_slots] invalid state | melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_INVALID_STATE_RESPONSE
+        );
+    }
+};
+
+const is_splitby_supported = function (query_dtypes) {
+    for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
+        if ((query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][0] 
+            && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][1])
+            || (query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][1] 
+                && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][0])
+        ) {
+            return true;
+        }
+    }
+
+    console.log(`[is_splitby_supported] splitby not supported for query_dtypes: ${JSON.stringify(query_dtypes)}`);
+    return false;
+};
+
+const validate_splitby_aux_state = function (melvin_state, splitby_state) {
+    const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], splitby_state[MelvinAttributes.DTYPE]];
+
+    if (!is_splitby_supported(query_dtypes)) {
+        throw melvin_error(
+            "Error while validating required attributes "
+            + `in melvin_state: ${JSON.stringify(melvin_state,)}, `
+            + `splitby_state: ${JSON.stringify(splitby_state,)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            "Sorry, this split-by operation is not supported."
+        );
+    }
+};
+
+const match_compare_dtype = function (query_dtypes, target_dtypes) {
+    if ((query_dtypes[0] === target_dtypes[0] && query_dtypes[1] === target_dtypes[1])
+        || (query_dtypes[0] === target_dtypes[1] && query_dtypes[1] === target_dtypes[0])
+    ) {
+        return true;
+    }
+    return false;
+};
 
 module.exports = {
     NAVIGATION_TOPICS,
@@ -290,6 +433,13 @@ module.exports = {
     update_melvin_history,
     resolve_oov_entity,
     validate_navigation_intent_state,
-    validate_action_intent_state
+    validate_action_intent_state,
+    clean_melvin_state,
+    clean_melvin_aux_state,
+    resolve_splitby_query,
+    validate_splitby_aux_state,
+    elicit_splitby_slots,
+    validate_splitby_melvin_state,
+    match_compare_dtype
 };
 

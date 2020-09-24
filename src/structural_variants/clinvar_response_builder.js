@@ -1,4 +1,3 @@
-const URL = require("url").URL;
 const Speech = require("ssml-builder");
 const _ = require("lodash");
 const { add_to_APL_image_pager } = require("../utils/APL_utils.js");

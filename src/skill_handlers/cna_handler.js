@@ -1,84 +1,17 @@
 const {
-    MelvinAttributes,
     DataTypes,
-    DataSources,
     CNATypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require("../common.js");
 
-const { build_navigate_cna_response } = require("../cna/response_builder.js");
+const { build_cna_response } = require("../cna/cna_response_builder.js");
+const { build_gain_response } = require("../cna/gain_response_builder.js");
+const { build_loss_response } = require("../cna/loss_response_builder.js");
 
 const {
     validate_action_intent_state,
     update_melvin_state
 } = require("../utils/navigation_utils.js");
-
-const CNAAmplificationGeneIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNAAmplificationGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.DSOURCE]:     DataSources.TCGA,
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.AMPLIFICATIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
-
-const CNADeletionGeneIntent = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNADeletionGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.DELETIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
-
-const CNAAlterationGeneIntent = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "CNAAlterationGeneIntent";
-    },
-    async handle(handlerInput) {
-        const params = {
-            [MelvinAttributes.GENE_NAME]:   handlerInput.requestEnvelope.request.intent.slots.gene.value,
-            [MelvinAttributes.STUDY_ABBRV]: handlerInput.requestEnvelope.request.intent.slots
-                .study.resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            cna_change: CNATypes.ALTERATIONS
-        };
-        const cna_response = await build_navigate_cna_response(handlerInput, params);
-        const speechText = cna_response["speech_text"];
-
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
-};
 
 
 const NavigateCNAIntentHandler = {
@@ -96,7 +29,7 @@ const NavigateCNAIntentHandler = {
                 ...melvin_state,
                 cna_change: CNATypes.ALTERATIONS
             };
-            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            const cna_response = await build_cna_response(handlerInput, params);
             speechText = cna_response["speech_text"];
 
         } catch (error) {
@@ -115,10 +48,10 @@ const NavigateCNAIntentHandler = {
     }
 };
 
-const NavigateCNAAmplificationsIntentHandler = {
+const NavigateGainIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "NavigateCNAAmplificationsIntent";
+            && handlerInput.requestEnvelope.request.intent.name === "NavigateGainIntent";
     },
     async handle(handlerInput) {
         let speechText = "";
@@ -130,7 +63,7 @@ const NavigateCNAAmplificationsIntentHandler = {
                 ...melvin_state,
                 cna_change: CNATypes.AMPLIFICATIONS
             };
-            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            const cna_response = await build_gain_response(handlerInput, params);
             speechText = cna_response["speech_text"];
 
         } catch (error) {
@@ -139,7 +72,7 @@ const NavigateCNAAmplificationsIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error("Error in NavigateCNAAmplificationsIntent", error);
+            console.error("Error in NavigateGainIntent", error);
         }
 
         return handlerInput.responseBuilder
@@ -149,10 +82,10 @@ const NavigateCNAAmplificationsIntentHandler = {
     }
 };
 
-const NavigateCNADeletionsIntentHandler = {
+const NavigateLossIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
-            && handlerInput.requestEnvelope.request.intent.name === "NavigateCNADeletionsIntent";
+            && handlerInput.requestEnvelope.request.intent.name === "NavigateLossIntent";
     },
     async handle(handlerInput) {
         let speechText = "";
@@ -164,7 +97,7 @@ const NavigateCNADeletionsIntentHandler = {
                 ...melvin_state,
                 cna_change: CNATypes.DELETIONS
             };
-            const cna_response = await build_navigate_cna_response(handlerInput, params);
+            const cna_response = await build_loss_response(handlerInput, params);
             speechText = cna_response["speech_text"];
 
         } catch (error) {
@@ -173,7 +106,7 @@ const NavigateCNADeletionsIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
-            console.error("Error in NavigateCNADeletionsIntent", error);
+            console.error("Error in NavigateLossIntent", error);
         }
 
         return handlerInput.responseBuilder
@@ -185,10 +118,7 @@ const NavigateCNADeletionsIntentHandler = {
 
 
 module.exports = {
-    CNAAmplificationGeneIntentHandler,
-    CNADeletionGeneIntent,
-    CNAAlterationGeneIntent,
     NavigateCNAIntentHandler,
-    NavigateCNAAmplificationsIntentHandler,
-    NavigateCNADeletionsIntentHandler
+    NavigateGainIntentHandler,
+    NavigateLossIntentHandler
 };

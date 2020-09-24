@@ -4,10 +4,13 @@ const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
 const https = require("https");
+const { performance } = require("perf_hooks");
 
 const {
     MelvinIntentErrors,
     melvin_error,
+    DEFAULT_AE_ACCESS_ERROR_RESPONSE,
+    DEFAULT_AE_CONNECT_ERROR_RESPONSE,
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
@@ -18,18 +21,8 @@ const {
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
-const controller_short = new AbortController();
-const signal_short = controller_short.signal;
-setTimeout(() => { 
-    controller_short.abort();
-}, 2500);
-
-
-const controller_long = new AbortController();
-const signal_long = controller_long.signal;
-setTimeout(() => { 
-    controller_long.abort();
-}, 8000);
+const ae_timeout_1 = 2500;
+const ae_timeout_2 = 5000;
 
 
 const send_request_async = function(url, signal) {
@@ -43,37 +36,62 @@ const send_request_async = function(url, signal) {
             throw melvin_error(
                 `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
                 MelvinIntentErrors.INVALID_API_RESPOSE,
-                "Sorry, I'm having trouble accessing the dataset. Please try again later.");
+                DEFAULT_AE_ACCESS_ERROR_RESPONSE
+            );
         }
     }).catch((err) => {
         throw melvin_error(
-            `[send_request_async] AE err: ${JSON.stringify(err)}`,
+            `[send_request_async] AE connect error: ${JSON.stringify(err)}`,
             MelvinIntentErrors.INVALID_API_RESPOSE,
-            "Sorry, I'm having trouble connecting to the Melvin service. Please try again later.");
+            DEFAULT_AE_CONNECT_ERROR_RESPONSE
+        );
     });
 };
 
-const process_repeat_requests = async function(handlerInput, url) {
-    try {
-        return await send_request_async(url, signal_short);
+const process_repeat_requests = async function(handlerInput, url, timeout1=ae_timeout_1, timeout2=ae_timeout_2) {
+    const controller_short = new AbortController();
+    const signal_short = controller_short.signal;
+    setTimeout(() => { 
+        controller_short.abort();
+    }, timeout1);
+
+    const t1 = performance.now();
+    try {        
+        const result = await send_request_async(url, signal_short);
+        const t2 = performance.now();
+        console.log("[process_repeat_requests] first AE request took " + (t2 - t1) + " ms");
+        return result;
     } catch(err) {
-        console.error(`[process_repeat_requests] first attempt failed | err: ${JSON.stringify(err)}`);
+        const t3 = performance.now();
+        console.error("[process_repeat_requests] first AE request failed and took " + (t3 - t1) +
+            ` ms | err: ${JSON.stringify(err)}`);
     }
 
     try {
         // send Alexa progressive response to indicate that this is going to take little longer
         const pr_speech = "I'm still working on it, please wait.";
         await call_directive_service(handlerInput, pr_speech);
-    }catch(err) {
+    } catch(err) {
         // ignore errors when invoking progressive response API
-        console.error(`[process_repeat_requests] failed to send PR | err: ${JSON.stringify(err)}`);
+        console.error("[process_repeat_requests] failed to send PR", err);
     }
     
-
-    try {
-        return await send_request_async(url, signal_long);
+    const controller_long = new AbortController();
+    const signal_long = controller_long.signal;
+    setTimeout(() => { 
+        controller_long.abort();
+    }, timeout2);
+    
+    const t4 = performance.now();
+    try {        
+        const result = await send_request_async(url, signal_long);
+        const t5 = performance.now();
+        console.log("[process_repeat_requests] second AE request took " + (t5 - t4) + " ms");
+        return result;
     } catch(err) {
-        console.error(`[process_repeat_requests] second attempt failed | err: ${JSON.stringify(err)}`);
+        const t6 = performance.now();
+        console.error("[process_repeat_requests] second AE request failed and took " + (t6 - t4) +
+            ` ms | err: ${JSON.stringify(err)}`);
         throw err;
     }
 };
@@ -116,9 +134,23 @@ const get_cna_clinvar_stats = async function (handlerInput, params) {
 };
 
 const get_cna_tcga_stats = async function (handlerInput, params) {
-    const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/stats`);
+    const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
     add_query_params(cna_url, params);
     const result = await process_repeat_requests(handlerInput, cna_url);
+    return result;
+};
+
+const get_gain_tcga_stats = async function (handlerInput, params) {
+    const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
+    add_query_params(gain_stats_url, params);
+    const result = await process_repeat_requests(handlerInput, gain_stats_url);
+    return result;
+};
+
+const get_loss_tcga_stats = async function (handlerInput, params) {
+    const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
+    add_query_params(loss_stats_url, params);
+    const result = await process_repeat_requests(handlerInput, loss_stats_url);
     return result;
 };
 
@@ -149,13 +181,6 @@ const get_mutations_clinvar_stats = async function (handlerInput, params) {
     return result;
 };
 
-const get_overview_clinvar_stats = async function (handlerInput, params) {
-    const overview_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/overview/clinvar/stats`);
-    add_query_params(overview_url, params);
-    const result = await process_repeat_requests(handlerInput, overview_url);
-    return result;
-};
-
 const get_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
@@ -176,13 +201,14 @@ module.exports = {
     get_mutations_tcga_top_genes,
     get_mutations_tcga_domain_stats,
     get_cna_tcga_stats,
+    get_gain_tcga_stats,
+    get_loss_tcga_stats,
     get_gene_expression_tcga_stats,
     get_splitby_tcga_stats,
     get_mutations_clinvar_stats,
     get_cna_clinvar_stats,
     get_gene_expression_clinvar_stats,
     get_sv_clinvar_stats,
-    get_overview_clinvar_stats,
     get_clinical_trials,    
     get_gene_by_name
 };

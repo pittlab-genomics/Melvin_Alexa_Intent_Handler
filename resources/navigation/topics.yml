@@ -6,7 +6,7 @@ data_types:
     subtopics:
       domains:
         intents:
-          - "NavigateMutationsDomainIntent"
+          - "NavigateMutationDomainsIntent"
   cna:
     intents:
       - "NavigateCNAIntent"
@@ -14,12 +14,12 @@ data_types:
     subtopics:
       amplifications:
         intents:
-          - "NavigateCNAAmplifications"
+          - "NavigateGainIntent"
 
       deletions:
         intents:
-          - "NavigateCNADeletions"
+          - "NavigateLossIntent"
 
       alterations:
         intents:
-          - "NavigateCNAAlterations"
+          - "NavigateCNAIntent"
