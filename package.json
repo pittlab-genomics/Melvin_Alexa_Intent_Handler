@@ -1,7 +1,7 @@
 {
-  "name": "aws-alexa-skill",
+  "name": "melvin-alexa-skill-serverless",
   "version": "1.0.0",
-  "description": "Melvin Alexa skill.",
+  "description": "Serverless framework project for Melvin Alexa skill - voice based genomics analytics tool",
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -15,11 +15,12 @@
     "node-fetch": "^2.6.1",
     "nunjucks": "^3.2.1",
     "promise.allsettled": "^1.0.2",
+    "serverless-plugin-resource-tagging": "^1.0.11",
     "ssml-builder": "^0.4.3"
   },
   "devDependencies": {
     "eslint": "^7.8.1",
-    "serverless": "^1.78.1",
+    "serverless": "^1.82.0",
     "serverless-plugin-aws-alerts": "^1.4.0",
     "serverless-plugin-include-dependencies": "^3.2.1",
     "serverless-plugin-tag-events": "^1.1.0",

@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const { MelvinAttributes } = require("../common.js");
 
-const APLDocs = { image_pager: require("../../resources/APL/image_pager.json"), };
+const APLDocs = { image_pager: require("../../resources/APL/image_pager.json") };
 const {
     get_melvin_state,
     get_melvin_aux_state
@@ -52,7 +52,7 @@ function build_APL_footer_text(handlerInput) {
 }
 
 function build_APL_layouts(url_list) {
-    const layouts = {};
+    const layout_result = {};
     const layout_page_template = {
         "parameters": [
             {
@@ -97,22 +97,27 @@ function build_APL_layouts(url_list) {
         ]
     };
 
-    url_list.forEach(function (value, i) {
-        let key = "Page" + i;
-        layouts[key] = layout_page_template;
+    url_list.forEach(function (value, index) {
+        let key = "Page" + index;
+        // deep clone layout template and set APL component ids
+        let layout_page_instance = JSON.parse(JSON.stringify(layout_page_template));
+        layout_page_instance["items"][0]["items"][0]["id"] = key + "_image_container";
+        layout_page_instance["items"][0]["items"][1]["id"] = key + "_text_container";
+        layout_result[key] = layout_page_instance;
     });
-    return layouts;
+    return layout_result;
 }
 
 
 function build_APL_main_template_items(url_list) {
     const items = [];
 
-    url_list.forEach(function (value, i) {
-        let type = "Page" + i;
-        let imageLabel = "image" + i;
+    url_list.forEach(function (value, index) {
+        let type = "Page" + index;
+        let imageLabel = "image" + index;
 
         let item = {
+            "id":          "imageComponent_" + index,
             "type":        type,
             "imageURL":    "${payload.pagerTemplateData.properties." + imageLabel + ".URL}",
             "footer_text": "${payload.pagerTemplateData.footer_text}"
@@ -125,7 +130,7 @@ function build_APL_main_template_items(url_list) {
 function add_context_to_urls(handlerInput, url_list) {
     const request_id = handlerInput.requestEnvelope.request.requestId;
     const session_id = handlerInput.requestEnvelope.session.sessionId;
-    url_list.forEach(function (url, i) {
+    url_list.forEach(function (url) {
         url.searchParams.set("request_id", request_id);
         url.searchParams.set("session_id", session_id);
     });
@@ -154,22 +159,45 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                 "type":        "object",
                 "properties":  build_APL_datasource_properties(url_list),
                 "footer_text": build_APL_footer_text(handlerInput)
-            }, },
+            }},
         });
 
-        if (url_list.length > 1) {
-            handlerInput.responseBuilder.addDirective({
-                type:     "Alexa.Presentation.APL.ExecuteCommands",
-                token:    "pagerToken",
-                commands: [
-                    {
-                        "type":        "AutoPage",
-                        "componentId": "pagerComponentId",
-                        "duration":    5000,
-                    },
-                ],
+        const apl_img_update_commands = [];
+        url_list.forEach(function (url, index) {
+            apl_img_update_commands.push({
+                "type":        "SetValue",
+                "property":    "source",
+                "value":       url,
+                "componentId": `Page${index}_image_container`
             });
-        }
+        });
+
+        handlerInput.responseBuilder.addDirective({
+            "type":     "Alexa.Presentation.APL.ExecuteCommands",
+            "token":    "pagerToken",
+            "commands": [
+                {
+                    "type":     "Parallel",
+                    "commands": [
+                        {
+                            "type":  "Idle",
+                            "delay": 120000
+                        },
+                        {
+                            "type":        "AutoPage",
+                            "componentId": "pagerComponentId",
+                            "duration":    5000,
+                            "delay":       3000
+                        },
+                        {
+                            "type":     "Parallel",
+                            "delay":    3500,
+                            "commands": apl_img_update_commands
+                        }   
+                    ]
+                }
+            ]
+        });
 
     } else {
         handlerInput.responseBuilder.withStandardCard(

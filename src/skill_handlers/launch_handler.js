@@ -9,7 +9,7 @@ const {
     STAGE 
 } = require("../common.js");
 
-const APLDocs = { welcome: require("../../resources/APL/welcome.json"), };
+const APLDocs = { welcome: require("../../resources/APL/welcome.json") };
 const { supportsAPL } = require("../utils/APL_utils.js");
 const sessions_doc = require("../dao/sessions.js");
 
