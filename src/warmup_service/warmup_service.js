@@ -22,6 +22,7 @@ const {
 
 const stats_ep_timeout = 2500;
 const plot_ep_timeout = 5000;
+const warmup_session_timeout = 600; // disable warmup rule if there is no new user sessions after X mins
 
 /*
     make sure to include at least N number of entries for each unique path 
@@ -296,7 +297,7 @@ const handler = async function (event, context, callback) {
     const result = await send_parallel_requests();
 
     try {
-        let recent_sessions = await sessions_doc.getRecentSessions();
+        let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
         if (recent_sessions.length == 0) {
             console.error("[warmup_handler] Recent user sessions do not exist. Disabling warmup cloudwatch rules...");
             await disable_warmup_cloudwatch_rule();
