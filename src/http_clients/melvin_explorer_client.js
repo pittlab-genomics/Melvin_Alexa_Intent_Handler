@@ -96,6 +96,12 @@ const process_repeat_requests = async function(handlerInput, url, timeout1=ae_ti
     }
 };
 
+const get_mutations_tcga_top_genes = async function (handlerInput, params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/top_genes`);
+    add_query_params(mutations_url, params);
+    const result = await process_repeat_requests(handlerInput, mutations_url);
+    return result;
+};
 
 const get_mutations_tcga_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats`);
@@ -104,17 +110,24 @@ const get_mutations_tcga_stats = async function (handlerInput, params) {
     return result;
 };
 
-const get_mutations_tcga_top_genes = async function (handlerInput, params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/top_genes`);
+const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
+    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats`);
     add_query_params(mutations_url, params);
     const result = await process_repeat_requests(handlerInput, mutations_url);
     return result;
 };
 
-const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
-    const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_stats`);
-    add_query_params(mutations_url, params);
-    const result = await process_repeat_requests(handlerInput, mutations_url);
+const get_indels_tcga_stats = async function (handlerInput, params) {
+    const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/indel_stats`);
+    add_query_params(indels_url, params);
+    const result = await process_repeat_requests(handlerInput, indels_url);
+    return result;
+};
+
+const get_indels_tcga_domain_stats = async function (handlerInput, params) {
+    const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/indel_stats`);
+    add_query_params(indels_url, params);
+    const result = await process_repeat_requests(handlerInput, indels_url);
     return result;
 };
 
@@ -197,9 +210,11 @@ const get_sv_clinvar_stats = async function (handlerInput, params) {
 };
 
 module.exports = {
-    get_mutations_tcga_stats,
     get_mutations_tcga_top_genes,
+    get_mutations_tcga_stats,
     get_mutations_tcga_domain_stats,
+    get_indels_tcga_stats,
+    get_indels_tcga_domain_stats,
     get_cna_tcga_stats,
     get_gain_tcga_stats,
     get_loss_tcga_stats,

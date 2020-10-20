@@ -37,6 +37,11 @@ const {
     build_mutations_domain_response,
     build_mutations_compare_response
 } = require("../mutations/response_builder.js");
+const {
+    build_indels_response,
+    build_indels_domain_response,
+    build_indels_compare_response
+} = require("../mutations/indels_response_builder.js");
 
 
 function add_followup_text(handlerInput, speech) {
@@ -156,7 +161,11 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_mutations_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
+            melvin_state[MelvinAttributes.STYLE]='domain';
             response = await build_mutations_domain_response(handlerInput, melvin_state);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {
+            response = await build_indels_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GAIN) {
             response = await build_gain_response(handlerInput, melvin_state);

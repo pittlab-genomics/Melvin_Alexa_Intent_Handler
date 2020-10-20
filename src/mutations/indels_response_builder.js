@@ -16,34 +16,36 @@ const {
 } = require("../utils/response_builder_utils.js");
 const {
     get_mutations_tcga_stats,
-    get_mutations_tcga_domain_stats
+    get_mutations_tcga_domain_stats,
+    get_indels_tcga_stats,
+    get_indels_tcga_domain_stats
 } = require("../http_clients/melvin_explorer_client.js");
 const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
-async function build_mutations_tcga_response(handlerInput, melvin_state) {
+async function build_indels_tcga_response(handlerInput, melvin_state) {
     const image_list = [];
-    const response = await get_mutations_tcga_stats(handlerInput, melvin_state);
+    const response = await get_indels_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
         response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context);
+    const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         melvin_state[MelvinAttributes.STYLE] = 'bar';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
         melvin_state[MelvinAttributes.STYLE] = 'treemap';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         melvin_state[MelvinAttributes.STYLE] = 'bar';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         melvin_state[MelvinAttributes.STYLE] = 'profile';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
     }
 
     // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
@@ -62,16 +64,16 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
     return { "speech_text": speech_ssml };
 }
 
-async function build_mutations_tcga_domain_response(handlerInput, melvin_state) {
+async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     const image_list = [];
-    const response = await get_mutations_tcga_domain_stats(handlerInput, melvin_state);
+    const response = await get_indels_tcga_domain_stats(handlerInput, melvin_state);
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
     const nunjucks_context = {
         melvin_state: melvin_state,
         response: response,
         records_list: records_list
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context);
+    const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_tcga.njk", nunjucks_context);
 
     // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
     //     && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -81,20 +83,20 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         melvin_state[MelvinAttributes.STYLE] = 'dompie';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
         melvin_state[MelvinAttributes.STYLE] = 'domstack';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_indels_tcga_plot(image_list, melvin_state);
     }
     add_to_APL_image_pager(handlerInput, image_list);
 
     return { "speech_text": speech_ssml };
 }
 
-async function build_mutations_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
+async function build_indels_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
     const image_list = [];
     const results = await Promise.all([
-        get_mutations_tcga_stats(handlerInput, melvin_state),
-        get_mutations_tcga_stats(handlerInput, compare_params)
+        get_indels_tcga_stats(handlerInput, melvin_state),
+        get_indels_tcga_stats(handlerInput, compare_params)
     ]);
     const nunjucks_context = {
         melvin_state: melvin_state,
@@ -126,9 +128,9 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
     return { "speech_text": speech_ssml };
 }
 
-async function build_mutations_clinvar_response(handlerInput, params) {
+async function build_indels_clinvar_response(handlerInput, params) {
     const image_list = [];
-    const response = await get_mutations_clinvar_stats(handlerInput, params);
+    const response = await get_indels_clinvar_stats(handlerInput, params);
     const nunjucks_context = {
         melvin_state: params,
         response: response
@@ -143,11 +145,18 @@ async function build_mutations_clinvar_response(handlerInput, params) {
     return { "speech_text": speech_ssml };
 }
 
-const add_mutations_tcga_plot = function (image_list, params) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/plot`);
+
+const add_indels_tcga_plot = function (image_list, params) {
+    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/indel_plot`);
     add_query_params(count_plot_url, params);
     image_list.push(count_plot_url);
 };
+
+
+
+
+
+
 
 const add_mutations_tcga_stats_plot = function (image_list, params) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
@@ -185,18 +194,18 @@ const add_mutations_clinvar_stats_plot = function (image_list, params) {
     image_list.push(count_plot_url);
 };
 
-async function build_mutations_response(handlerInput, params) {
-    console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
+async function build_indels_response(handlerInput, params) {
+    console.info(`[build_indels_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_response(handlerInput, params);
+        response = await build_indels_tcga_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = await build_mutations_clinvar_response(handlerInput, params);
+        response = await build_indels_clinvar_response(handlerInput, params);
 
     } else {
         throw melvin_error(
-            `[build_mutations_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_indels_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
             DEFAULT_INVALID_STATE_RESPONSE
         );
@@ -204,23 +213,23 @@ async function build_mutations_response(handlerInput, params) {
     return response;
 }
 
-async function build_mutations_domain_response(handlerInput, params) {
+async function build_indels_domain_response(handlerInput, params) {
     params[MelvinAttributes.STYLE]='domain';
-    console.info(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
+    console.info(`[build_indels_domain_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_domain_response(handlerInput, params);
+        response = await build_indels_tcga_domain_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
-            `[build_mutations_domain_response] not implemented: ${JSON.stringify(params)}`,
+            `[build_indels_domain_response] not implemented: ${JSON.stringify(params)}`,
             MelvinIntentErrors.NOT_IMPLEMENTED,
             DEFAULT_NOT_IMPLEMENTED_RESPONSE
         );
 
     } else {
         throw melvin_error(
-            `[build_mutations_domain_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_indels_domain_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
             DEFAULT_INVALID_STATE_RESPONSE
         );
@@ -228,22 +237,22 @@ async function build_mutations_domain_response(handlerInput, params) {
     return response;
 }
 
-async function build_mutations_compare_response(handlerInput, params, compare_params, sate_diff) {
-    console.info(`[build_mutations_compare_response] params: ${JSON.stringify(params)}`);
+async function build_indels_compare_response(handlerInput, params, compare_params, sate_diff) {
+    console.info(`[build_indels_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_compare_tcga_response(handlerInput, params, compare_params, sate_diff);
+        response = await build_indels_compare_tcga_response(handlerInput, params, compare_params, sate_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
-            `[build_mutations_compare_response] not implemented: ${JSON.stringify(params)}`,
+            `[build_indels_compare_response] not implemented: ${JSON.stringify(params)}`,
             MelvinIntentErrors.NOT_IMPLEMENTED,
             DEFAULT_NOT_IMPLEMENTED_RESPONSE
         );
 
     } else {
         throw melvin_error(
-            `[build_mutations_compare_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_indels_compare_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
             DEFAULT_INVALID_STATE_RESPONSE
         );
@@ -252,7 +261,7 @@ async function build_mutations_compare_response(handlerInput, params, compare_pa
 }
 
 module.exports = {
-    build_mutations_response,
-    build_mutations_domain_response,
-    build_mutations_compare_response
+    build_indels_response,
+    build_indels_domain_response,
+    build_indels_compare_response
 };
