@@ -36,7 +36,7 @@ const {
     build_mutations_response,
     build_mutations_domain_response,
     build_mutations_compare_response
-} = require("../mutations/response_builder.js");
+} = require("../mutations/mutations_response_builder.js");
 const {
     build_indels_response,
     build_indels_domain_response,

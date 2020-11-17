@@ -11,7 +11,7 @@ const {
 const {
     build_mutations_response,
     build_mutations_domain_response
-} = require("../mutations/response_builder.js");
+} = require("../mutations/mutations_response_builder.js");
 
 const {
     build_indels_response,
