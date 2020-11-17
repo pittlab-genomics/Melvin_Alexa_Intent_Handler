@@ -64,6 +64,7 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
 
 async function build_mutations_tcga_domain_response(handlerInput, melvin_state) {
     const image_list = [];
+    melvin_state[MelvinAttributes.STYLE] = 'domain';
     const response = await get_mutations_tcga_domain_stats(handlerInput, melvin_state);
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
     const nunjucks_context = {
