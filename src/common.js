@@ -27,8 +27,7 @@ const MelvinAttributes = {
     GENE_NAME:   "gene_name",
     STUDY_ABBRV: "study_abbreviation",
     DTYPE:       "data_type",
-    DSOURCE:     "data_source",
-    STYLE:       "style"
+    DSOURCE:     "data_source"
 };
 
 const MelvinExplorerErrors = {

@@ -32,18 +32,14 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        melvin_state[MelvinAttributes.STYLE] = 'bar';
-        add_mutations_tcga_plot(image_list, melvin_state);
-        melvin_state[MelvinAttributes.STYLE] = 'treemap';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_mutations_tcga_plot(image_list, melvin_state, 'bar');
+        add_mutations_tcga_plot(image_list, melvin_state, 'treemap');
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        melvin_state[MelvinAttributes.STYLE] = 'bar';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_mutations_tcga_plot(image_list, melvin_state, 'bar');
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        melvin_state[MelvinAttributes.STYLE] = 'profile';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_mutations_tcga_plot(image_list, melvin_state, 'profile');
     }
 
     // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
@@ -64,11 +60,11 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
 
 async function build_mutations_tcga_domain_response(handlerInput, melvin_state) {
     const image_list = [];
-    melvin_state[MelvinAttributes.STYLE] = 'domain';
     const response = await get_mutations_tcga_domain_stats(handlerInput, melvin_state);
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
     const nunjucks_context = {
         melvin_state: melvin_state,
+        subtype: 'domain',
         response: response,
         records_list: records_list
     };
@@ -81,10 +77,8 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
     // } else 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        melvin_state[MelvinAttributes.STYLE] = 'dompie';
-        add_mutations_tcga_plot(image_list, melvin_state);
-        melvin_state[MelvinAttributes.STYLE] = 'domstack';
-        add_mutations_tcga_plot(image_list, melvin_state);
+        add_mutations_tcga_plot(image_list, melvin_state, "dompie");
+        add_mutations_tcga_plot(image_list, melvin_state, "domstack");
     }
     add_to_APL_image_pager(handlerInput, image_list);
 
@@ -144,9 +138,12 @@ async function build_mutations_clinvar_response(handlerInput, params) {
     return { "speech_text": speech_ssml };
 }
 
-const add_mutations_tcga_plot = function (image_list, params) {
+const add_mutations_tcga_plot = function (image_list, params, style) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/plot`);
     add_query_params(count_plot_url, params);
+    if(style) {
+        count_plot_url.searchParams.set("style", style);
+    }
     image_list.push(count_plot_url);
 };
 
@@ -206,7 +203,6 @@ async function build_mutations_response(handlerInput, params) {
 }
 
 async function build_mutations_domain_response(handlerInput, params) {
-    params[MelvinAttributes.STYLE]='domain';
     console.info(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
