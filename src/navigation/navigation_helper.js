@@ -161,7 +161,6 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_mutations_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
-            melvin_state[MelvinAttributes.STYLE]='domain';
             response = await build_mutations_domain_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {

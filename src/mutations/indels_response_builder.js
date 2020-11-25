@@ -87,7 +87,7 @@ async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     return { "speech_text": speech_ssml };
 }
 
-async function build_indels_compare_tcga_response(handlerInput, melvin_state, compare_params, sate_diff) {
+async function build_indels_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff) {
     const image_list = [];
     const results = await Promise.all([
         get_indels_tcga_stats(handlerInput, melvin_state),
@@ -96,7 +96,7 @@ async function build_indels_compare_tcga_response(handlerInput, melvin_state, co
     const nunjucks_context = {
         melvin_state: melvin_state,
         compare_params: compare_params,
-        sate_diff: sate_diff,
+        state_diff: state_diff,
         response: results[0],
         compare_response: results[1]
     };
@@ -234,11 +234,11 @@ async function build_indels_domain_response(handlerInput, params) {
     return response;
 }
 
-async function build_indels_compare_response(handlerInput, params, compare_params, sate_diff) {
+async function build_indels_compare_response(handlerInput, params, compare_params, state_diff) {
     console.info(`[build_indels_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_indels_compare_tcga_response(handlerInput, params, compare_params, sate_diff);
+        response = await build_indels_compare_tcga_response(handlerInput, params, compare_params, state_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
