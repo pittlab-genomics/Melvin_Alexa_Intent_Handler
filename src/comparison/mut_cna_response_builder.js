@@ -14,7 +14,7 @@ const {
 const { get_mutations_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 const { get_cna_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
-async function build_mut_cna_compare_tcga_response(handlerInput, melvin_state, sate_diff) {
+async function build_mut_cna_compare_tcga_response(handlerInput, melvin_state, state_diff) {
     const image_list = [];
     const results = await Promise.all([
         get_mutations_tcga_stats(handlerInput, melvin_state),
@@ -22,7 +22,7 @@ async function build_mut_cna_compare_tcga_response(handlerInput, melvin_state, s
     ]);
     const nunjucks_context = {
         melvin_state: melvin_state,
-        sate_diff:    sate_diff,
+        state_diff:    state_diff,
         mut_response: results[0],
         cna_response: results[1],
     };
@@ -32,11 +32,11 @@ async function build_mut_cna_compare_tcga_response(handlerInput, melvin_state, s
     return { "speech_text": speech_ssml };
 }
 
-async function build_mut_cna_compare_response(handlerInput, params, sate_diff) {
+async function build_mut_cna_compare_response(handlerInput, params, state_diff) {
     console.info(`[build_mut_cna_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mut_cna_compare_tcga_response(handlerInput, params, sate_diff);
+        response = await build_mut_cna_compare_tcga_response(handlerInput, params, state_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
