@@ -27,10 +27,7 @@ const add_query_params = function (url, params) {
     if (params[MelvinAttributes.STUDY_ABBRV]) {
         url.searchParams.set("study", params[MelvinAttributes.STUDY_ABBRV]);
     }
-    
-    if (params[MelvinAttributes.STYLE]) {
-        url.searchParams.set("style", params[MelvinAttributes.STYLE]);
-    }
+
 };
 
 const get_state_change_diff = function (state_change) {
