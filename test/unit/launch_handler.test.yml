@@ -1,0 +1,31 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: Launch request, no further interaction. 
+- LaunchRequest:
+  - response.card.title: "Welcome to Melvin test"
+  - response.outputSpeech.ssml: "Welcome to Melvin test version."
+  - response.reprompt.outputSpeech.ssml: "What would you like to know? You can ask me about a gene or cancer type."
+
+--- 
+- test: Launch, helpIntent and cancelIntent. 
+- LaunchRequest
+- AMAZON.HelpIntent: 
+  - response.outputSpeech.ssml: "You can say hello to me! How can I help?"
+  - response.reprompt.outputSpeech.ssml: "You can say hello to me! How can I help?"
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+---
+- test: AMAZON.StopIntent
+- LaunchRequest
+- AMAZON.StopIntent: Goodbye!
+
+---
+- test: Handles SessionEndedRequest
+- LaunchRequest
+- SessionEndedRequest:
+  - response: undefined
