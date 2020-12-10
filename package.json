@@ -19,6 +19,8 @@
     "ssml-builder": "^0.4.3"
   },
   "devDependencies": {
+    "aws-sdk-mock": "^5.1.0",
+    "bespoken-tools": "^2.4.88",
     "eslint": "^7.8.1",
     "serverless": "^1.82.0",
     "serverless-plugin-aws-alerts": "^1.4.0",
