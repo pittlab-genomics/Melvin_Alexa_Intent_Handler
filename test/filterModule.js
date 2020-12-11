@@ -8,6 +8,10 @@ module.exports = {
         AWS.mock("DynamoDB.DocumentClient", "put", function(params, callback) {
             callback(null, "successfully put item in database");
         });
+
+        AWS.mock("SQS", "sendMessage", function(params, callback) {
+            callback(null, "successfully published message");
+        });
     },
     onRequest: (test, request) => {
         oovMapperInterceptor();
@@ -15,6 +19,8 @@ module.exports = {
         MelvinExplorerInterceptor.cna_tcga_stats();
         MelvinExplorerInterceptor.gain_tcga_stats();
         MelvinExplorerInterceptor.loss_tcga_stats();
+        MelvinExplorerInterceptor.gene_by_name();
+        MelvinExplorerInterceptor.gene_expression_tcga_stats();
 
         request.requestFiltered = true;
     },
@@ -23,5 +29,6 @@ module.exports = {
     },
     onTestSuiteEnd: (testResults) => {
         AWS.restore("DynamoDB.DocumentClient");
+        AWS.restore("SQS");
     } 
 };

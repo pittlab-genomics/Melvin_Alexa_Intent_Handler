@@ -1,0 +1,34 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: NavigateEmailIntent count 
+- NavigateEmailIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      count:
+        name: "count"
+        value: "3"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Ok, I'm emailing last 3 results to you now."
+  - response.reprompt.outputSpeech.ssml: "Please check your inbox in a while."
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateEmailIntent duration 
+- NavigateEmailIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      duration:
+        name: "duration"
+        value: "PT4200S"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Ok, I'm emailing results during that period."
+  - response.reprompt.outputSpeech.ssml: "Please check your inbox in a while."
+  - response.shouldEndSession: false
