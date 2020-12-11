@@ -217,6 +217,60 @@ const MelvinExplorerInterceptor = {
 
                 return [ 200, jsonResult];
             });
-    } 
+    }, gene_by_name() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/genes/HIF1A")
+            .query(true)
+            .reply(200, { data: {
+                location:   "14q23.2",
+                name:       "HIF1A",
+                ccds:       1,
+                pfamID:     "Q16665",
+                in_clinvar: "1",
+                ncbi:       1,
+                // eslint-disable-next-line max-len
+                summary:    "This gene encodes the alpha subunit of transcription factor hypoxia-inducible factor-1 (HIF-1), which is a heterodimer composed of an alpha and a beta subunit. HIF-1 functions as a master regulator of cellular and systemic homeostatic response to hypoxia by activating transcription of many genes, including those involved in energy metabolism, angiogenesis, apoptosis, and other genes whose protein products increase oxygen delivery or facilitate metabolic adaptation to hypoxia. HIF-1 thus plays an essential role in embryonic vascularization, tumor angiogenesis and pathophysiology of ischemic disease. Alternatively spliced transcript variants encoding different isoforms have been identified for this gene.",
+                idGENE:     2411,
+                cgc:        1,
+                pfamLENGTH: 826
+            }});
+    }, gene_expression_tcga_stats() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/gene_expression/tcga/stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        mean:      11.2856699669967,
+                        max:       13.44,
+                        n_cases:   1093,
+                        n_records: 1212
+                    }});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: {
+                        study: "LAML",
+                        mean:  11.93
+                    }});
+                    }
+                }
+                else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: {
+                        gene: "EEF1A1",
+                        mean: 18.75
+                    }});
+                    }
+                }
+
+                return [ 200, jsonResult];
+            });
+    }
 };
 module.exports = { MelvinExplorerInterceptor };

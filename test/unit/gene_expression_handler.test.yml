@@ -1,0 +1,38 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: NavigateExpressionIntent_S 
+- NavigateExpressionIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "The highest mean expression of Ovarian serous cystadenocarcinoma patients is recorded in EEF1A1 at 18.8 percent"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateExpressionIntent_G
+- NavigateExpressionIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "The highest mean expression of TP53 is recorded in Acute Myeloid Leukemia patients at 11.9 percent"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateExpressionIntent_GS
+- NavigateExpressionIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "The mean expression of TP53 in Breast invasive carcinoma patients is 11.3 percent"
+  - response.shouldEndSession: false

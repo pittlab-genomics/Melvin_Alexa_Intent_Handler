@@ -27,6 +27,16 @@ const oovMapperInterceptor = function() {
                     target:          "breast cancer" 
                 }
             }}];
+            case "Hif one alpha": return[200, { data: {
+                entity_type: "GENE",
+                from:        "ml_mapper_gene",
+                entity_data: {
+                    query_utterance: "Hif one alpha",
+                    value:           "HIF1A",
+                    target:          "HIF1A",
+                    score:           null
+                }
+            }}];
             }
         });
 };

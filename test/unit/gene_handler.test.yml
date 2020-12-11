@@ -1,0 +1,18 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: NavigateGeneDefinitionIntent 
+- NavigateGeneDefinitionIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "Hif one alpha"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>HIF1A is at 14q23.2 <break time='200ms'/> *"
+  - response.shouldEndSession: false
