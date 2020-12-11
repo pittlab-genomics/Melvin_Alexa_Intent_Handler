@@ -1,0 +1,123 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: NavigateCNAIntent_S 
+- LaunchRequest
+- NavigateCNAIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+  - response.outputSpeech.ssml: "HCN2 has the greatest number of copy number alterations in Ovarian serous cystadenocarcinoma at 59.5 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateCNAIntent_G
+- LaunchRequest
+- NavigateCNAIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "In TP53 greatest number of copy number alterations are found in Sarcoma patients at 37.6 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateCNAIntent_GS
+- LaunchRequest
+- NavigateCNAIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+  - response.outputSpeech.ssml: "In Ovarian serous cystadenocarcinoma patients, Braca one is amplified 4.5 percent and deleted 8 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateGainIntent_S 
+- LaunchRequest
+- NavigateGainIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "CCND1 has the greatest number of amplifications in Breast invasive carcinoma at 27.4 percent"
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateGainIntent_G
+- LaunchRequest
+- NavigateGainIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "In TP53 greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 9.4 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateGainIntent_GS
+- LaunchRequest
+- NavigateGainIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is amplified 1.5 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+
+--- 
+- test: NavigateLossIntent_S 
+- LaunchRequest
+- NavigateLossIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "KAZN has the greatest number of deletions in Breast invasive carcinoma at 16.9 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateLossIntent_G
+- LaunchRequest
+- NavigateLossIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "In TP53 greatest number of deletions are found in Sarcoma patients at 34.1 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+--- 
+- test: NavigateLossIntent_GS
+- LaunchRequest
+- NavigateLossIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is deleted 4.3 percent."
+  - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
