@@ -9,6 +9,22 @@ module.exports = {
             callback(null, "successfully put item in database");
         });
 
+        AWS.mock("DynamoDB.DocumentClient", "query", function(params, callback) {
+            callback(null, {
+                Items:
+                [ {
+                    session_start: 123,
+                    session_id:    "abc" 
+                } ],
+                Count:        1,
+                ScannedCount: 1 
+            });
+        });
+
+        AWS.mock("DynamoDB.DocumentClient", "scan", function(params, callback) {
+            callback(null, {});
+        });
+
         AWS.mock("SQS", "sendMessage", function(params, callback) {
             callback(null, "successfully published message");
         });

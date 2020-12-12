@@ -1,0 +1,91 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: NavigateResetIntent 
+- NavigateResetIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.card.title: "Welcome to Melvin test"
+  - response.outputSpeech.ssml: "Welcome to Melvin test version."
+
+---
+- test: NavigateGoBackIntent 1
+- NavigateGoBackIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+      MELVIN.HISTORY: 
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          study_abbreviation: "BRCA"
+          data_type: "MUTATIONS"
+        intent: "NavigateMutationsIntent"
+        event_type: "analysis_event"
+  - response.outputSpeech.ssml: "You have reached the end of analysis series. Please provide a new query."
+
+---
+- test: NavigateGoBackIntent 2
+- NavigateGoBackIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+      MELVIN.HISTORY:
+      - melvin_state:
+          gene_name: TP53
+          data_source: TCGA
+          study_abbreviation: BRCA
+          data_type: MUTATIONS
+        intent: NavigateMutationsIntent
+        event_type: analysis_event
+      - melvin_state:
+          gene_name: TP53
+          data_source: TCGA
+          study_abbreviation: BRCA
+          data_type: MUTATIONS
+        intent: NavigateGoBackIntent
+        event_type: navigation_revert_event
+      - melvin_state:
+          gene_name: TP53
+          data_source: TCGA
+          study_abbreviation: LIHC
+          data_type: MUTATIONS
+        intent: NavigateMutationsIntent
+        event_type: analysis_event
+      - melvin_state:
+          gene_name: TP53
+          data_source: TCGA
+          study_abbreviation: OV
+          data_type: MUTATIONS
+        intent: NavigateMutationsIntent
+        event_type: analysis_event
+  - response.outputSpeech.ssml: "TP53 mutations are found in 26 percent of Liver hepatocellular carcinoma patients with 19 amino acid residues recurrently mutated."
+
+---
+- test: NavigateRestoreSessionIntent
+- NavigateRestoreSessionIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "Ok. Your last session was restored."
+  - response.reprompt.outputSpeech.ssml: "You may continue from your last analysis now."
+
+---
+- test: NavigateRepeatIntent
+- NavigateRepeatIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+      MELVIN.HISTORY: 
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          study_abbreviation: "BRCA"
+          data_type: "MUTATIONS"
+        intent: "NavigateMutationsIntent"
+        event_type: "analysis_event"
+  - response.outputSpeech.ssml: "<speak>Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody></speak>"
