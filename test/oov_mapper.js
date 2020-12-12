@@ -27,6 +27,15 @@ const oovMapperInterceptor = function() {
                     target:          "breast cancer" 
                 }
             }}];
+            case "liver cancer": return[200, { data: {
+                entity_type: "STUDY",
+                from:        "study_lookup",
+                entity_data: {
+                    value:           "LIHC",
+                    query_utterance: "liver cancer",
+                    target:          "liver cancer"
+                }
+            }}];
             case "Hif one alpha": return[200, { data: {
                 entity_type: "GENE",
                 from:        "ml_mapper_gene",

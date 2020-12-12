@@ -16,6 +16,10 @@ const MelvinExplorerInterceptor = {
                     case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  30.0306,
                         recurrent_positions: 53
+                    }}); break;
+                    case "TP53-LIHC": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  25.9669,
+                        recurrent_positions: 19
                     }});
                     }
                 } else if(gene) {
