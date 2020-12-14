@@ -3,7 +3,7 @@
     "locale": "en-US",
     "trace": false,
     "jest": {
-        "silent": false,
+        "silent": true, 
         "collectCoverageFrom": ["src/**/*.js"]
     },
     "filter": "../filterModule.js",

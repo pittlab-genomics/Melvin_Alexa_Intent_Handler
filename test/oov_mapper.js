@@ -46,8 +46,57 @@ const oovMapperInterceptor = function() {
                     score:           null
                 }
             }}];
+            case "braca one": return[200, { data: {
+                entity_type: "GENE",
+                from:        "ml_mapper_gene",
+                entity_data: {
+                    query_utterance: "braca one",
+                    value:           "BRCA1",
+                    target:          "BRCA1",
+                    score:           null
+                }
+            }}];
+            case "TP53": return[200, { data: {
+                entity_type: "GENE",
+                from:        "ml_mapper_gene",
+                entity_data: {
+                    query_utterance: "TP53",
+                    value:           "TP53",
+                    target:          "TP53",
+                    score:           null
+                }
+            }}];
+            case "mutations": return[200, { data: {
+                entity_type: "DTYPE",
+                from:        "dtype_lookup",
+                entity_data: {
+                    value:           "MUTATIONS",
+                    query_utterance: "mutations",
+                    target:          "mutations"
+                }
+            }}];
+            case "most affected domains": return[200, { data: {
+                entity_type: "DTYPE",
+                from:        "dtype_lookup",
+                entity_data: {
+                    value:           "PROTEIN_DOMAINS",
+                    query_utterance: "most affected domains",
+                    target:          "most affected domains"
+                }
+            }}];
+            case "CDH1": return[200, {
+                data: {
+                    entity_type: "GENE",
+                    from: "gene_lookup",
+                    entity_data: {
+                        value: "CDH1",
+                        query_utterance: "CDH1",
+                        target: "CDH1"
+                    }
+                }
+            }];
             }
-        });
+        }).persist();
 };
 
 module.exports = { oovMapperInterceptor };

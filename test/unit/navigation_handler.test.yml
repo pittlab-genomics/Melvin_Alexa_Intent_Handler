@@ -89,3 +89,259 @@ configuration:
         intent: "NavigateMutationsIntent"
         event_type: "analysis_event"
   - response.outputSpeech.ssml: "<speak>Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+
+---
+- test: NavigateCompareIntent_cna_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 has the greatest number of copy number alterations in Sarcoma at 37.6 percent while Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent"
+
+---
+- test: NavigateCompareIntent_cna_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less copy number alterations in TP53 at 5.7 percent while 11.9 percent of cases have alterations in Braca one."
+
+---
+- test: NavigateCompareIntent_cna_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of copy number alterations at 28.6 percent while HCN2 has the greatest number of copy number alterations in Ovarian serous cystadenocarcinoma at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_cna_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has more copy number alterations in Ovarian serous cystadenocarcinoma at 12.5 percent while 11.9 percent of Breast invasive carcinoma cases have alterations."
+
+---
+- test: NavigateCompareIntent_gain_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 has the greatest number of amplifications in Ovarian serous cystadenocarcinoma at 9.4 percent while Braca one has the greatest number of amplifications in Esophageal carcinoma at 10.8 percent"
+
+---
+- test: NavigateCompareIntent_gain_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of amplifications at 27.4 percent while MECOM has the greatest number of amplifications in Ovarian serous cystadenocarcinoma at 55.9 percent."
+
+---
+- test: NavigateCompareIntent_gain_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less amplifications in TP53 at 1.5 percent while 3.7 percent of cases have amplifications in Braca one."
+
+---
+- test: NavigateCompareIntent_gain_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has more amplifications in Ovarian serous cystadenocarcinoma at 4.5 percent while 3.7 percent of Breast invasive carcinoma cases have amplifications."
+
+---
+- test: NavigateCompareIntent_loss_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 has the greatest number of deletions in Sarcoma at 34.1 percent while Braca one has the greatest number of deletions in Uterine Carcinosarcoma at 15.8 percent"
+
+---
+- test: NavigateCompareIntent_loss_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, KAZN has the greatest number of deletions at 16.9 percent while TCF3 has the greatest number of deletions in Ovarian serous cystadenocarcinoma at 57.7 percent."
+
+---
+- test: NavigateCompareIntent_loss_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less deletions in TP53 at 4.3 percent while 8.2 percent of cases have deletions in Braca one."
+
+---
+- test: NavigateCompareIntent_loss_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent while 8.2 percent of Breast invasive carcinoma cases have deletions."
+
+--- 
+- test: NavigateJoinFilterIntent_BRCA
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "breast cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Ok, Breast invasive carcinoma."
+
+--- 
+- test: NavigateJoinFilterIntent_MUT
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Ok, mutations. <prosody rate='110%'>What would you like to know?</prosody>"
+
+--- 
+- test: NavigateJoinFilterIntent_Mutations_TP53_BRCA
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated."
+
+--- 
+- test: NavigateJoinFilterIntent_TP53
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody>"
+
+--- 
+- test: NavigateJoinFilterIntent_TP53_BRCA_OV
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated."
+
+--- 
+- test: NavigateJoinFilterIntent_SV-MD_TP53_BRCA
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+        data_type: "STRUCTURAL_VARIANTS"
+        study_abbreviation: "BRCA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "most affected domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively."

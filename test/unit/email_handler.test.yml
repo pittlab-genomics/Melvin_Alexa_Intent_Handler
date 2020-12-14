@@ -4,7 +4,7 @@ configuration:
   dynamo: mock
 
 --- 
-- test: NavigateEmailIntent count 
+- test: NavigateEmailIntent_count 
 - NavigateEmailIntent:
   - request.session.attributes:
       MELVIN.STATE:
@@ -19,7 +19,7 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateEmailIntent duration 
+- test: NavigateEmailIntent_duration 
 - NavigateEmailIntent:
   - request.session.attributes:
       MELVIN.STATE:

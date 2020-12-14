@@ -36,6 +36,12 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
+- test: NavigateCNAIntent_Error
+- NavigateCNAIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.shouldEndSession: false
+
+--- 
 - test: NavigateGainIntent_S 
 - NavigateGainIntent:
   - request.request.intent.slots:
@@ -70,6 +76,12 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
+- test: NavigateGainIntent_Error
+- NavigateGainIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.shouldEndSession: false
+
+--- 
 - test: NavigateLossIntent_S 
 - NavigateLossIntent:
   - request.request.intent.slots:
@@ -101,4 +113,10 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
   - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is deleted 4.3 percent."
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateLossIntent_Error
+- NavigateLossIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
   - response.shouldEndSession: false
