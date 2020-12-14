@@ -36,3 +36,9 @@ configuration:
         gene_name: "TP53"
   - response.outputSpeech.ssml: "The mean expression of TP53 in Breast invasive carcinoma patients is 11.3 percent"
   - response.shouldEndSession: false
+
+--- 
+- test: NavigateExpressionIntent_Error
+- NavigateExpressionIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.shouldEndSession: false

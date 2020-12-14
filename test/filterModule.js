@@ -5,6 +5,14 @@ const { oovMapperInterceptor } = require("./oov_mapper");
 
 module.exports = { 
     onTestSuiteStart: (test) => {
+        oovMapperInterceptor();
+        MelvinExplorerInterceptor.mutation_tcga_stats();
+        MelvinExplorerInterceptor.cna_tcga_stats();
+        MelvinExplorerInterceptor.gain_tcga_stats();
+        MelvinExplorerInterceptor.loss_tcga_stats();
+        MelvinExplorerInterceptor.gene_by_name();
+        MelvinExplorerInterceptor.gene_expression_tcga_stats();
+
         AWS.mock("DynamoDB.DocumentClient", "put", function(params, callback) {
             callback(null, "successfully put item in database");
         });
@@ -29,21 +37,8 @@ module.exports = {
             callback(null, "successfully published message");
         });
     },
-    onRequest: (test, request) => {
-        oovMapperInterceptor();
-        MelvinExplorerInterceptor.mutation_tcga_stats();
-        MelvinExplorerInterceptor.cna_tcga_stats();
-        MelvinExplorerInterceptor.gain_tcga_stats();
-        MelvinExplorerInterceptor.loss_tcga_stats();
-        MelvinExplorerInterceptor.gene_by_name();
-        MelvinExplorerInterceptor.gene_expression_tcga_stats();
-
-        request.requestFiltered = true;
-    },
-    onResponse: (test, response) => {
-        nock.cleanAll();
-    },
     onTestSuiteEnd: (testResults) => {
+        nock.cleanAll();
         AWS.restore("DynamoDB.DocumentClient");
         AWS.restore("SQS");
     } 

@@ -10,8 +10,31 @@ const MelvinExplorerInterceptor = {
                 const parsed = new url.URL(this.req.path, "http://example.com");
                 const gene = parsed.searchParams.get("gene");
                 const study = parsed.searchParams.get("study");
+                const style = parsed.searchParams.get("style");
                 var jsonResult = { data: { records: []}};
-                if(gene && study) {
+                if(gene && study && style) {
+                    switch(gene+"-"+study+"-"+style) {
+                    case "TP53-BRCA-domain": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            domain:     "P53 DNA-binding domain",
+                            percentage: 88.0
+                        },
+                        {
+                            domain:     "P53 tetramerisation motif",
+                            percentage: 5.33
+                        },
+                        {
+                            domain:     "P53 transactivation motif",
+                            percentage: 0.67
+                        },
+                        {
+                            domain:     "Transactivation domain 2",
+                            percentage: 0.67
+                        }
+                    ]}});
+                    }
+                }
+                else if(gene && study) {
                     switch(gene + "-"+ study) {
                     case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  30.0306,
@@ -20,7 +43,11 @@ const MelvinExplorerInterceptor = {
                     case "TP53-LIHC": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  25.9669,
                         recurrent_positions: 19
-                    }});
+                    }}); break;
+                    case "TP53-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  69.9541,
+                        recurrent_positions: 65
+                    }}); 
                     }
                 } else if(gene) {
                     switch(gene) {
@@ -55,7 +82,7 @@ const MelvinExplorerInterceptor = {
                 }
 
                 return [ 200, jsonResult];
-            });
+            }).persist();
     }, cna_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/cna/tcga/cna_stats")
@@ -78,6 +105,30 @@ const MelvinExplorerInterceptor = {
                         all_cases_percent:   12.54180602006689,
                         amp_cases_percent:   4.51505016722408,
                         del_cases_percent:   8.02675585284281
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "BRCA1",
+                        study_abbreviation:  "BRCA",
+                        amp_cases_count:     41,
+                        del_cases_count:     90,
+                        all_cases_count:     131,
+                        case_count_in_study: 1098,
+                        zero_count:          967,
+                        all_cases_percent:   11.930783242258652,
+                        amp_cases_percent:   3.734061930783242,
+                        del_cases_percent:   8.19672131147541
+                    }}); break;
+                    case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "TP53",
+                        study_abbreviation:  "BRCA",
+                        amp_cases_count:     16,
+                        del_cases_count:     47,
+                        all_cases_count:     63,
+                        case_count_in_study: 1098,
+                        zero_count:          1035,
+                        all_cases_percent:   5.737704918032787,
+                        amp_cases_percent:   1.4571948998178506,
+                        del_cases_percent:   4.280510018214936
                     }});
                     }
                 } else if(gene) {
@@ -90,6 +141,16 @@ const MelvinExplorerInterceptor = {
                         {
                             study_abbreviation: "PRAD",
                             cna_percentage:     18.0
+                        }
+                    ]}}); break;
+                    case "BRCA1": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            study_abbreviation: "UCS",
+                            cna_percentage:     21.05
+                        },
+                        {
+                            study_abbreviation: "ESCA",
+                            cna_percentage:     14.05
                         }
                     ]}});
                     }
@@ -105,12 +166,22 @@ const MelvinExplorerInterceptor = {
                             gene:           "FSTL3",
                             cna_percentage: 59.53
                         }
-                    ]}});
+                    ]}}); break;
+                    case "BRCA": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            gene:           "CCND1",
+                            cna_percentage: 28.6
+                        },
+                        {
+                            gene:           "LTO1",
+                            cna_percentage: 28.6
+                        }
+                    ]}}); 
                     }
                 }
 
                 return [ 200, jsonResult];
-            });
+            }).persist();
     }, gain_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/cna/tcga/gain_stats")
@@ -133,6 +204,30 @@ const MelvinExplorerInterceptor = {
                         all_cases_percent:   5.737704918032787,
                         amp_cases_percent:   1.4571948998178506,
                         del_cases_percent:   4.280510018214936
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "BRCA1",
+                        study_abbreviation:  "BRCA",
+                        amp_cases_count:     41,
+                        del_cases_count:     90,
+                        all_cases_count:     131,
+                        case_count_in_study: 1098,
+                        zero_count:          967,
+                        all_cases_percent:   11.930783242258652,
+                        amp_cases_percent:   3.734061930783242,
+                        del_cases_percent:   8.19672131147541
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "BRCA1",
+                        study_abbreviation:  "OV",
+                        amp_cases_count:     27,
+                        del_cases_count:     48,
+                        all_cases_count:     75,
+                        case_count_in_study: 598,
+                        zero_count:          523,
+                        all_cases_percent:   12.54180602006689,
+                        amp_cases_percent:   4.51505016722408,
+                        del_cases_percent:   8.02675585284281
                     }});
                     }
                 } else if(gene) {
@@ -145,6 +240,16 @@ const MelvinExplorerInterceptor = {
                         {
                             study_abbreviation: "UCS",
                             gain_percentage:    5.26
+                        }
+                    ]}}); break;
+                    case "BRCA1": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            study_abbreviation: "ESCA",
+                            gain_percentage:    10.81
+                        },
+                        {
+                            study_abbreviation: "STAD",
+                            gain_percentage:    7.22
                         }
                     ]}});
                     }
@@ -160,12 +265,22 @@ const MelvinExplorerInterceptor = {
                             gene:            "LTO1",
                             gain_percentage: 27.41
                         }
+                    ]}}); break;
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            gene:            "MECOM",
+                            gain_percentage: 55.85
+                        },
+                        {
+                            gene:            "MYC",
+                            gain_percentage: 55.18
+                        }
                     ]}});
                     }
                 }
 
                 return [ 200, jsonResult];
-            });
+            }).persist();
     }, loss_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/cna/tcga/loss_stats")
@@ -188,6 +303,30 @@ const MelvinExplorerInterceptor = {
                         all_cases_percent:   5.737704918032787,
                         amp_cases_percent:   1.4571948998178506,
                         del_cases_percent:   4.280510018214936
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "BRCA1",
+                        study_abbreviation:  "BRCA",
+                        amp_cases_count:     41,
+                        del_cases_count:     90,
+                        all_cases_count:     131,
+                        case_count_in_study: 1098,
+                        zero_count:          967,
+                        all_cases_percent:   11.930783242258652,
+                        amp_cases_percent:   3.734061930783242,
+                        del_cases_percent:   8.19672131147541
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        name:                "BRCA1",
+                        study_abbreviation:  "OV",
+                        amp_cases_count:     27,
+                        del_cases_count:     48,
+                        all_cases_count:     75,
+                        case_count_in_study: 598,
+                        zero_count:          523,
+                        all_cases_percent:   12.54180602006689,
+                        amp_cases_percent:   4.51505016722408,
+                        del_cases_percent:   8.02675585284281
                     }});
                     }
                 } else if(gene) {
@@ -200,6 +339,16 @@ const MelvinExplorerInterceptor = {
                         {
                             study_abbreviation: "PRAD",
                             loss_percentage:    18.0
+                        }
+                    ]}}); break;
+                    case "BRCA1": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            study_abbreviation: "UCS",
+                            loss_percentage:    15.79
+                        },
+                        {
+                            study_abbreviation: "BRCA",
+                            loss_percentage:    8.2
                         }
                     ]}});
                     }
@@ -215,12 +364,22 @@ const MelvinExplorerInterceptor = {
                             gene:            "RCC2",
                             loss_percentage: 16.85
                         }
+                    ]}}); break;
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            gene:            "TCF3",
+                            loss_percentage: 57.69
+                        },
+                        {
+                            gene:            "ATP5F1D",
+                            loss_percentage: 57.53
+                        }
                     ]}});
                     }
                 }
 
                 return [ 200, jsonResult];
-            });
+            }).persist();
     }, gene_by_name() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/genes/HIF1A")
@@ -237,7 +396,7 @@ const MelvinExplorerInterceptor = {
                 idGENE:     2411,
                 cgc:        1,
                 pfamLENGTH: 826
-            }});
+            }}).persist();
     }, gene_expression_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/gene_expression/tcga/stats")
@@ -274,7 +433,7 @@ const MelvinExplorerInterceptor = {
                 }
 
                 return [ 200, jsonResult];
-            });
+            }).persist();
     }
 };
 module.exports = { MelvinExplorerInterceptor };
