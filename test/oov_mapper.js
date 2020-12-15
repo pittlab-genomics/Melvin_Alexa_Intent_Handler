@@ -84,17 +84,15 @@ const oovMapperInterceptor = function() {
                     target:          "most affected domains"
                 }
             }}];
-            case "CDH1": return[200, {
-                data: {
-                    entity_type: "GENE",
-                    from: "gene_lookup",
-                    entity_data: {
-                        value: "CDH1",
-                        query_utterance: "CDH1",
-                        target: "CDH1"
-                    }
+            case "CDH1": return[200, { data: {
+                entity_type: "GENE",
+                from:        "gene_lookup",
+                entity_data: {
+                    value:           "CDH1",
+                    query_utterance: "CDH1",
+                    target:          "CDH1"
                 }
-            }];
+            }}];
             }
         }).persist();
 };
