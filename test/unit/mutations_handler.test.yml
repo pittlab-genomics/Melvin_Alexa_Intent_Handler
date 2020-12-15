@@ -24,6 +24,12 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
+- test: NavigateMutationsIntent_Error
+- NavigateMutationsIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.shouldEndSession: false
+
+--- 
 - test: NavigateMutationsIntent_GS
 - NavigateMutationsIntent:
   - request.request.intent.slots:
@@ -58,4 +64,10 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
   - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated."
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateMutationDomainsIntent_Error
+- NavigateMutationDomainsIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
   - response.shouldEndSession: false

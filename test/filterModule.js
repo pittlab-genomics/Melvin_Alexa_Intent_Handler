@@ -36,10 +36,21 @@ module.exports = {
         AWS.mock("SQS", "sendMessage", function(params, callback) {
             callback(null, "successfully published message");
         });
+
+        AWS.mock("CloudWatchEvents", "putRule", function(params, callback) {
+            callback(null, "successfully put rule");
+        });
+
+        AWS.mock("CloudWatchEvents", "listTagsForResource", function(params, callback) {
+            callback(null, { Tags: [{
+                Key: "label", Value: "melvin-alexa-intent-handlers-test-warmup_service"
+            }]});
+        });
     },
     onTestSuiteEnd: (testResults) => {
         nock.cleanAll();
         AWS.restore("DynamoDB.DocumentClient");
         AWS.restore("SQS");
+        AWS.restore("CloudWatchEvents");
     } 
 };
