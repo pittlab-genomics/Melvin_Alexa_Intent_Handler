@@ -345,3 +345,23 @@ configuration:
         value: "most affected domains"
         confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively."
+
+---
+- test: NavigateCompareIntent_cna_Error
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "The data type is missing for comparison."
+
+--- 
+- test: NavigateJoinFilterIntent_Error
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+  - response.outputSpeech.ssml: "Sorry, something went wrong while processing the request. Please try again later."

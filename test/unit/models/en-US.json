@@ -246,6 +246,26 @@
             ]
           },
           {
+            "name": "NavigateIndelsIntent",
+            "slots": [
+              {
+                "name": "query",
+                "type": "AMAZON.SearchQuery"
+              }
+            ],
+            "samples": []
+          },
+          {
+            "name": "NavigateIndelDomainsIntent",
+            "slots": [
+              {
+                "name": "query",
+                "type": "AMAZON.SearchQuery"
+              }
+            ],
+            "samples": []
+          },
+          {
             "name": "NavigateCNAIntent",
             "slots": [
               {

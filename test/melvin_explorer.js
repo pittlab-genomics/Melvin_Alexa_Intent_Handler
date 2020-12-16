@@ -434,6 +434,72 @@ const MelvinExplorerInterceptor = {
 
                 return [ 200, jsonResult];
             }).persist();
+    }, indels_tcga_stats() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/mutations/tcga/indel_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                const style = parsed.searchParams.get("style");
+                var jsonResult = { data: { records: []}};
+                if(gene && study && style) {
+                    switch(gene+"-"+study+"-"+style) {
+                    case "TP53-BRCA-domain": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            domain:     "P53 DNA-binding domain",
+                            percentage: 75.0
+                        },
+                        {
+                            domain:     "none",
+                            percentage: 17.86
+                        },
+                        {
+                            domain:     "P53 tetramerisation motif",
+                            percentage: 7.14
+                        }
+                    ]}});
+                    }
+                } else if(gene && study) {
+                    switch(gene+ "-"+ study) {
+                    case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  5.7201,
+                        recurrent_positions: 6
+                    }});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: {
+                        records: [
+                            {
+                                study_abbreviation:      "ESCA",
+                                gene_study_case_percent: 12.09
+                            },
+                            {
+                                study_abbreviation:      "OV",
+                                gene_study_case_percent: 11.7
+                            }
+                        ],
+                        cancer_count: 26
+                    }});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            name:         "TP53",
+                            case_percent: 11.7
+                        },
+                        {
+                            name:         "NF1",
+                            case_percent: 1.83
+                        }
+                    ]}});
+                    }
+                }          
+                return [ 200, jsonResult];
+            }).persist();
     }
 };
 module.exports = { MelvinExplorerInterceptor };

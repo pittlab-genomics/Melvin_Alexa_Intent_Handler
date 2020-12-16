@@ -12,6 +12,7 @@ module.exports = {
         MelvinExplorerInterceptor.loss_tcga_stats();
         MelvinExplorerInterceptor.gene_by_name();
         MelvinExplorerInterceptor.gene_expression_tcga_stats();
+        MelvinExplorerInterceptor.indels_tcga_stats();
 
         AWS.mock("DynamoDB.DocumentClient", "put", function(params, callback) {
             callback(null, "successfully put item in database");

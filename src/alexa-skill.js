@@ -32,7 +32,9 @@ const {
 
 const {
     NavigateMutationsIntentHandler,
-    NavigateMutationDomainsIntentHandler
+    NavigateMutationDomainsIntentHandler,
+    NavigateIndelsIntentHandler,
+    NavigateIndelDomainsIntentHandler
 } = require("./skill_handlers/mutations_handler.js");
 
 const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
@@ -135,6 +137,10 @@ add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT
 add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
 add_event_configuration("NavigateMutationDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
     NavigateMutationDomainsIntentHandler);
+add_event_configuration("NavigateIndelsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateIndelsIntentHandler);
+add_event_configuration("NavigateIndelDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateIndelDomainsIntentHandler);
+
 add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
 add_event_configuration("NavigateGainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
     NavigateGainIntentHandler);
@@ -188,6 +194,8 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateSplitbyIntentHandler,
         NavigateMutationsIntentHandler,
         NavigateMutationDomainsIntentHandler,
+        NavigateIndelsIntentHandler,
+        NavigateIndelDomainsIntentHandler,
         NavigateCNAIntentHandler,
         NavigateGainIntentHandler,
         NavigateLossIntentHandler,
