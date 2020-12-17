@@ -1,3 +1,5 @@
+const { isEqual } = require("lodash");
+const _ = require("lodash");
 const nock = require("nock");
 const url = require("url");
 
@@ -498,6 +500,78 @@ const MelvinExplorerInterceptor = {
                     ]}});
                     }
                 }          
+                return [ 200, jsonResult];
+            }).persist();
+    }, splitby_tcga_stats() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const melvin_state = JSON.parse(parsed.searchParams.get("melvin_state"));
+                const splitby_state = JSON.parse(parsed.searchParams.get("splitby_state"));
+
+                const ms_data_type = melvin_state.data_type;
+                const ss_data_type = splitby_state.data_type;
+
+                var jsonResult = { data: { records: []}};
+
+                if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "MUTATIONS")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        statistic: 45551.0,
+                        pvalue:    0.04471175703426707,
+                        method:    "mannwhit"
+                    }});
+                } else if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "GAIN")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        statistic: 21940.0,
+                        pvalue:    0.11903585460026533,
+                        method:    "mannwhit"
+                    }});
+                } else if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "LOSS")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        statistic: 26989.5,
+                        pvalue:    0.2655149373075927,
+                        method:    "mannwhit"
+                    }});
+                } else if(isEqual(ms_data_type, "GAIN") && isEqual(ss_data_type, "GAIN")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        oddsratio: 7.335664335664336,
+                        pvalue:    0.013521281907155201,
+                        method:    "fishers"
+                    }});
+                } else if(isEqual(ms_data_type, "LOSS") && isEqual(ss_data_type, "LOSS")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        oddsratio: 0.4859903381642512,
+                        pvalue:    0.7172876350133848,
+                        method:    "fishers"
+                    }});
+                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "GENE_EXPRESSION")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        statistic: 102906.0,
+                        pvalue:    0.4382316176955987,
+                        method:    "mannwhit"
+                    }});
+                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "GAIN")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        oddsratio: 2.945080091533181,
+                        pvalue:    0.004706783810086384,
+                        method:    "fishers"
+                    }});
+                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "LOSS")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        oddsratio: 1.5968620974401322,
+                        pvalue:    0.22301587161377634,
+                        method:    "fishers"
+                    }});
+                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "MUTATIONS")) {
+                    jsonResult = Object.assign(jsonResult, { data: {
+                        oddsratio: 0.48717948717948717,
+                        pvalue:    0.069462458766369,
+                        method:    "fishers"
+                    }});
+                }
+
                 return [ 200, jsonResult];
             }).persist();
     }

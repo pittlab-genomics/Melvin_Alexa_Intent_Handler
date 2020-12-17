@@ -7,3 +7,7 @@
 # npm package files
 node_modules
 package-lock.json
+
+# unit test output
+test_output/
+bst-debug.log
