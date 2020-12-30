@@ -175,6 +175,12 @@ const get_gene_by_name = async function (handlerInput, params) {
     return result;
 };
 
+const get_gene_target = async function (handlerInput, params) {
+    const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
+    const result = await process_repeat_requests(handlerInput, gene_url);
+    return result;
+};
+
 const get_gene_expression_clinvar_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/clinvar/stats`);
     add_query_params(gene_expression_url, params);
@@ -227,5 +233,6 @@ module.exports = {
     get_gene_expression_clinvar_stats,
     get_sv_clinvar_stats,
     get_clinical_trials,    
-    get_gene_by_name
+    get_gene_by_name,
+    get_gene_target
 };

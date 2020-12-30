@@ -28,7 +28,7 @@ const {
     build_loss_response, build_loss_compare_response
 } = require("../cna/loss_response_builder.js");
 
-const { build_gene_definition_response } = require("../gene/gene_definition_response_builder.js");
+const { build_gene_definition_response } = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
 const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
 const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");

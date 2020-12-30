@@ -18,7 +18,27 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
+- test: NavigateGeneTargetIntent 
+- NavigateGeneTargetIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "Hif one alpha"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>HIF1A can be targeted. <break time='200ms'/> *"
+  - response.shouldEndSession: false
+
+--- 
 - test: NavigateGeneDefinitionIntent_Error
 - NavigateGeneDefinitionIntent:
+  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateGeneTargetIntent_Error
+- NavigateGeneTargetIntent:
   - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
   - response.shouldEndSession: false

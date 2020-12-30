@@ -10,7 +10,10 @@ const {
     UserUtteranceTrackInterceptor
 } = require("./interceptors.js");
 
-const { NavigateGeneDefinitionIntentHandler } = require("./skill_handlers/gene_handler.js");
+const {
+    NavigateGeneDefinitionIntentHandler,
+    NavigateGeneTargetIntentHandler
+} = require("./skill_handlers/gene_handler.js");
 
 const {
     NavigateResetIntentHandler,
@@ -131,6 +134,8 @@ const ErrorHandler = {
 
 add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, 
     NavigateGeneDefinitionIntentHandler);
+add_event_configuration("NavigateGeneTargetIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+    NavigateGeneTargetIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
@@ -189,6 +194,7 @@ exports.handler = Alexa.SkillBuilders.custom()
 
         // Navigation handlers - analysis
         NavigateGeneDefinitionIntentHandler,
+        NavigateGeneTargetIntentHandler,
         NavigateJoinFilterIntentHandler,
         NavigateCompareIntentHandler,
         NavigateSplitbyIntentHandler,
