@@ -1,0 +1,14 @@
+{
+    "handler": "../src/alexa-skill.js",
+    "locale": "en-US",
+    "trace": false,
+    "jest": {
+        "silent": true,
+        "collectCoverage": false
+    },
+    "filter": "unit/config/filterModule.js",
+    "env": "test/unit/config/.env",
+    "userId": "testUserId",
+    "deviceId": "testDeviceId",
+    "platform": "alexa"
+}
