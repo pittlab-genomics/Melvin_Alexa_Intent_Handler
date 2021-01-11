@@ -123,7 +123,10 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA) {
             response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
-        } else {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
+            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+
+        }else {
             throw melvin_error(
                 `Error while building compare reponse: melvin_state: ${melvin_state}, ` + 
                     `compare_state: ${compare_state}`,
