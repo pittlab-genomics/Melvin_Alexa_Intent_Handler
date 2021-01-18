@@ -34,6 +34,9 @@ bst test /unit.test.gene_handler.test
 These tests are similar to e2e tests in that they interact with the "real" skill. However, they do not actually "speak" to Alexa using text-to-speech but instead use text invocations. 
 
 By default, the skillId is pointed to Melvin dev. If you want to test against uat, update the skillId in `integration.test.yml`.
+
+To configure `ask cli` credentials to authenticate the user to Amazon developer services (This is needed as we are invoking the skillId)
 ```
+ask configure
 bst test /integration.test
 ```

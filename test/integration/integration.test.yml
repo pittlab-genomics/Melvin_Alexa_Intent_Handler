@@ -6,14 +6,14 @@ configuration:
   #skillId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d
   stage: development
 
-# ---
-# - test: Test 1
-# - develop melvin: Welcome to Melvin *
-# - tell me about TP-53: <speak>Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me mutations: TP53 mutations are found in 31 out of 33 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent.
-# - show me breast cancer: TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated.
-# - how about ovarian cancer: TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated.
-# - show me domains: P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.7 percent and 5 percent of mutations respectively.
+---
+- test: Test 1
+- develop melvin: Welcome to Melvin *
+- tell me about TP-53: <speak>Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me mutations: TP53 mutations are found in 31 out of 33 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent.
+- show me breast cancer: TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated.
+- how about ovarian cancer: TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated.
+- show me domains: P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.7 percent and 5 percent of mutations respectively.
 
 ---
 - test: Test 2
@@ -22,68 +22,68 @@ configuration:
 - show me glioblastoma: CDKN2A has the greatest number of copy number alterations in Glioblastoma multiforme at 62.6 percent.
 - compare to sarcoma: Among Glioblastoma multiforme patients, CDKN2A has the greatest number of copy number alterations at 62.6 percent while ATP1B2 has the greatest number of copy number alterations in Sarcoma at 37.6 percent.
 
-# ---
-# - test: Test 3
-# - develop melvin : Welcome to Melvin *
-# - tell me about lung adenocarcinoma: <speak>Ok, Lung adenocarcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me deletions: CDKN2A has the greatest number of deletions in Lung adenocarcinoma at 18.1 percent.
-# - how about amplifications: SFTA3 has the greatest number of amplifications in Lung adenocarcinoma at 22.3 percent.
-# - show me MYC: In Lung adenocarcinoma patients, MYC is amplified 17.2 percent.
-# - split by expression: Which gene would you like to split by?
-# - MYC: In Lung adenocarcinoma, MYC is not differentially expressed between MYC mutant and wild type samples with a wilcoxon P value of 0.01
+---
+- test: Test 3
+- develop melvin : Welcome to Melvin *
+- tell me about lung adenocarcinoma: <speak>Ok, Lung adenocarcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me deletions: CDKN2A has the greatest number of deletions in Lung adenocarcinoma at 18.1 percent.
+- how about amplifications: SFTA3 has the greatest number of amplifications in Lung adenocarcinoma at 22.3 percent.
+- show me MYC: In Lung adenocarcinoma patients, MYC is amplified 17.2 percent.
+- split by expression: Which gene would you like to split by?
+- MYC: In Lung adenocarcinoma, MYC is not differentially expressed between MYC mutant and wild type samples with a wilcoxon P value of 0.01
 
-# ---
-# - test: Test 4
-# - develop melvin : Welcome to Melvin *
-# - tell me about RAD 51 C: <speak>Ok, RAD51B. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - what does it do: Sorry, something went wrong while processing the request. Please try again later.
-# - show me amplifications: In RAD51B greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 12.9 percent.
+---
+- test: Test 4
+- develop melvin : Welcome to Melvin *
+- tell me about RAD 51 C: <speak>Ok, RAD51B. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- what does it do: Sorry, something went wrong while processing the request. Please try again later.
+- show me amplifications: In RAD51B greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 12.9 percent.
 
-# ---
-# - test: Test 5
-# - develop melvin : Welcome to Melvin *
-# - show me esophageal cancer:  <speak>Ok, Esophageal carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - tell me about gene expression:  The highest mean expression of Esophageal carcinoma patients is recorded in ACTB at 18.1 percent
-# - show me CCND1: The mean expression of CCND1 in Esophageal carcinoma patients is 13.8 percent
-# - compare to breast cancer: The data type is missing for comparison.
-# - compare to TERT: The data type is missing for comparison.
-# - compare to mutations: This data type comparison analysis is not yet supported
+---
+- test: Test 5
+- develop melvin : Welcome to Melvin *
+- show me esophageal cancer:  <speak>Ok, Esophageal carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- tell me about gene expression:  The highest mean expression of Esophageal carcinoma patients is recorded in ACTB at 18.1 percent
+- show me CCND1: The mean expression of CCND1 in Esophageal carcinoma patients is 13.8 percent
+- compare to breast cancer: CCND1 has less copy number alterations in Breast invasive carcinoma at 28.6 percent while 38.9 percent of Esophageal carcinoma cases have alterations.
+- compare to TERT: Esophageal carcinoma patients have less copy number alterations in TERT at 21.6 percent while 38.9 percent of cases have alterations in CCND1.
+- compare to mutations: This data type comparison analysis is not yet supported
 
-# ---
-# - test: Test 6
-# - develop melvin: Welcome to Melvin *
-# - show me mesothelioma: <speak>Ok, Mesothelioma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me mutations: Among Mesothelioma patients, BAP1 and NF2 are the top 2 mutated genes found in 21.8 percent and 19.2 percent of the patients respectively.
-# - compare to CNAs: Among Mesothelioma patients, records is the top mutated gene at NaN while patient_percentage is most mutated in Mesothelioma at 0 percent.
+---
+- test: Test 6
+- develop melvin: Welcome to Melvin *
+- show me mesothelioma: <speak>Ok, Mesothelioma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me mutations: Among Mesothelioma patients, BAP1 and NF2 are the top 2 mutated genes found in 21.8 percent and 19.2 percent of the patients respectively.
+- compare to copy number alterations: Among Mesothelioma patients, records is the top mutated gene at NaN while patient_percentage is most mutated in Mesothelioma at 0 percent.
 
-# ---
-# - test: Test 7
-# - develop melvin: Welcome to Melvin *
-# - tell me about RNA expression: <speak>Ok, gene expression. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me BRCA1: The highest mean expression of Braca one is recorded in Acute Myeloid Leukemia patients at 11.3 percent
-# - compare to BRCA2: The data type is missing for comparison.
+---
+- test: Test 7
+- develop melvin: Welcome to Melvin *
+- tell me about RNA expression: <speak>Ok, gene expression. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me BRCA1: The highest mean expression of Braca one is recorded in Acute Myeloid Leukemia patients at 11.3 percent
+- compare to BRCA2: Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent while Braca two has the greatest number of copy number alterations in Sarcoma at 23.4 percent
 
-# ---
-# - test: Test 8
-# - develop melvin: Welcome to Melvin *
-# - show me breast cancer: <speak>Ok, Breast invasive carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me GATA3: Ok, GATA3.
-# - compare to CDH1: The data type is missing for comparison.
+---
+- test: Test 8
+- develop melvin: Welcome to Melvin *
+- show me breast cancer: <speak>Ok, Breast invasive carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me GATA3: Ok, GATA3.
+- compare to CDH1: The data type is missing for comparison.
 
-# ---
-# - test: Test 9
-# - develop melvin: Welcome to Melvin *
-# - tell me about hepatocellular carcinoma: <speak>Ok, Liver hepatocellular carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me CTNNB1: Ok, Catenin Beta 1.
-# - show me mutations: Catenin Beta 1 mutations are found in 25.4 percent of Liver hepatocellular carcinoma patients with 10 amino acid residues recurrently mutated.
-# - split by expression: Which gene would you like to split by?
-# - CCND1: In Liver hepatocellular carcinoma, Catenin Beta 1 is not differentially expressed between CCND1 mutant and wild type samples with a wilcoxon P value of 0.01
+---
+- test: Test 9
+- develop melvin: Welcome to Melvin *
+- tell me about hepatocellular carcinoma: <speak>Ok, Liver hepatocellular carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me CTNNB1: Ok, Catenin Beta 1.
+- show me mutations: Catenin Beta 1 mutations are found in 25.4 percent of Liver hepatocellular carcinoma patients with 10 amino acid residues recurrently mutated.
+- split by expression: Which gene would you like to split by?
+- CCND1: In Liver hepatocellular carcinoma, Catenin Beta 1 is not differentially expressed between CCND1 mutant and wild type samples with a wilcoxon P value of 0.01
 
-# ---
-# - test: Test 10
-# - develop melvin: Welcome to Melvin *
-# - tell me about colon cancer: <speak>Ok, Colon adenocarcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
-# - show me mutations: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively.
-# - show me KRAS: <speak>* mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated.</speak>
-# - split by amplifications: Which gene would you like to split by?
-# - M.Y.C: <speak>In Colon adenocarcinoma, * is differentially expressed between MYC mutant and wild type samples with a wilcoxon P value of 0.24</speak>
+---
+- test: Test 10
+- develop melvin: Welcome to Melvin *
+- tell me about colon cancer: <speak>Ok, Colon adenocarcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
+- show me mutations: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively.
+- show me KRAS: <speak>* mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated.</speak>
+- split by amplifications: Which gene would you like to split by?
+- M.Y.C: <speak>In Colon adenocarcinoma, * is differentially expressed between MYC mutant and wild type samples with a wilcoxon P value of 0.24</speak>
