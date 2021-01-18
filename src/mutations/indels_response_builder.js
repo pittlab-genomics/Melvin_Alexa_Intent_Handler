@@ -4,7 +4,6 @@ const {
     MelvinAttributes,
     MelvinIntentErrors,
     DataSources,
-    DataTypes,
     melvin_error,
     MELVIN_EXPLORER_ENDPOINT,
     DEFAULT_INVALID_STATE_RESPONSE,
@@ -15,12 +14,9 @@ const {
     add_query_params, build_ssml_response_from_nunjucks
 } = require("../utils/response_builder_utils.js");
 const {
-    get_mutations_tcga_stats,
-    get_mutations_tcga_domain_stats,
     get_indels_tcga_stats,
     get_indels_tcga_domain_stats
 } = require("../http_clients/melvin_explorer_client.js");
-const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 async function build_indels_tcga_response(handlerInput, melvin_state) {
@@ -28,20 +24,20 @@ async function build_indels_tcga_response(handlerInput, melvin_state) {
     const response = await get_indels_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
-        response: response
+        response:     response
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_indels_tcga_plot(image_list, melvin_state, 'bar');
-        add_indels_tcga_plot(image_list, melvin_state, 'treemap');
+        add_indels_tcga_plot(image_list, melvin_state, "bar");
+        add_indels_tcga_plot(image_list, melvin_state, "treemap");
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_indels_tcga_plot(image_list, melvin_state, 'bar');
+        add_indels_tcga_plot(image_list, melvin_state, "bar");
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_indels_tcga_plot(image_list, melvin_state, 'profile');
+        add_indels_tcga_plot(image_list, melvin_state, "profile");
     }
 
     // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
@@ -66,8 +62,8 @@ async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
     const nunjucks_context = {
         melvin_state: melvin_state,
-        subtype: 'domain',
-        response: response,
+        subtype:      "domain",
+        response:     response,
         records_list: records_list
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_tcga.njk", nunjucks_context);
@@ -79,8 +75,8 @@ async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     // } else 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_indels_tcga_plot(image_list, melvin_state, 'dompie');
-        add_indels_tcga_plot(image_list, melvin_state, 'domstack');
+        add_indels_tcga_plot(image_list, melvin_state, "dompie");
+        add_indels_tcga_plot(image_list, melvin_state, "domstack");
     }
     add_to_APL_image_pager(handlerInput, image_list);
 
@@ -94,10 +90,10 @@ async function build_indels_compare_tcga_response(handlerInput, melvin_state, co
         get_indels_tcga_stats(handlerInput, compare_params)
     ]);
     const nunjucks_context = {
-        melvin_state: melvin_state,
-        compare_params: compare_params,
-        state_diff: state_diff,
-        response: results[0],
+        melvin_state:     melvin_state,
+        compare_params:   compare_params,
+        state_diff:       state_diff,
+        response:         results[0],
         compare_response: results[1]
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context);
@@ -128,7 +124,7 @@ async function build_indels_clinvar_response(handlerInput, params) {
     const response = await get_indels_clinvar_stats(handlerInput, params);
     const nunjucks_context = {
         melvin_state: params,
-        response: response
+        response:     response
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_clinvar.njk", nunjucks_context);
 

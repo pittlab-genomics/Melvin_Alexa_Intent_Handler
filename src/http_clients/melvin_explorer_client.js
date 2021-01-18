@@ -113,7 +113,7 @@ const get_mutations_tcga_stats = async function (handlerInput, params) {
 const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats`);
     add_query_params(mutations_url, params);
-    mutations_url.searchParams.set("style", 'domain');
+    mutations_url.searchParams.set("style", "domain");
     const result = await process_repeat_requests(handlerInput, mutations_url);
     return result;
 };
@@ -128,8 +128,23 @@ const get_indels_tcga_stats = async function (handlerInput, params) {
 const get_indels_tcga_domain_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/indel_stats`);
     add_query_params(indels_url, params);
-    indels_url.searchParams.set("style", 'domain');
+    indels_url.searchParams.set("style", "domain");
     const result = await process_repeat_requests(handlerInput, indels_url);
+    return result;
+};
+
+const get_snvs_tcga_stats = async function (handlerInput, params) {
+    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/snv_stats`);
+    add_query_params(snvs_url, params);
+    const result = await process_repeat_requests(handlerInput, snvs_url);
+    return result;
+};
+
+const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
+    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/snv_stats`);
+    add_query_params(snvs_url, params);
+    snvs_url.searchParams.set("style", "domain");
+    const result = await process_repeat_requests(handlerInput, snvs_url);
     return result;
 };
 
@@ -223,6 +238,8 @@ module.exports = {
     get_mutations_tcga_domain_stats,
     get_indels_tcga_stats,
     get_indels_tcga_domain_stats,
+    get_snvs_tcga_stats,
+    get_snvs_tcga_domain_stats,
     get_cna_tcga_stats,
     get_gain_tcga_stats,
     get_loss_tcga_stats,
