@@ -89,8 +89,8 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateC
 
 ### Compare - MUTATIONS vs CNA
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mut_cna_G.json
-serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mut_cna_GS.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mut_cna_S.json
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mut_cna_GS.json
 
 
 ### Splitby - MUTATIONS vs CNA

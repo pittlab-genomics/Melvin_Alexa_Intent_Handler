@@ -232,6 +232,13 @@ const get_sv_clinvar_stats = async function (handlerInput, params) {
     return result;
 };
 
+const get_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvCNA_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
 module.exports = {
     get_mutations_tcga_top_genes,
     get_mutations_tcga_stats,
@@ -251,5 +258,6 @@ module.exports = {
     get_sv_clinvar_stats,
     get_clinical_trials,    
     get_gene_by_name,
-    get_gene_target
+    get_gene_target,
+    get_compare_tcga_stats
 };
