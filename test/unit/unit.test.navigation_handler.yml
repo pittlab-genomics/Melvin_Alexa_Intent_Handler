@@ -160,7 +160,7 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "TP53 has the greatest number of amplifications in Ovarian serous cystadenocarcinoma at 9.4 percent while Braca one has the greatest number of amplifications in Esophageal carcinoma at 10.8 percent"
+  - response.outputSpeech.ssml: "TP53 is the most amplified gene in Ovarian serous cystadenocarcinoma at 9.4 percent while Braca one is the most amplified gene in Esophageal carcinoma at 10.8 percent"
 
 ---
 - test: NavigateCompareIntent_gain_S_vs_S
@@ -189,7 +189,7 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less amplifications in TP53 at 1.5 percent while 3.7 percent of cases have amplifications in Braca one."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less amplifications of TP53 at 1.5 percent compared to 3.7 percent at Braca one."
 
 ---
 - test: NavigateCompareIntent_gain_GS_vs_S
@@ -204,7 +204,7 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has more amplifications in Ovarian serous cystadenocarcinoma at 4.5 percent while 3.7 percent of Breast invasive carcinoma cases have amplifications."
+  - response.outputSpeech.ssml: "Braca one has more amplifications in Ovarian serous cystadenocarcinoma at 4.5 percent compared to 3.7 percent of Breast invasive carcinoma cases."
 
 ---
 - test: NavigateCompareIntent_loss_G_vs_G
@@ -247,7 +247,7 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less deletions in TP53 at 4.3 percent while 8.2 percent of cases have deletions in Braca one."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less deletions of TP53 at 4.3 percent compared to 8.2 percent at Braca one."
 
 ---
 - test: NavigateCompareIntent_loss_GS_vs_S
@@ -262,7 +262,7 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent while 8.2 percent of Breast invasive carcinoma cases have deletions."
+  - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent compared to 8.2 percent of Breast invasive carcinoma cases."
 
 --- 
 - test: NavigateJoinFilterIntent_BRCA

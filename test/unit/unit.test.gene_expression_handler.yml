@@ -11,7 +11,7 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "The highest mean expression of Ovarian serous cystadenocarcinoma patients is recorded in EEF1A1 at 18.8 percent"
+  - response.outputSpeech.ssml: "The gene with the highest mean log2 normalized expression count in Ovarian serous cystadenocarcinoma is EEF1A1 at 18.8"
   - response.shouldEndSession: false
 
 --- 
@@ -20,7 +20,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "The highest mean expression of TP53 is recorded in Acute Myeloid Leukemia patients at 11.9 percent"
+  - response.outputSpeech.ssml: "The highest mean expression of TP53 is found in Acute Myeloid Leukemia with a log2 normalized count of 11.9."
   - response.shouldEndSession: false
 
 --- 
@@ -34,7 +34,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "The mean expression of TP53 in Breast invasive carcinoma patients is 11.3 percent"
+  - response.outputSpeech.ssml: "The mean log2 normalized expression count of TP53 in Breast invasive carcinoma is 11.3"
   - response.shouldEndSession: false
 
 --- 

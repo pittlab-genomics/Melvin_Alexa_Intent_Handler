@@ -18,7 +18,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "In TP53 greatest number of copy number alterations are found in Sarcoma patients at 37.6 percent."
+  - response.outputSpeech.ssml: "For TP53 the greatest number of copy number alterations occur in Sarcoma patients at 37.6 percent."
   - response.shouldEndSession: false
 
 --- 
@@ -32,7 +32,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "BRCA1"
-  - response.outputSpeech.ssml: "In Ovarian serous cystadenocarcinoma patients, Braca one is amplified 4.5 percent and deleted 8 percent."
+  - response.outputSpeech.ssml: "In Ovarian serous cystadenocarcinoma patients, Braca one is amplified at 4.5 percent and deleted in 8 percent."
   - response.shouldEndSession: false
 
 --- 
@@ -58,7 +58,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "In TP53 greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 9.4 percent."
+  - response.outputSpeech.ssml: "For TP53 the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 9.4 percent."
   - response.shouldEndSession: false
 
 --- 
@@ -72,7 +72,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is amplified 1.5 percent."
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is amplified at 1.5 percent."
   - response.shouldEndSession: false
 
 --- 
@@ -98,7 +98,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "In TP53 greatest number of deletions are found in Sarcoma patients at 34.1 percent."
+  - response.outputSpeech.ssml: "For TP53 greatest number of deletions are found in Sarcoma patients at 34.1 percent."
   - response.shouldEndSession: false
 
 --- 
@@ -112,7 +112,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is deleted 4.3 percent."
+  - response.outputSpeech.ssml: "TP53 is deleted in 4.3 percent of Breast invasive carcinoma patients."
   - response.shouldEndSession: false
 
 --- 
