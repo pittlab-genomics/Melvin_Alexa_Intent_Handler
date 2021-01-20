@@ -30,13 +30,18 @@ async function build_indels_tcga_response(handlerInput, melvin_state) {
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+
         add_indels_tcga_plot(image_list, melvin_state, "bar");
         add_indels_tcga_plot(image_list, melvin_state, "treemap");
+
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+
         add_indels_tcga_plot(image_list, melvin_state, "bar");
+
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+
         add_indels_tcga_plot(image_list, melvin_state, "profile");
     }
 
@@ -75,6 +80,7 @@ async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     // } else 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+
         add_indels_tcga_plot(image_list, melvin_state, "dompie");
         add_indels_tcga_plot(image_list, melvin_state, "domstack");
     }
@@ -100,20 +106,44 @@ async function build_indels_compare_tcga_response(handlerInput, melvin_state, co
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_stats_plot(image_list, melvin_state);
-        add_mutations_tcga_treemap_plot(image_list, melvin_state);
 
-        add_mutations_tcga_stats_plot(image_list, compare_params);
-        add_mutations_tcga_treemap_plot(image_list, compare_params);
+        add_indels_tcga_plot(image_list, melvin_state, 'bar');
+        add_indels_tcga_plot(image_list, melvin_state, 'treemap');
+
+        add_indels_tcga_plot(image_list, compare_params, 'bar');
+        add_indels_tcga_plot(image_list, compare_params, 'treemap');
+
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_stats_plot(image_list, melvin_state);
-        add_mutations_tcga_stats_plot(image_list, compare_params);
+
+        add_indels_tcga_plot(image_list, melvin_state, 'bar');
+        add_indels_tcga_plot(image_list, compare_params, 'bar');
+
+
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_tcga_profile_plot(image_list, melvin_state);
-        add_mutations_tcga_profile_plot(image_list, compare_params);
+            
+        add_indels_tcga_plot(image_list, melvin_state, 'profile');
+        add_indels_tcga_plot(image_list, compare_params, 'profile');
+
     }
+
+    // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
+    //     && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
+    //     add_mutations_tcga_treemap_plot(image_list, melvin_state);
+
+    //     add_mutations_tcga_stats_plot(image_list, compare_params);
+    //     add_mutations_tcga_treemap_plot(image_list, compare_params);
+    // } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
+    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
+    //     add_mutations_tcga_stats_plot(image_list, compare_params);
+    // } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
+    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    //     add_mutations_tcga_profile_plot(image_list, melvin_state);
+    //     add_mutations_tcga_profile_plot(image_list, compare_params);
+    // }
     add_to_APL_image_pager(handlerInput, image_list);
 
     return { "speech_text": speech_ssml };
@@ -138,7 +168,7 @@ async function build_indels_clinvar_response(handlerInput, params) {
 
 
 const add_indels_tcga_plot = function (image_list, params, style) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/indel_plot`);
+    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_plot`);
     add_query_params(count_plot_url, params);
     if(style) {
         count_plot_url.searchParams.set("style", style);
@@ -152,35 +182,35 @@ const add_indels_tcga_plot = function (image_list, params, style) {
 
 
 
-const add_mutations_tcga_stats_plot = function (image_list, params) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
-    add_query_params(count_plot_url, params);
-    image_list.push(count_plot_url);
-};
+// const add_mutations_tcga_stats_plot = function (image_list, params) {
+//     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
+//     add_query_params(count_plot_url, params);
+//     image_list.push(count_plot_url);
+// };
 
-const add_mutations_tcga_treemap_plot = function (image_list, params) {
-    const count_treemap_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/treemap_plot`);
-    add_query_params(count_treemap_plot_url, params);
-    image_list.push(count_treemap_plot_url);
-};
+// const add_mutations_tcga_treemap_plot = function (image_list, params) {
+//     const count_treemap_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/treemap_plot`);
+//     add_query_params(count_treemap_plot_url, params);
+//     image_list.push(count_treemap_plot_url);
+// };
 
-const add_mutations_tcga_profile_plot = function (image_list, params) {
-    const profile_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/profile_plot`);
-    add_query_params(profile_plot_url, params);
-    image_list.push(profile_plot_url);
-};
+// const add_mutations_tcga_profile_plot = function (image_list, params) {
+//     const profile_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/profile_plot`);
+//     add_query_params(profile_plot_url, params);
+//     image_list.push(profile_plot_url);
+// };
 
-const add_mutations_tcga_domain_pie_plot = function (image_list, params) {
-    const domain_pie_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_pie_plot`);
-    add_query_params(domain_pie_plot_url, params);
-    image_list.push(domain_pie_plot_url);
-};
+// const add_mutations_tcga_domain_pie_plot = function (image_list, params) {
+//     const domain_pie_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_pie_plot`);
+//     add_query_params(domain_pie_plot_url, params);
+//     image_list.push(domain_pie_plot_url);
+// };
 
-const add_mutations_tcga_domain_stack_plot = function (image_list, params) {
-    const domain_stack_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_stack_plot`);
-    add_query_params(domain_stack_plot_url, params);
-    image_list.push(domain_stack_plot_url);
-};
+// const add_mutations_tcga_domain_stack_plot = function (image_list, params) {
+//     const domain_stack_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_stack_plot`);
+//     add_query_params(domain_stack_plot_url, params);
+//     image_list.push(domain_stack_plot_url);
+// };
 
 const add_mutations_clinvar_stats_plot = function (image_list, params) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/plot`);
