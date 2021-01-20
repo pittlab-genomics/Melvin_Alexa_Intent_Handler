@@ -36,7 +36,7 @@ configuration:
 - test: Test 4
 - develop melvin : Welcome to Melvin *
 - tell me about RAD 51 C: <speak>Ok, RAD51B. <prosody rate='110%'>What would you like to know?</prosody></speak>
-- what does it do: Sorry, something went wrong while processing the request. Please try again later.
+- what does it do: Sorry, I don't have the gene definition for RAD51B.
 - show me amplifications: For RAD51B the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 12.9 percent.
 
 ---

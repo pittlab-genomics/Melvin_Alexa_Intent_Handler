@@ -93,6 +93,16 @@ const oovMapperInterceptor = function() {
                     target:          "CDH1"
                 }
             }}];
+            case "Rad fifty one b": return[200, { data: {
+                entity_type: "GENE",
+                from:        "ml_mapper_gene",
+                entity_data: {
+                    query_utterance: "Rad fifty one b",
+                    value:           "RAD51B",
+                    target:          "RAD51B",
+                    score:           null
+                }
+            }}];
             }
         }).persist();
 };

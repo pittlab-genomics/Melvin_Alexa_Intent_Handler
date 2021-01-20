@@ -15,13 +15,25 @@ const build_gene_definition_response = async function (handlerInput, params) {
     const speech = new Speech();
     const response = await get_gene_by_name(handlerInput, params);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const sentence_sum = response.data.summary.match(/\S.*?\."?(?=\s|$)/g)[0];
+    let regex = new RegExp(/\S.*?\."?(?=\s|$)/g);
+    
+    if(response.data.summary.match(regex))
+    {
+        const sentence_sum = response.data.summary.match(regex)[0];
+        const location = response.data.location;
 
-    speech
-        .sayWithSSML(gene_speech_text)
-        .say(`is at ${response.data.location}`)
-        .pause("200ms")
-        .say(sentence_sum);
+        if(location != "N/A") {
+            speech
+                .sayWithSSML(gene_speech_text)
+                .say(`is at ${location}`)
+                .pause("200ms")
+                .say(sentence_sum);
+        } else {
+            speech.say(sentence_sum);
+        }
+    } else {
+        speech.sayWithSSML(`Sorry, I don't have the gene definition for ${gene_speech_text}.`);
+    }
 
     return { "speech_text": speech.ssml() };
 };

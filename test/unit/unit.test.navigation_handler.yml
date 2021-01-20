@@ -264,6 +264,49 @@ configuration:
         confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent compared to 8.2 percent of Breast invasive carcinoma cases."
 
+---
+- test: NavigateCompareIntent_mut_cna_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 is mutated in 19.4 percent of all cases and has copy number alterations in 5.7 percent of cases."
+
+---
+- test: NavigateCompareIntent_mut_cna_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 34.3 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent."
+
+# ---
+# - test: NavigateCompareIntent_mut_cna_GS
+# - NavigateCompareIntent:
+#   - request.session.attributes:
+#       MELVIN.STATE:
+#         gene_name: "BRCA1"
+#         study_abbreviation: "BRCA"
+#         data_type: "CNA"
+#   - request.request.intent.slots:
+#       query:
+#         name: "query"
+#         value: "mutations"
+#         confirmationStatus: "NONE"
+#   - response.outputSpeech.ssml:
+
 --- 
 - test: NavigateJoinFilterIntent_BRCA
 - NavigateJoinFilterIntent:

@@ -399,6 +399,21 @@ const MelvinExplorerInterceptor = {
                 cgc:        1,
                 pfamLENGTH: 826
             }}).persist();
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/genes/RAD51B")
+            .query(true)
+            .reply(200, { data: {
+                name:       "RAD51B",
+                location:   "N/A",
+                ccds:       1,
+                pfamID:     "O15315",
+                in_clinvar: "1",
+                summary:    "N/A",
+                idGENE:     76469,
+                ncbi:       0,
+                cgc:        1,
+                pfamLENGTH: 384
+            }}).persist();
     }, gene_expression_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/gene_expression/tcga/stats")
@@ -572,6 +587,38 @@ const MelvinExplorerInterceptor = {
                     }});
                 }
 
+                return [ 200, jsonResult];
+            }).persist();
+    }, compare_tcga_stats() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/MUTvCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, {});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_cases_perc: 19.35941797533493,
+                        CNA_cases_perc: 5.660544760890781
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_mut_gene:      "TP53",
+                        top_mut_gene_perc: 34.28,
+                        top_cna_gene:      "POLRMT",
+                        top_cna_gene_perc: 59.53
+                    }}});
+                    }
+                }
                 return [ 200, jsonResult];
             }).persist();
     }
