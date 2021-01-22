@@ -292,20 +292,20 @@ configuration:
         confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 34.3 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent."
 
-# ---
-# - test: NavigateCompareIntent_mut_cna_GS
-# - NavigateCompareIntent:
-#   - request.session.attributes:
-#       MELVIN.STATE:
-#         gene_name: "BRCA1"
-#         study_abbreviation: "BRCA"
-#         data_type: "CNA"
-#   - request.request.intent.slots:
-#       query:
-#         name: "query"
-#         value: "mutations"
-#         confirmationStatus: "NONE"
-#   - response.outputSpeech.ssml:
+---
+- test: NavigateCompareIntent_mut_cna_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one mutations are found in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients have both a mutation and copy number alteration at Braca one."
 
 --- 
 - test: NavigateJoinFilterIntent_BRCA

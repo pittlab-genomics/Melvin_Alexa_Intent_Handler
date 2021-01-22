@@ -6,7 +6,7 @@ const url = require("url");
 const MelvinExplorerInterceptor = {
     mutation_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
-            .get("/v0.1/analysis/mutations/tcga/stats")
+            .get("/v0.1/analysis/mutations/tcga/MUT_stats")
             .query(true)
             .reply(function(uri, requestBody) {
                 const parsed = new url.URL(this.req.path, "http://example.com");
@@ -52,21 +52,38 @@ const MelvinExplorerInterceptor = {
                     }}); 
                     }
                 } else if(gene) {
-                    switch(gene) {
-                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { 
-                        records: [
-                            {
-                                study_abbreviation:      "OV",
-                                gene_study_case_percent: 69.95
-                            },
-                            {
-                                study_abbreviation:      "LUSC",
-                                gene_study_case_percent: 67.96
-                            }
-                        ],
-                        cancer_count: 31 
-                    }});
+                    if(style) {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: [{
+                            domain: "P53 DNA-binding domain", percentage: 85.76 
+                        }, {
+                            domain: "none", percentage: 6.72 
+                        }, {
+                            domain: "P53 tetramerisation motif", percentage: 5.5 
+                        }, {
+                            domain: "Transactivation domain 2", percentage: 1.45 
+                        }, {
+                            domain: "P53 transactivation motif", percentage: 0.57
+                        }]}});
+                        }
+                    } else {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: { 
+                            records: [
+                                {
+                                    study_abbreviation:      "OV",
+                                    gene_study_case_percent: 69.95
+                                },
+                                {
+                                    study_abbreviation:      "LUSC",
+                                    gene_study_case_percent: 67.96
+                                }
+                            ],
+                            cancer_count: 31 
+                        }});
+                        }
                     }
+                    
                 }
                 else if(study) {
                     switch(study) {
@@ -453,7 +470,7 @@ const MelvinExplorerInterceptor = {
             }).persist();
     }, indels_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
-            .get("/v0.1/analysis/mutations/tcga/indel_stats")
+            .get("/v0.1/analysis/mutations/tcga/IND_stats")
             .query(true)
             .reply(function(uri, requestBody) {
                 const parsed = new url.URL(this.req.path, "http://example.com");
@@ -486,20 +503,36 @@ const MelvinExplorerInterceptor = {
                     }});
                     }
                 } else if(gene) {
-                    switch(gene) {
-                    case "TP53": jsonResult = Object.assign(jsonResult, { data: {
-                        records: [
-                            {
-                                study_abbreviation:      "ESCA",
-                                gene_study_case_percent: 12.09
-                            },
-                            {
-                                study_abbreviation:      "OV",
-                                gene_study_case_percent: 11.7
-                            }
-                        ],
-                        cancer_count: 26
-                    }});
+                    if(style) {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: [{
+                            domain: "P53 DNA-binding domain", percentage: 65.81
+                        }, {
+                            domain: "none", percentage: 17.98 
+                        }, {
+                            domain: "P53 tetramerisation motif", percentage: 8.1
+                        }, {
+                            domain: "Transactivation domain 2", percentage: 5.93
+                        }, {
+                            domain: "P53 transactivation motif", percentage: 2.17
+                        }]}});
+                        }
+                    } else {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: {
+                            records: [
+                                {
+                                    study_abbreviation:      "ESCA",
+                                    gene_study_case_percent: 12.09
+                                },
+                                {
+                                    study_abbreviation:      "OV",
+                                    gene_study_case_percent: 11.7
+                                }
+                            ],
+                            cancer_count: 26
+                        }});
+                        }
                     }
                 } else if(study) {
                     switch(study) {
@@ -600,7 +633,11 @@ const MelvinExplorerInterceptor = {
                 var jsonResult = { data: { records: []}};
                 if(gene && study) {
                     switch(gene + "-"+ study) {
-                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, {});
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_perc:  3.0,
+                        cna_perc:  13.0,
+                        both_perc: 1.0
+                    }}});
                     }
                 } else if(gene) {
                     switch(gene) {

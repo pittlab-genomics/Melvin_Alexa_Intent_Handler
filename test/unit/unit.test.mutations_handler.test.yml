@@ -49,7 +49,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "TP53 mutations are found in 31 out of 33 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
   - response.shouldEndSession: false
 
 --- 
@@ -118,7 +118,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "TP53 indels are found in 26 out of 33 cancer types. It has most indels in Esophageal carcinoma at 12.1 percent followed by Ovarian serous cystadenocarcinoma at 11.7 percent."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively."
   - response.shouldEndSession: false
 
 --- 

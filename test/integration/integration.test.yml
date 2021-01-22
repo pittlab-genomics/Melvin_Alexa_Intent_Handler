@@ -54,7 +54,7 @@ configuration:
 - develop melvin: Welcome to Melvin *
 - show me mesothelioma: <speak>Ok, Mesothelioma. <prosody rate='110%'>What would you like to know?</prosody></speak>
 - show me mutations: Among Mesothelioma patients, BAP1 and NF2 are the top 2 mutated genes found in 21.8 percent and 19.2 percent of the patients respectively.
-- compare to copy number alterations: Among Mesothelioma patients, records is the top mutated gene at NaN percent while BAP1 has the greatest number of copy number alterations at 50.6 percent.
+- compare to copy number alterations: Among Mesothelioma patients, BAP1 is the top mutated gene at 5.8 percent while BAP1 has the greatest number of copy number alterations at 36.8 percent.
 
 ---
 - test: Test 7

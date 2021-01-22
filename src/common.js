@@ -114,6 +114,10 @@ const melvin_round = function (value, precision) {
     return Math.round(value * multiplier) / multiplier;
 };
 
+const filter_domains = function(records) {
+    return records.filter(item => item.domain !== "none");
+};
+
 /*
  * G (Gene) | C (CancerType)
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
@@ -168,6 +172,7 @@ nunjucks_env.addGlobal("get_gene_speech_text", get_gene_speech_text);
 nunjucks_env.addGlobal("get_study_name_text", get_study_name_text);
 nunjucks_env.addGlobal("get_dtype_name_text", get_dtype_name_text);
 nunjucks_env.addGlobal("melvin_round", melvin_round);
+nunjucks_env.addGlobal("filter_domains", filter_domains);
 
 module.exports = {
     // Welcome greeting specific to the deployment environment helps to identify which skill is being used
@@ -190,6 +195,7 @@ module.exports = {
     get_study_name_text,
     get_dtype_name_text,
     melvin_round,
+    filter_domains,
     OOVEntityTypes,
     DataTypes,
     DataSources,
