@@ -15,21 +15,23 @@ In order to deploy the endpoint simply run
 serverless deploy
 ```
 
-## Test Locally
+## Testing
 
-To run all the unit tests
+### To run the unit tests
+
+To run all the tests
 ```
-bst test /unit.test
+npm run unit-tests
 ```
 
 To run a particular suite
 ```
-bst test /unit.test.mutations_handler.test
-bst test /unit.test.navigation_handler.test
-bst test /unit.test.gene_handler.test
+bst test --config test/unit/testing.json /unit.test.mutations_handler.test 
+bst test --config test/unit/testing.json /unit.test.navigation_handler.test
+bst test --config test/unit/testing.json /unit.test.gene_handler.test
 ```
 
-### To run integration tests
+### To run tests via Skill Simulation API
 
 These tests are similar to e2e tests in that they interact with the "real" skill. However, they do not actually "speak" to Alexa using text-to-speech but instead use text invocations. 
 
@@ -38,5 +40,19 @@ By default, the skillId is pointed to Melvin dev. If you want to test against ua
 To configure `ask cli` credentials to authenticate the user to Amazon developer services (This is needed as we are invoking the skillId)
 ```
 ask configure
-bst test /integration.test
+npm run smapi-tests
+```
+
+### To run the end-to-end tests
+
+To run the tests for all the voice recordings
+```
+npm run e2e-tests
+```
+
+To run a particular person's recordings
+```
+bst test --config test/e2e/testing.json /e2e.test.Hannan
+bst test --config test/e2e/testing.json /e2e.test.Shwetha
+bst test --config test/e2e/testing.json /e2e.test.Jason
 ```

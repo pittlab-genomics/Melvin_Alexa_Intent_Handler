@@ -1,0 +1,134 @@
+
+---
+- test: Jason Test 1
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.1.mp3: 
+  - caption: Ok, TP53. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.2.mp3: 
+  - caption: TP53 mutations are found in 31 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.3.mp3: 
+  - caption: TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.4.mp3: 
+  - caption: TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.5.mp3: 
+  - caption: P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.7 percent and 5 percent of mutations respectively.
+
+---
+- test: Jason Test 2
+- melvin : 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_2/Test2.1.mp3: 
+  - caption: Ok, copy number alterations. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_2/Test2.2.mp3: 
+  - caption: CDKN2A and CDKN2B have the greatest number of copy number alterations in Glioblastoma multiforme at 62.6 and 62.3 percent, respectively
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_2/Test2.3.mp3: 
+  - caption: Among Glioblastoma multiforme patients, CDKN2A has the greatest number of copy number alterations at 62.6 percent while ATP1B2 has the greatest number of copy number alterations in Sarcoma at 37.6 percent.
+
+---
+- test: Jason Test 3
+- melvin : 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.1.mp3: 
+  - caption: Ok, Lung adenocarcinoma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.2.mp3: 
+  - caption: CDKN2A has the greatest number of deletions in Lung adenocarcinoma at 18.1 percent.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.3.mp3: 
+  - caption: SFTA3 has the greatest number of amplifications in Lung adenocarcinoma at 22.3 percent.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.4.mp3: 
+  - caption: In Lung adenocarcinoma patients, MYC is amplified at 17.2 percent.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.5.mp3: 
+  - caption: Which gene would you like to split by?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.6.mp3: 
+  - caption: In Lung adenocarcinoma, MYC is not differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01
+
+---
+- test: Jason Test 4
+- melvin : 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.1.mp3: 
+  - caption: Ok, RAD51B. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.2.mp3: 
+  - caption: Sorry, I don't have the gene definition for RAD51B.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.3.mp3: 
+  - caption: For RAD51B the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 12.9 percent.
+
+---
+- test: Jason Test 5
+- melvin : 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.1.mp3: 
+  - caption: Ok, Esophageal carcinoma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.2.mp3: 
+  - caption: The gene with the highest mean log2 normalized expression count in Esophageal carcinoma is ACTB at 18.1
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.3.mp3: 
+  - caption: The mean log2 normalized expression count of CCND1 in Esophageal carcinoma is 13.8
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.4.mp3: 
+  - caption: CCND1 has less copy number alterations in Breast invasive carcinoma at 28.6 percent while 38.9 percent of Esophageal carcinoma cases have alterations.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.5.mp3: 
+  - caption: Esophageal carcinoma patients have less copy number alterations in TERT at 21.6 percent while 38.9 percent of cases have alterations in CCND1.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.6.mp3: 
+  - caption: This data type comparison analysis is not yet supported
+
+---
+- test: Jason Test 6
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.1.mp3: 
+  - caption: Ok, Mesothelioma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.2.mp3: 
+  - caption: Among Mesothelioma patients, BAP1 and NF2 are the top 2 mutated genes found in 21.8 percent and 19.2 percent of the patients respectively.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.3.mp3: 
+  - caption: Among Mesothelioma patients, records is the top mutated gene at NaN percent while BAP1 has the greatest number of copy number alterations at 50.6 percent.
+
+---
+- test: Jason Test 7
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.1.mp3: 
+  - caption: Ok, gene expression. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.2.mp3: 
+  - caption: The highest mean expression of Braca one is found in Acute Myeloid Leukemia with a log2 normalized count of 11.3.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.3.mp3: 
+  - caption: Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent while Braca two has the greatest number of copy number alterations in Sarcoma at 23.4 percent
+
+---
+- test: Jason Test 8
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_8/Test8.1.mp3: 
+  - caption: Ok, Breast invasive carcinoma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_8/Test8.2.mp3: 
+  - caption: Ok, GATA3
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_8/Test8.3.mp3: 
+  - caption: The data type is missing for comparison.
+
+---
+- test: Jason Test 9
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.1.mp3: 
+  - caption: Ok, Liver hepatocellular carcinoma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.2.mp3: 
+  - caption: Ok, Catenin Beta 1.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.3.mp3: 
+  - caption: Catenin Beta 1 mutations are found in 25.4 percent of Liver hepatocellular carcinoma patients with 10 amino acid residues recurrently mutated.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.4.mp3: 
+  - caption: Which gene would you like to split by?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.5.mp3: 
+  - caption: In Liver hepatocellular carcinoma, Catenin Beta 1 is not differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0.01
+
+---
+- test: Jason Test 10
+- melvin: 
+  - caption: Welcome to Melvin
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.1.mp3: 
+  - caption: Ok, Colon adenocarcinoma. What would you like to know?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.2.mp3: 
+  - caption: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.3.mp3: 
+  - caption: KRAS mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated.
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.4.mp3: 
+  - caption: Which gene would you like to split by?
+- https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.5.mp3: 
+  - caption: In Colon adenocarcinoma,KRAS is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.24

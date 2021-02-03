@@ -1,7 +1,5 @@
 ---
 configuration: 
-  locale: en-US
-  type: simulation
   skillId: amzn1.ask.skill.76bde827-301f-478d-af1a-c7241f046388
   #skillId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d
   stage: development

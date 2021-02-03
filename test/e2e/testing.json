@@ -1,0 +1,14 @@
+{
+    "locale": "en-US",
+    "type": "e2e",
+    "virtualDeviceToken": "alexa-8fc51429-a31a-4815-8bf5-a4a17746e7a6",
+    "asyncMode": true,
+    "trace": false,
+    "jest": {
+        "silent": true,
+        "collectCoverage": false
+    },
+    "userId": "testUserId",
+    "deviceId": "testDeviceId",
+    "platform": "alexa"
+}
