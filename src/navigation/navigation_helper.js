@@ -42,6 +42,9 @@ const {
     build_indels_domain_response,
     build_indels_compare_response
 } = require("../mutations/indels_response_builder.js");
+const {
+    build_snvs_response, build_snv_domains_response
+} = require("../mutations/snvs_response_builder.js");
 
 
 function add_followup_text(handlerInput, speech) {
@@ -164,10 +167,20 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_mutations_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
-            response = await build_mutations_domain_response(handlerInput, melvin_state);
+            const prev_dtype = state_change["prev_state"]["data_type"];
+            if(prev_dtype === DataTypes.INDELS) {
+                response = await build_indels_domain_response(handlerInput, melvin_state);
+            } else if(prev_dtype === DataTypes.SNV) {
+                response = await build_snv_domains_response(handlerInput, melvin_state);
+            } else {
+                response = await build_mutations_domain_response(handlerInput, melvin_state);
+            }
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {
             response = await build_indels_response(handlerInput, melvin_state);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.SNV) {
+            response = await build_snvs_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GAIN) {
             response = await build_gain_response(handlerInput, melvin_state);
