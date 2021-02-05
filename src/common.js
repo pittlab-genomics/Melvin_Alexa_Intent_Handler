@@ -127,6 +127,7 @@ RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.PROTEIN_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.INDELS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributesTCGA[DataTypes.SNV] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.CNA] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.GAIN] = [3, 1, 2]; // ['GC', 'C', 'G'];
 RequiredAttributesTCGA[DataTypes.LOSS] = [3, 1, 2]; // ['GC', 'C', 'G'];

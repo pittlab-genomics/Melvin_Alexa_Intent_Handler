@@ -287,6 +287,34 @@
             ]
           },
           {
+            "name": "NavigateSNVsIntent",
+            "slots": [
+              {
+                "name": "query",
+                "type": "AMAZON.SearchQuery"
+              }
+            ],
+            "samples": [
+              "show SNVs in {query}",
+              "show SNVs"
+            ]
+          },
+          {
+            "name": "NavigateSNVDomainsIntent",
+            "slots": [
+              {
+                "name": "query",
+                "type": "AMAZON.SearchQuery"
+              }
+            ],
+            "samples": [
+              "show most affected domains in {query}",
+              "show domains in {query}",
+              "show most affected domains",
+              "show domains"
+            ]
+          },
+          {
             "name": "NavigateCNAIntent",
             "slots": [
               {

@@ -13,6 +13,7 @@ module.exports = {
         MelvinExplorerInterceptor.gene_by_name();
         MelvinExplorerInterceptor.gene_expression_tcga_stats();
         MelvinExplorerInterceptor.indels_tcga_stats();
+        MelvinExplorerInterceptor.snv_tcga_stats();
         MelvinExplorerInterceptor.splitby_tcga_stats();
         MelvinExplorerInterceptor.compare_tcga_stats();
 

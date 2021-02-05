@@ -550,6 +550,107 @@ const MelvinExplorerInterceptor = {
                 }          
                 return [ 200, jsonResult];
             }).persist();
+    }, snv_tcga_stats() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/mutations/tcga/SNV_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                const style = parsed.searchParams.get("style");
+                var jsonResult = { data: { records: []}};
+                if(gene && study && style) {
+                    switch(gene+"-"+study+"-"+style) {
+                    case "TP53-BRCA-domain": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            domain:     "P53 DNA-binding domain",
+                            percentage: 90.98
+                        },
+                        {
+                            domain:     "P53 tetramerisation motif",
+                            percentage: 4.92
+                        },
+                        {
+                            domain:     "none",
+                            percentage: 2.46
+                        },
+                        {
+                            domain:     "P53 transactivation motif",
+                            percentage: 0.82
+                        },
+                        {
+                            domain:     "Transactivation domain 2",
+                            percentage: 0.82
+                        }
+                    ]}});
+                    }
+                } else if(gene && study) {
+                    switch(gene+ "-"+ study) {
+                    case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  24.4127,
+                        recurrent_positions: 44
+                    }});
+                    }
+                } else if(gene) {
+                    if(style) {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: [
+                            {
+                                domain:     "P53 DNA-binding domain",
+                                percentage: 89.12
+                            },
+                            {
+                                domain:     "P53 tetramerisation motif",
+                                percentage: 5.06
+                            },
+                            {
+                                domain:     "none",
+                                percentage: 4.82
+                            },
+                            {
+                                domain:     "Transactivation domain 2",
+                                percentage: 0.7
+                            },
+                            {
+                                domain:     "P53 transactivation motif",
+                                percentage: 0.3
+                            }
+                        ]}});
+                        }
+                    } else {
+                        switch(gene) {
+                        case "TP53": jsonResult = Object.assign(jsonResult, { data: {
+                            records: [
+                                {
+                                    study_abbreviation:      "UCS",
+                                    gene_study_case_percent: 61.4
+                                },
+                                {
+                                    study_abbreviation:      "OV",
+                                    gene_study_case_percent: 58.72
+                                }
+                            ],
+                            "cancer_count": 31
+                        }});
+                        }
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            name:         "TP53",
+                            case_percent: 58.72
+                        },
+                        {
+                            name:         "TTN",
+                            case_percent: 21.33
+                        }
+                    ]}});
+                    }
+                }          
+                return [ 200, jsonResult];
+            }).persist();
     }, splitby_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/splitby/tcga/stats")

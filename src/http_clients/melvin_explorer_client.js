@@ -134,14 +134,14 @@ const get_indels_tcga_domain_stats = async function (handlerInput, params) {
 };
 
 const get_snvs_tcga_stats = async function (handlerInput, params) {
-    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/snv_stats`);
+    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
     const result = await process_repeat_requests(handlerInput, snvs_url);
     return result;
 };
 
 const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
-    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/snv_stats`);
+    const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
     snvs_url.searchParams.set("style", "domain");
     const result = await process_repeat_requests(handlerInput, snvs_url);
