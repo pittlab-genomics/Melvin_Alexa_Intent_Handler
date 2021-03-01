@@ -118,6 +118,8 @@ const filter_domains = function(records) {
     return records.filter(item => item.domain !== "none");
 };
 
+const total_cancer_types = 33;
+
 /*
  * G (Gene) | C (CancerType)
  * [] = 0, [G] = 2, [C] = 1, [GC] = 3
@@ -173,6 +175,7 @@ nunjucks_env.addGlobal("get_gene_speech_text", get_gene_speech_text);
 nunjucks_env.addGlobal("get_study_name_text", get_study_name_text);
 nunjucks_env.addGlobal("get_dtype_name_text", get_dtype_name_text);
 nunjucks_env.addGlobal("melvin_round", melvin_round);
+nunjucks_env.addGlobal("total_cancer_types", total_cancer_types);
 nunjucks_env.addGlobal("filter_domains", filter_domains);
 
 module.exports = {
@@ -196,6 +199,7 @@ module.exports = {
     get_study_name_text,
     get_dtype_name_text,
     melvin_round,
+    total_cancer_types,
     filter_domains,
     OOVEntityTypes,
     DataTypes,
