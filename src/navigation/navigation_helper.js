@@ -43,7 +43,9 @@ const {
     build_indels_compare_response
 } = require("../mutations/indels_response_builder.js");
 const {
-    build_snvs_response, build_snv_domains_response
+    build_snvs_response, 
+    build_snv_domains_response,
+    build_snvs_compare_response
 } = require("../mutations/snvs_response_builder.js");
 
 
@@ -125,6 +127,12 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.CNA) {
             response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {
+            response = await build_indels_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.SNV) {
+            response = await build_snvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
             response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);

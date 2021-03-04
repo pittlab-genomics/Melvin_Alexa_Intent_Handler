@@ -44,18 +44,7 @@ async function build_indels_tcga_response(handlerInput, melvin_state) {
 
         add_indels_tcga_plot(image_list, melvin_state, "profile");
     }
-
-    // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
-    //     && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
-    //     add_mutations_tcga_treemap_plot(image_list, melvin_state);
-    // } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
-    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
-    // } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
-    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_profile_plot(image_list, melvin_state);
-    // }    
+  
     add_to_APL_image_pager(handlerInput, image_list);
 
     return { "speech_text": speech_ssml };
@@ -73,11 +62,6 @@ async function build_indels_tcga_domain_response(handlerInput, melvin_state) {
     };
     const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_tcga.njk", nunjucks_context);
 
-    // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) 
-    //     && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_domain_pie_plot(image_list, melvin_state);
-    //     add_mutations_tcga_domain_stack_plot(image_list, melvin_state);
-    // } else 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
 
@@ -102,70 +86,36 @@ async function build_indels_compare_tcga_response(handlerInput, melvin_state, co
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context);
+    const speech_ssml = build_ssml_response_from_nunjucks("mutations/indels_compare_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
 
-        add_indels_tcga_plot(image_list, melvin_state, 'bar');
-        add_indels_tcga_plot(image_list, melvin_state, 'treemap');
+        add_indels_tcga_plot(image_list, melvin_state, "bar");
+        add_indels_tcga_plot(image_list, melvin_state, "treemap");
 
-        add_indels_tcga_plot(image_list, compare_params, 'bar');
-        add_indels_tcga_plot(image_list, compare_params, 'treemap');
+        add_indels_tcga_plot(image_list, compare_params, "bar");
+        add_indels_tcga_plot(image_list, compare_params, "treemap");
 
     } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
 
-        add_indels_tcga_plot(image_list, melvin_state, 'bar');
-        add_indels_tcga_plot(image_list, compare_params, 'bar');
+        add_indels_tcga_plot(image_list, melvin_state, "bar");
+        add_indels_tcga_plot(image_list, compare_params, "bar");
 
 
     } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
             
-        add_indels_tcga_plot(image_list, melvin_state, 'profile');
-        add_indels_tcga_plot(image_list, compare_params, 'profile');
+        add_indels_tcga_plot(image_list, melvin_state, "profile");
+        add_indels_tcga_plot(image_list, compare_params, "profile");
 
     }
 
-    // if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
-    //     && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
-    //     add_mutations_tcga_treemap_plot(image_list, melvin_state);
-
-    //     add_mutations_tcga_stats_plot(image_list, compare_params);
-    //     add_mutations_tcga_treemap_plot(image_list, compare_params);
-    // } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
-    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_stats_plot(image_list, melvin_state);
-    //     add_mutations_tcga_stats_plot(image_list, compare_params);
-    // } else if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
-    //     && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
-    //     add_mutations_tcga_profile_plot(image_list, melvin_state);
-    //     add_mutations_tcga_profile_plot(image_list, compare_params);
-    // }
     add_to_APL_image_pager(handlerInput, image_list);
 
     return { "speech_text": speech_ssml };
 }
-
-async function build_indels_clinvar_response(handlerInput, params) {
-    const image_list = [];
-    const response = await get_indels_clinvar_stats(handlerInput, params);
-    const nunjucks_context = {
-        melvin_state: params,
-        response:     response
-    };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_clinvar.njk", nunjucks_context);
-
-    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_clinvar_stats_plot(image_list, params);
-    }
-    add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
-}
-
 
 const add_indels_tcga_plot = function (image_list, params, style) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_plot`);
@@ -176,48 +126,6 @@ const add_indels_tcga_plot = function (image_list, params, style) {
     image_list.push(count_plot_url);
 };
 
-
-
-
-
-
-
-// const add_mutations_tcga_stats_plot = function (image_list, params) {
-//     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/stats_plot`);
-//     add_query_params(count_plot_url, params);
-//     image_list.push(count_plot_url);
-// };
-
-// const add_mutations_tcga_treemap_plot = function (image_list, params) {
-//     const count_treemap_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/treemap_plot`);
-//     add_query_params(count_treemap_plot_url, params);
-//     image_list.push(count_treemap_plot_url);
-// };
-
-// const add_mutations_tcga_profile_plot = function (image_list, params) {
-//     const profile_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/profile_plot`);
-//     add_query_params(profile_plot_url, params);
-//     image_list.push(profile_plot_url);
-// };
-
-// const add_mutations_tcga_domain_pie_plot = function (image_list, params) {
-//     const domain_pie_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_pie_plot`);
-//     add_query_params(domain_pie_plot_url, params);
-//     image_list.push(domain_pie_plot_url);
-// };
-
-// const add_mutations_tcga_domain_stack_plot = function (image_list, params) {
-//     const domain_stack_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/domain_stack_plot`);
-//     add_query_params(domain_stack_plot_url, params);
-//     image_list.push(domain_stack_plot_url);
-// };
-
-const add_mutations_clinvar_stats_plot = function (image_list, params) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/plot`);
-    add_query_params(count_plot_url, params);
-    image_list.push(count_plot_url);
-};
-
 async function build_indels_response(handlerInput, params) {
     console.info(`[build_indels_response] params: ${JSON.stringify(params)}`);
     let response = {};
@@ -225,8 +133,11 @@ async function build_indels_response(handlerInput, params) {
         response = await build_indels_tcga_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = await build_indels_clinvar_response(handlerInput, params);
-
+        throw melvin_error(
+            `[build_indels_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            DEFAULT_NOT_IMPLEMENTED_RESPONSE
+        );
     } else {
         throw melvin_error(
             `[build_indels_response] invalid state: ${JSON.stringify(params)}`,
