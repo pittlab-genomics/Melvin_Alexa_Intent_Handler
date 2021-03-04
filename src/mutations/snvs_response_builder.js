@@ -68,7 +68,7 @@ async function build_snvs_tcga_domain_response(handlerInput, melvin_state) {
 }
 
 const add_snv_tcga_plot = function (image_list, params, style) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/snv_plot`);
+    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_plot`);
     add_query_params(count_plot_url, params);
     if(style) {
         count_plot_url.searchParams.set("style", style);

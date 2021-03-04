@@ -30,7 +30,7 @@ const {
 
 const { build_gene_definition_response } = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
-const { build_gene_expression_response } = require("../gene_expression/response_builder.js");
+const { build_gene_expression_response, build_gene_expression_compare_response } = require("../gene_expression/response_builder.js");
 const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");
 const {
     build_mutations_response,
@@ -135,7 +135,8 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
             response = await build_snvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
-            response = await build_cna_compare_response(handlerInput, melvin_state, compare_state, state_diff);
+            response = 
+                await build_gene_expression_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         }else {
             throw melvin_error(

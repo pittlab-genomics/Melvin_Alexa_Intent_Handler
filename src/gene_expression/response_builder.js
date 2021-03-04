@@ -4,6 +4,7 @@ const {
     DataSources,
     melvin_error,
     DEFAULT_INVALID_STATE_RESPONSE,
+    DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     MELVIN_EXPLORER_ENDPOINT
 } = require("../common.js");
 
@@ -14,7 +15,7 @@ const {
     add_query_params, build_ssml_response_from_nunjucks 
 } = require("../utils/response_builder_utils.js");
 
-const add_gene_expression_tcga_stats_plot = function(image_list, params) {
+const add_gene_expression_tcga_plot = function(image_list, params) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/tcga/plot`);
     add_query_params(count_plot_url, params);
     image_list.push(count_plot_url);
@@ -32,7 +33,7 @@ async function build_gene_expression_tcga_response(handlerInput, params) {
     const speech_ssml = build_ssml_response_from_nunjucks(
         "gene_expression/gene_expression_tcga.njk", nunjucks_context);
 
-    add_gene_expression_tcga_stats_plot(image_list, params);
+    add_gene_expression_tcga_plot(image_list, params);
     add_to_APL_image_pager(handlerInput, image_list);    
     return { "speech_text": speech_ssml };
 }
@@ -67,4 +68,51 @@ async function build_gene_expression_response(handlerInput, params) {
     return response;
 }
 
-module.exports = { build_gene_expression_response };
+async function build_gene_expression_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff) {
+    const image_list = [];
+    const results = await Promise.all([
+        get_gene_expression_tcga_stats(handlerInput, melvin_state),
+        get_gene_expression_tcga_stats(handlerInput, compare_params)
+    ]);
+    const nunjucks_context = {
+        melvin_state:     melvin_state,
+        compare_params:   compare_params,
+        state_diff:       state_diff,
+        response:         results[0],
+        compare_response: results[1]
+    };
+    const speech_ssml = 
+        build_ssml_response_from_nunjucks("gene_expression/gene_expression_compare_tcga.njk", nunjucks_context);
+    add_gene_expression_tcga_plot(image_list, melvin_state);
+    add_gene_expression_tcga_plot(image_list, compare_params);
+    add_to_APL_image_pager(handlerInput, image_list);
+
+    return { "speech_text": speech_ssml };
+}
+
+async function build_gene_expression_compare_response(handlerInput, params, compare_params, state_diff) {
+    console.info(`[build_gene_expression_compare_response] params: ${JSON.stringify(params)}`);
+    let response = {};
+    if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
+        response = await build_gene_expression_compare_tcga_response(handlerInput, params, compare_params, state_diff);
+
+    } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
+        throw melvin_error(
+            `[build_cna_compare_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            DEFAULT_NOT_IMPLEMENTED_RESPONSE
+        );
+
+    } else {
+        throw melvin_error(
+            `[build_cna_compare_response] invalid state: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_INVALID_STATE_RESPONSE
+        );
+    }
+    return response;
+}
+
+module.exports = {
+    build_gene_expression_response, build_gene_expression_compare_response 
+};
