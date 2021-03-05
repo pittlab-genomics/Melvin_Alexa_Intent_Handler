@@ -30,8 +30,20 @@ const {
 
 const { build_gene_definition_response } = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
-const { build_gene_expression_response, build_gene_expression_compare_response } = require("../gene_expression/response_builder.js");
+const {
+    build_gene_expression_response, build_gene_expression_compare_response 
+} = require("../gene_expression/response_builder.js");
 const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");
+const { build_mut_gain_compare_response } = require("../comparison/mut_gain_response_builder.js");
+const { build_mut_loss_compare_response } = require("../comparison/mut_loss_response_builder.js");
+const { build_gain_loss_compare_response } = require("../comparison/gain_loss_response_builder.js");
+const { build_snv_ind_compare_response } = require("../comparison/snv_ind_response_builder.js");
+const { build_snv_cna_compare_response } = require("../comparison/snv_cna_response_builder.js");
+const { build_ind_cna_compare_response } = require("../comparison/ind_cna_response_builder.js");
+const { build_ind_gain_compare_response } = require("../comparison/ind_gain_response_builder.js");
+const { build_ind_loss_compare_response } = require("../comparison/ind_loss_response_builder.js");
+const { build_snv_gain_compare_response } = require("../comparison/snv_gain_response_builder.js");
+const { build_snv_loss_compare_response } = require("../comparison/snv_loss_response_builder.js");
 const {
     build_mutations_response,
     build_mutations_domain_response,
@@ -95,6 +107,36 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], state_diff["entity_value"]];
         if (match_compare_dtype(query_dtypes, [DataTypes.MUTATIONS, DataTypes.CNA])) {
             response = await build_mut_cna_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.MUTATIONS, DataTypes.GAIN])) {
+            response = await build_mut_gain_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.MUTATIONS, DataTypes.LOSS])) {
+            response = await build_mut_loss_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.GAIN, DataTypes.LOSS])) {
+            response = await build_gain_loss_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.SNV, DataTypes.CNA])) {
+            response = await build_snv_cna_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.SNV, DataTypes.INDELS])) {
+            response = await build_snv_ind_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.INDELS, DataTypes.CNA])) {
+            response = await build_ind_cna_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.INDELS, DataTypes.GAIN])) {
+            response = await build_ind_gain_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.INDELS, DataTypes.LOSS])) {
+            response = await build_ind_loss_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.SNV, DataTypes.GAIN])) {
+            response = await build_snv_gain_compare_response(handlerInput, melvin_state, state_diff);
+
+        } else if (match_compare_dtype(query_dtypes, [DataTypes.SNV, DataTypes.LOSS])) {
+            response = await build_snv_loss_compare_response(handlerInput, melvin_state, state_diff);
 
         } else {
             throw melvin_error(

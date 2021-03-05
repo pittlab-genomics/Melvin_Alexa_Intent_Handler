@@ -11,18 +11,16 @@ const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
 const {
     add_query_params, build_ssml_response_from_nunjucks 
 } = require("../utils/response_builder_utils.js");
-// const { get_mutations_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
-// const { get_cna_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
-const { get_compare_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
+const { get_mut_cna_compare_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 async function build_mut_cna_compare_tcga_response(handlerInput, melvin_state, state_diff) {
     const image_list = [];
-    const response = await get_compare_tcga_stats(handlerInput, melvin_state);
+    const response = await get_mut_cna_compare_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
-        state_diff:    state_diff,
-        response: response
+        state_diff:   state_diff,
+        response:     response
     };
     const speech_ssml = build_ssml_response_from_nunjucks("dtype_compare/mut_cna.njk", nunjucks_context);
 

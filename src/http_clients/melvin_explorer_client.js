@@ -232,8 +232,78 @@ const get_sv_clinvar_stats = async function (handlerInput, params) {
     return result;
 };
 
-const get_compare_tcga_stats = async function (handlerInput, params) {
+const get_mut_cna_compare_tcga_stats = async function (handlerInput, params) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvCNA_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_mut_gain_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvGAIN_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_mut_loss_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvLOSS_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_gain_loss_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/GAINvLOSS_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_ind_cna_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvCNA_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_snv_cna_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvCNA_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_snv_ind_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvIND_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_ind_gain_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvGAIN_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_ind_loss_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvLOSS_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_snv_gain_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvGAIN_stats`);
+    add_query_params(compare_url, params);
+    const result = await process_repeat_requests(handlerInput, compare_url);
+    return result;
+};
+
+const get_snv_loss_compare_tcga_stats = async function (handlerInput, params) {
+    const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvLOSS_stats`);
     add_query_params(compare_url, params);
     const result = await process_repeat_requests(handlerInput, compare_url);
     return result;
@@ -259,5 +329,15 @@ module.exports = {
     get_clinical_trials,    
     get_gene_by_name,
     get_gene_target,
-    get_compare_tcga_stats
+    get_mut_cna_compare_tcga_stats,
+    get_mut_gain_compare_tcga_stats,
+    get_mut_loss_compare_tcga_stats,
+    get_gain_loss_compare_tcga_stats,
+    get_ind_cna_compare_tcga_stats,
+    get_snv_cna_compare_tcga_stats,
+    get_snv_ind_compare_tcga_stats,
+    get_ind_gain_compare_tcga_stats,
+    get_ind_loss_compare_tcga_stats,
+    get_snv_gain_compare_tcga_stats,
+    get_snv_loss_compare_tcga_stats
 };
