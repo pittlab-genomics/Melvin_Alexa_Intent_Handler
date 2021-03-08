@@ -46,7 +46,7 @@ const send_request_async = function(url, timeout) {
 };
 
 const get_oov_mapping_by_query = async function(params) {
-    const oov_url = new URL(`${OOV_MAPPER_ENDPOINT}/entity_mappings`);
+    const oov_url = new URL(`${OOV_MAPPER_ENDPOINT}`);
     oov_url.searchParams.set("query", params.query);
     oov_url.searchParams.set("request_id", params.request_id);
     oov_url.searchParams.set("session_id", params.session_id);
