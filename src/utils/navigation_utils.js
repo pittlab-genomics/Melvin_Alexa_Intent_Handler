@@ -114,14 +114,14 @@ const update_melvin_state = async function (
     if (!_.isEmpty(query)) { // empty query is valid for direct intent invocations
         // resolve out-of-vocabulary entity using OOV Mapper API
         const query_response = await resolve_oov_entity(handlerInput, query);
-        if (query_response.data.entity_type === OOVEntityTypes.GENE) {
-            oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.entity_data.value");
-        } else if (query_response.data.entity_type === OOVEntityTypes.STUDY) {
-            oov_entity[MelvinAttributes.STUDY_ABBRV] = _.get(query_response, "data.entity_data.value");
-        } else if (query_response.data.entity_type === OOVEntityTypes.DTYPE) {
-            oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.value");
-        } else if (query_response.data.entity_type === OOVEntityTypes.DSOURCE) {
-            oov_entity[MelvinAttributes.DSOURCE] = _.get(query_response, "data.entity_data.value");
+        if (query_response.data.type === OOVEntityTypes.GENE) {
+            oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.val");
+        } else if (query_response.data.type === OOVEntityTypes.STUDY) {
+            oov_entity[MelvinAttributes.STUDY_ABBRV] = _.get(query_response, "data.val");
+        } else if (query_response.data.type === OOVEntityTypes.DTYPE) {
+            oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.val");
+        } else if (query_response.data.type === OOVEntityTypes.DSOURCE) {
+            oov_entity[MelvinAttributes.DSOURCE] = _.get(query_response, "data.val");
         }
         console.log(`[update_melvin_state] session_path: ${JSON.stringify(session_path)}, `
             + `query_path: ${query_path}, prev_state: ${JSON.stringify(prev_state)}, `
@@ -309,14 +309,14 @@ const resolve_splitby_query = async function(handlerInput) {
     for (const [key, query] of Object.entries(splitby_queries)) {
         if (!_.isEmpty(query)) {
             let query_response = await resolve_oov_entity(handlerInput, query);
-            if (query_response.data.entity_type === OOVEntityTypes.DTYPE && 
+            if (query_response.data.type === OOVEntityTypes.DTYPE && 
                 (key === "splitby_query" || key === "dtype_query")) {
-                oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.entity_data.value");
+                oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.val");
             }
 
-            if (query_response.data.entity_type === OOVEntityTypes.GENE && 
+            if (query_response.data.type === OOVEntityTypes.GENE && 
                 (key === "splitby_query" || key === "gene_query")) {
-                oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.entity_data.value");
+                oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.val");
             }
         }
     }
