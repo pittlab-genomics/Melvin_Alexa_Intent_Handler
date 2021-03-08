@@ -408,3 +408,135 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
   - response.outputSpeech.ssml: "Sorry, something went wrong while processing the request. Please try again later."
+
+---
+- test: NavigateCompareIntent_mut_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one and TP53 mutations are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.9 percent of all cases while TP53 is mutated in 70 percent"
+
+---
+- test: NavigateCompareIntent_mut_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more mutations in TP53 at 30 percent while 1.9 percent of cases have Braca one mutations."
+
+---
+- test: NavigateCompareIntent_mut_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 3.2 percent while 1.9 percent of Breast invasive carcinoma cases have mutations."
+
+---
+- test: NavigateCompareIntent_ind_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one and TP53 indels are found in 21.2 and 78.8 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 1.2 percent of all cases while TP53 is mutated in 12.1 percent"
+
+---
+- test: NavigateCompareIntent_ind_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more indels in TP53 at 5.7 percent while 0.3 percent of cases have Braca one indels."
+
+---
+- test: NavigateCompareIntent_ind_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 1.1 percent while 0.3 percent of Breast invasive carcinoma cases have indels."
+
+---
+- test: NavigateCompareIntent_snv_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "SNV"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one and TP53 SNVs are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.4 percent of all cases while TP53 is mutated in 61.4 percent"
+
+---
+- test: NavigateCompareIntent_snv_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "SNV"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more SNVs in TP53 at 24.4 percent while 1.6 percent of cases have Braca one SNVs."
+
+---
+- test: NavigateCompareIntent_snv_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "SNV"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 2.1 percent while 1.6 percent of Breast invasive carcinoma cases have SNVs."

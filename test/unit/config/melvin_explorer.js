@@ -49,7 +49,15 @@ const MelvinExplorerInterceptor = {
                     case "TP53-OV": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  69.9541,
                         recurrent_positions: 65
-                    }}); 
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  1.9408,
+                        recurrent_positions: 0
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  3.211,
+                        recurrent_positions: 1
+                    }});
                     }
                 } else if(gene) {
                     if(style) {
@@ -80,6 +88,19 @@ const MelvinExplorerInterceptor = {
                                 }
                             ],
                             cancer_count: 31 
+                        }}); break;
+                        case "BRCA1": jsonResult = Object.assign(jsonResult, { data: {
+                            records: [
+                                {
+                                    study_abbreviation:      "UCEC",
+                                    gene_study_case_percent: 7.94
+                                },
+                                {
+                                    study_abbreviation:      "DLBC",
+                                    gene_study_case_percent: 5.41
+                                }
+                            ],
+                            cancer_count: 21
                         }});
                         }
                     }
@@ -500,6 +521,14 @@ const MelvinExplorerInterceptor = {
                     case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  5.7201,
                         recurrent_positions: 6
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  0.3064,
+                        recurrent_positions: 0
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  1.1468,
+                        recurrent_positions: 0
                     }});
                     }
                 } else if(gene) {
@@ -531,6 +560,19 @@ const MelvinExplorerInterceptor = {
                                 }
                             ],
                             cancer_count: 26
+                        }}); break;
+                        case "BRCA1": jsonResult = Object.assign(jsonResult, { data: {
+                            records: [
+                                {
+                                    study_abbreviation:      "OV",
+                                    gene_study_case_percent: 1.15
+                                },
+                                {
+                                    study_abbreviation:      "UCEC",
+                                    gene_study_case_percent: 0.57
+                                }
+                            ],
+                            cancer_count: 7
                         }});
                         }
                     }
@@ -590,6 +632,14 @@ const MelvinExplorerInterceptor = {
                     case "TP53-BRCA": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  24.4127,
                         recurrent_positions: 44
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  1.6343,
+                        recurrent_positions: 0
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        patient_percentage:  2.0642,
+                        recurrent_positions: 1
                     }});
                     }
                 } else if(gene) {
@@ -632,6 +682,19 @@ const MelvinExplorerInterceptor = {
                                 }
                             ],
                             "cancer_count": 31
+                        }}); break;
+                        case "BRCA1": jsonResult = Object.assign(jsonResult, { data: {
+                            records: [
+                                {
+                                    study_abbreviation:      "UCEC",
+                                    gene_study_case_percent: 7.37
+                                },
+                                {
+                                    study_abbreviation:      "DLBC",
+                                    gene_study_case_percent: 5.41
+                                }
+                            ],
+                            cancer_count: 21
                         }});
                         }
                     }
