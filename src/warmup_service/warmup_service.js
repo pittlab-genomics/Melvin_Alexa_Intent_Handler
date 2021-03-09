@@ -17,11 +17,13 @@ const {
     MelvinAttributes,
     SUPPORTED_SPLITBY_DTYPES,
     MELVIN_EXPLORER_ENDPOINT,
+    OOV_MAPPER_ENDPOINT,
     STAGE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
 const plot_ep_timeout = 5000;
+const mapper_ep_timeout = 5000;
 const warmup_session_timeout = 600; // disable warmup rule if there is no new user sessions after X mins
 
 /*
@@ -111,6 +113,15 @@ const plots_ep_path_dict = {
     ]
 };
 
+const oov_mapper_ep_path_dict = {
+    "mapper_model": [
+        "?query=press%20cancell",
+        "?query=barack%20obama",
+        "?query=domin",
+        "?query=Rad%20fifty%20one%20b"
+    ]
+};
+
 const request_async = function(url, timeout) {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -153,10 +164,10 @@ function get_splitby_state_with_dtype(dtype) {
     };
 }
 
-function generate_urls_from_paths(endpoint_paths) {
+function generate_urls_from_paths(endpoint, endpoint_paths) {
     const service_urls = [];
     for (const ep_path of endpoint_paths) {
-        let ep_url = MELVIN_EXPLORER_ENDPOINT + ep_path;
+        let ep_url = endpoint + ep_path;
         service_urls.push(ep_url);
     }
     return service_urls;
@@ -205,13 +216,18 @@ const send_parallel_requests = async function() {
          */
         const results = {};
 
+        for (let cat_item in oov_mapper_ep_path_dict) {
+            let cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]);
+            results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, mapper_ep_timeout)));
+        }
+
         for (let cat_item in stats_ep_path_dict) {
-            let cat_url_list = generate_urls_from_paths(stats_ep_path_dict[cat_item]);
+            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]);
             results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, stats_ep_timeout)));
         }
 
         for (let cat_item in plots_ep_path_dict) {
-            let cat_url_list = generate_urls_from_paths(plots_ep_path_dict[cat_item]);
+            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]);
             results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, plot_ep_timeout)));
         }
 
