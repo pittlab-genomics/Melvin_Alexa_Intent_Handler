@@ -454,6 +454,20 @@ configuration:
   - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 3.2 percent while 1.9 percent of Breast invasive carcinoma cases have mutations."
 
 ---
+- test: NavigateCompareIntent_mut_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 33.1 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 70 percent."
+
+---
 - test: NavigateCompareIntent_ind_G_vs_G
 - NavigateCompareIntent:
   - request.session.attributes:
@@ -498,6 +512,20 @@ configuration:
   - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 1.1 percent while 0.3 percent of Breast invasive carcinoma cases have indels."
 
 ---
+- test: NavigateCompareIntent_ind_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, GATA3 is the top mutated gene at 8.3 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 11.7 percent."
+
+---
 - test: NavigateCompareIntent_snv_G_vs_G
 - NavigateCompareIntent:
   - request.session.attributes:
@@ -540,3 +568,17 @@ configuration:
         value: "ovarian cancer"
         confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 2.1 percent while 1.6 percent of Breast invasive carcinoma cases have SNVs."
+
+---
+- test: NavigateCompareIntent_snv_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "SNV"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 31.8 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 58.7 percent."

@@ -117,6 +117,16 @@ const MelvinExplorerInterceptor = {
                             name:         "TTN",
                             case_percent: 22.02
                         }
+                    ]}}); break;
+                    case "BRCA": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            name:         "PIK3CA",
+                            case_percent: 33.09
+                        },
+                        {
+                            name:         "TP53",
+                            case_percent: 30.03
+                        }
                     ]}});
                     }
                 }
@@ -587,6 +597,16 @@ const MelvinExplorerInterceptor = {
                             name:         "NF1",
                             case_percent: 1.83
                         }
+                    ]}}); break;
+                    case "BRCA": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            name:         "GATA3",
+                            case_percent: 8.27
+                        },
+                        {
+                            name:         "CDH1",
+                            case_percent: 6.64
+                        }
                     ]}});
                     }
                 }          
@@ -708,6 +728,16 @@ const MelvinExplorerInterceptor = {
                         {
                             name:         "TTN",
                             case_percent: 21.33
+                        }
+                    ]}}); break;
+                    case "BRCA": jsonResult = Object.assign(jsonResult, { data: { records: [
+                        {
+                            name:         "PIK3CA",
+                            case_percent: 31.77
+                        },
+                        {
+                            name:         "TP53",
+                            case_percent: 24.41
                         }
                     ]}});
                     }
