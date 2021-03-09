@@ -49,6 +49,11 @@ const oovMapperInterceptor = function() {
                 val:   "PROTEIN_DOMAINS",
                 query: "most affected domains"
             }}];
+            case "domains": return[200, { data: {
+                type:  "DTYPE",
+                val:   "PROTEIN_DOMAINS",
+                query: "domains"
+            }}];
             case "CDH1": return[200, { data: {
                 type:  "GENE",
                 val:   "CDH1",

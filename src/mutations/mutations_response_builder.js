@@ -17,7 +17,7 @@ const {
     get_mutations_tcga_stats,
     get_mutations_tcga_domain_stats
 } = require("../http_clients/melvin_explorer_client.js");
-const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
+//const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
 async function build_mutations_tcga_response(handlerInput, melvin_state) {
@@ -118,22 +118,22 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
     return { "speech_text": speech_ssml };
 }
 
-async function build_mutations_clinvar_response(handlerInput, params) {
-    const image_list = [];
-    const response = await get_mutations_clinvar_stats(handlerInput, params);
-    const nunjucks_context = {
-        melvin_state: params,
-        response:     response
-    };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_clinvar.njk", nunjucks_context);
+// async function build_mutations_clinvar_response(handlerInput, params) {
+//     const image_list = [];
+//     const response = await get_mutations_clinvar_stats(handlerInput, params);
+//     const nunjucks_context = {
+//         melvin_state: params,
+//         response:     response
+//     };
+//     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_clinvar.njk", nunjucks_context);
 
-    if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-        add_mutations_clinvar_stats_plot(image_list, params);
-    }
-    add_to_APL_image_pager(handlerInput, image_list);
+//     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
+//         add_mutations_clinvar_stats_plot(image_list, params);
+//     }
+//     add_to_APL_image_pager(handlerInput, image_list);
 
-    return { "speech_text": speech_ssml };
-}
+//     return { "speech_text": speech_ssml };
+// }
 
 const add_mutations_tcga_plot = function (image_list, params, style) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_plot`);
@@ -144,11 +144,11 @@ const add_mutations_tcga_plot = function (image_list, params, style) {
     image_list.push(count_plot_url);
 };
 
-const add_mutations_clinvar_stats_plot = function (image_list, params) {
-    const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/plot`);
-    add_query_params(count_plot_url, params);
-    image_list.push(count_plot_url);
-};
+// const add_mutations_clinvar_stats_plot = function (image_list, params) {
+//     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/plot`);
+//     add_query_params(count_plot_url, params);
+//     image_list.push(count_plot_url);
+// };
 
 async function build_mutations_response(handlerInput, params) {
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
@@ -157,7 +157,12 @@ async function build_mutations_response(handlerInput, params) {
         response = await build_mutations_tcga_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = await build_mutations_clinvar_response(handlerInput, params);
+        //response = await build_mutations_clinvar_response(handlerInput, params);
+        throw melvin_error(
+            `[build_mutations_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            DEFAULT_NOT_IMPLEMENTED_RESPONSE
+        );
 
     } else {
         throw melvin_error(

@@ -359,6 +359,51 @@ configuration:
   - response.outputSpeech.ssml: "Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody>"
 
 --- 
+- test: NavigateJoinFilterIntent_Domains_TP53_MUT
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+        data_type: "MUTATIONS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
+
+--- 
+- test: NavigateJoinFilterIntent_Domains_TP53_IND
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively."
+
+--- 
+- test: NavigateJoinFilterIntent_Domains_TP53_SNV
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+        data_type: "SNV"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.1 percent and 5.1 percent of SNVs respectively."
+
+--- 
 - test: NavigateJoinFilterIntent_TP53_BRCA_OV
 - NavigateJoinFilterIntent:
   - request.session.attributes:
@@ -582,3 +627,61 @@ configuration:
         value: "ovarian cancer"
         confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 31.8 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 58.7 percent."
+
+---
+- test: NavigateCompareIntent_exp_G_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "GENE_EXPRESSION"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "braca one"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "I'm still working on implementing this analysis. Please try again later."
+
+---
+- test: NavigateCompareIntent_exp_GS_vs_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "TP53"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, Braca one is expressed lower than TP53 with mean TPM of 9.1 and 11.3, respectively."
+
+---
+- test: NavigateCompareIntent_exp_GS_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one is expressed higher in Breast invasive carcinoma compared to Ovarian serous cystadenocarcinoma with mean TPMs of 9.1 and 8.3, respectively."
+
+---
+- test: NavigateCompareIntent_exp_S_vs_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "I'm still working on implementing this analysis. Please try again later."

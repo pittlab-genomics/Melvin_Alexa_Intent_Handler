@@ -478,6 +478,18 @@ const MelvinExplorerInterceptor = {
                         max:       13.44,
                         n_cases:   1093,
                         n_records: 1212
+                    }}); break;
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        mean:      9.131332830033003,
+                        max:       11.9512,
+                        n_cases:   1093,
+                        n_records: 1212
+                    }}); break;
+                    case "BRCA1-OV": jsonResult = Object.assign(jsonResult, { data: {
+                        mean:      8.250753231850117,
+                        max:       11.1191,
+                        n_cases:   422,
+                        n_records: 427
                     }});
                     }
                 } else if(gene) {
@@ -485,6 +497,10 @@ const MelvinExplorerInterceptor = {
                     case "TP53": jsonResult = Object.assign(jsonResult, { data: {
                         study: "LAML",
                         mean:  11.93
+                    }}); break;
+                    case "BRCA1": jsonResult = Object.assign(jsonResult, { data: {
+                        study: "LAML",
+                        mean:  11.29
                     }});
                     }
                 }
@@ -493,6 +509,10 @@ const MelvinExplorerInterceptor = {
                     case "OV": jsonResult = Object.assign(jsonResult, { data: {
                         gene: "EEF1A1",
                         mean: 18.75
+                    }}); break;
+                    case "BRCA": jsonResult = Object.assign(jsonResult, { data: {
+                        gene: "EEF1A1",
+                        mean: 18.61
                     }});
                     }
                 }

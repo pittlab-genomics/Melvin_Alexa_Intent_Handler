@@ -38,16 +38,16 @@ async function build_gene_expression_tcga_response(handlerInput, params) {
     return { "speech_text": speech_ssml };
 }
 
-async function build_gene_expression_clinvar_response(handlerInput, params) {
-    const nunjucks_context = {
-        MelvinAttributes,
-        melvin_state: params
-    };
+// async function build_gene_expression_clinvar_response(handlerInput, params) {
+//     const nunjucks_context = {
+//         MelvinAttributes,
+//         melvin_state: params
+//     };
 
-    const speech_ssml = build_ssml_response_from_nunjucks(
-        "gene_expression/gene_expression_clinvar.njk", nunjucks_context);
-    return { "speech_text": speech_ssml };
-}
+//     const speech_ssml = build_ssml_response_from_nunjucks(
+//         "gene_expression/gene_expression_clinvar.njk", nunjucks_context);
+//     return { "speech_text": speech_ssml };
+// }
 
 async function build_gene_expression_response(handlerInput, params) {
     console.info(`[build_gene_expression_response] params: ${JSON.stringify(params)}`);
@@ -56,7 +56,12 @@ async function build_gene_expression_response(handlerInput, params) {
         response = await build_gene_expression_tcga_response(handlerInput, params);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        response = await build_gene_expression_clinvar_response(handlerInput, params);
+        //response = await build_gene_expression_clinvar_response(handlerInput, params);
+        throw melvin_error(
+            `[build_gene_expression_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            DEFAULT_NOT_IMPLEMENTED_RESPONSE
+        );
 
     } else {
         throw melvin_error(
@@ -98,14 +103,14 @@ async function build_gene_expression_compare_response(handlerInput, params, comp
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
-            `[build_cna_compare_response] not implemented: ${JSON.stringify(params)}`,
+            `[build_gene_expression_compare_response] not implemented: ${JSON.stringify(params)}`,
             MelvinIntentErrors.NOT_IMPLEMENTED,
             DEFAULT_NOT_IMPLEMENTED_RESPONSE
         );
 
     } else {
         throw melvin_error(
-            `[build_cna_compare_response] invalid state: ${JSON.stringify(params)}`,
+            `[build_gene_expression_compare_response] invalid state: ${JSON.stringify(params)}`,
             MelvinIntentErrors.INVALID_STATE,
             DEFAULT_INVALID_STATE_RESPONSE
         );
