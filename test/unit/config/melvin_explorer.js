@@ -872,6 +872,366 @@ const MelvinExplorerInterceptor = {
                 }
                 return [ 200, jsonResult];
             }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/INDvCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_perc:  1.0,
+                        cna_perc:  12.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_cases_perc: 4.409546624079496,
+                        cna_cases_perc: 5.660544760890781
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_ind_gene:      "TP53",
+                        top_ind_gene_perc: 8.53,
+                        top_cna_gene:      "POLRMT",
+                        top_cna_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/SNVvCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_perc:  3.0,
+                        cna_perc:  13.0,
+                        both_perc: 1.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_cases_perc: 23.64475201845444,
+                        CNA_cases_perc: 5.660544760890781
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_snv_gene:      "TP53",
+                        top_snv_gene_perc: 42.81,
+                        top_cna_gene:      "DAZAP1",
+                        top_cna_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/MUTvGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_perc:  3.0,
+                        gain_perc: 5.0,
+                        both_perc: 1.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_cases_perc:  27.655043918019697,
+                        gain_cases_perc: 1.2776151184455682
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_mut_gene:       "TP53",
+                        top_mut_gene_perc:  51.0,
+                        top_gain_gene:      "MECOM",
+                        top_gain_gene_perc: 57.36
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/MUTvLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_perc:  2.0,
+                        loss_perc: 9.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        mut_cases_perc:  27.655043918019697,
+                        LOSS_cases_perc: 4.391801969656641
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_mut_gene:       "TP53",
+                        top_mut_gene_perc:  51.0,
+                        top_loss_gene:      "PWWP3A",
+                        top_loss_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/INDvGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_perc:  1.0,
+                        gain_perc: 4.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_cases_perc:  4.409546624079496,
+                        gain_cases_perc: 1.2776151184455682
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_ind_gene:       "TP53",
+                        top_ind_gene_perc:  8.53,
+                        top_gain_gene:      "MECOM",
+                        top_gain_gene_perc: 57.36
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/INDvLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_perc:  1.0,
+                        loss_perc: 9.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        ind_cases_perc:  4.409546624079496,
+                        loss_cases_perc: 4.391801969656641
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_ind_gene:       "TP53",
+                        top_ind_gene_perc:  8.53,
+                        top_loss_gene:      "PWWP3A",
+                        top_loss_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/SNVvGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_perc:  3.0,
+                        gain_perc: 5.0,
+                        both_perc: 1.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_cases_perc:  23.64475201845444,
+                        gain_cases_perc: 1.2776151184455682
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_snv_gene:       "TP53",
+                        top_snv_gene_perc:  42.81,
+                        top_gain_gene:      "MECOM",
+                        top_gain_gene_perc: 57.36
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/SNVvLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_perc:  2.0,
+                        loss_perc: 9.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_cases_perc:  23.64475201845444,
+                        loss_cases_perc: 4.391801969656641
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_snv_gene:       "TP53",
+                        top_snv_gene_perc:  42.81,
+                        top_loss_gene:      "DAZAP1",
+                        top_loss_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/GAINvLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        gain_perc: 4.0,
+                        loss_perc: 9.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        gain_cases_perc: 1.2776151184455682,
+                        loss_cases_perc: 4.391801969656641
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_gain_gene:      "MECOM",
+                        top_gain_gene_perc: 57.36,
+                        top_loss_gene:      "PWWP3A",
+                        top_loss_gene_perc: 59.53
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/comparison/tcga/SNVvIND_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const gene = parsed.searchParams.get("gene");
+                const study = parsed.searchParams.get("study");
+                var jsonResult = { data: { records: []}};
+                if(gene && study) {
+                    switch(gene + "-"+ study) {
+                    case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_perc:  2.0,
+                        ind_perc:  1.0,
+                        both_perc: 0.0
+                    }}});
+                    }
+                } else if(gene) {
+                    switch(gene) {
+                    case "TP53": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        snv_cases_perc: 23.64475201845444,
+                        ind_cases_perc: 4.409546624079496
+                    }}});
+                    }
+                } else if(study) {
+                    switch(study) {
+                    case "OV": jsonResult = Object.assign(jsonResult, { data: { records: {
+                        top_snv_gene:      "TP53",
+                        top_snv_gene_perc: 42.47,
+                        top_ind_gene:      "TP53",
+                        top_ind_gene_perc: 8.19
+                    }}});
+                    }
+                }
+                return [ 200, jsonResult];
+            }).persist();
     }
 };
 module.exports = { MelvinExplorerInterceptor };

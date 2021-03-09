@@ -276,7 +276,7 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 is mutated in 19.4 percent of all cases and has copy number alterations in 5.7 percent of cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 19.4 percent and has copy number of alterations in 5.7 percent of all cases."
 
 ---
 - test: NavigateCompareIntent_mut_cna_S
@@ -305,7 +305,437 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one mutations are found in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients have both a mutation and copy number alteration at Braca one."
+  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_ind_cna_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has copy number of alterations in 5.7 percent of all cases."
+
+---
+- test: NavigateCompareIntent_ind_cna_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_ind_cna_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 12 percent have copy number alterations. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_snv_cna_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has copy number of alterations in 5.7 percent of all cases."
+
+---
+- test: NavigateCompareIntent_snv_cna_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of copy number alterations at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_snv_cna_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "CNA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_mut_gain_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has gains in 1.3 percent of all cases."
+
+---
+- test: NavigateCompareIntent_mut_gain_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while MECOM has the greatest number of gains at 57.4 percent."
+
+---
+- test: NavigateCompareIntent_mut_gain_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_mut_loss_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has losses in 4.4 percent of all cases."
+
+---
+- test: NavigateCompareIntent_mut_loss_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_mut_loss_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has mutations in 2 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_ind_gain_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has gains in 1.3 percent of all cases."
+
+---
+- test: NavigateCompareIntent_ind_gain_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while MECOM has the greatest number of gains at 57.4 percent."
+
+---
+- test: NavigateCompareIntent_ind_gain_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 4 percent have gains. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_ind_loss_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has losses in 4.4 percent of all cases."
+
+---
+- test: NavigateCompareIntent_ind_loss_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_ind_loss_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_snv_gain_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has gains in 1.3 percent of all cases."
+
+---
+- test: NavigateCompareIntent_snv_gain_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while MECOM has the greatest number of gains at 57.4 percent."
+
+---
+- test: NavigateCompareIntent_snv_gain_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "GAIN"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_snv_loss_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has losses in 4.4 percent of all cases."
+
+---
+- test: NavigateCompareIntent_snv_loss_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of losses at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_snv_loss_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has SNVs in percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_gain_loss_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "amplifications"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has gains in 1.3 percent and has losses in 4.4 percent of all cases."
+
+---
+- test: NavigateCompareIntent_gain_loss_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "amplifications"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, MECOM has the highest number of gains at 57.4 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+
+---
+- test: NavigateCompareIntent_gain_loss_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "LOSS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "amplifications"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has gains in 4 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+
+---
+- test: NavigateCompareIntent_snv_ind_G
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has indels in 4.4 percent of all cases."
+
+---
+- test: NavigateCompareIntent_snv_ind_S
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        study_abbreviation: "OV"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.5 percent while TP53 has the greatest number of indels at 8.2 percent."
+
+---
+- test: NavigateCompareIntent_snv_ind_GS
+- NavigateCompareIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "BRCA1"
+        study_abbreviation: "BRCA"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "Braca one has SNVs in 2 percent of Breast invasive carcinoma patients while 1 percent have indels. 0 percent of Breast invasive carcinoma patients harbor both alterations."
 
 --- 
 - test: NavigateJoinFilterIntent_BRCA

@@ -74,6 +74,11 @@ const oovMapperInterceptor = function() {
                 type:  "DTYPE",
                 val:   "SNV"
             }}];
+            case "amplifications": return[200, { data: {
+                query: "amplifications",
+                type:  "DTYPE",
+                val:   "GAIN"
+            }}];
             }
         }).persist();
 };
