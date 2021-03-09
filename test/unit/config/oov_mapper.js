@@ -64,6 +64,16 @@ const oovMapperInterceptor = function() {
                 query: "Rad fifty one b",
                 val:   "RAD51B"
             }}];
+            case "indels": return[200, { data: {
+                query: "indels",
+                type:  "DTYPE",
+                val:   "INDELS"
+            }}];
+            case "SNVs": return[200, { data: {
+                query: "SNVs",
+                type:  "DTYPE",
+                val:   "SNV"
+            }}];
             }
         }).persist();
 };

@@ -389,6 +389,35 @@ configuration:
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively."
 
 --- 
+- test: NavigateJoinFilterIntent_TP53_IND
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 indels are found in 26 cancer types. It has most indels in Esophageal carcinoma at 12.1 percent followed by Ovarian serous cystadenocarcinoma at 11.7 percent."
+
+--- 
+- test: NavigateJoinFilterIntent_TP53_SNV
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_source: "TCGA"
+        gene_name: "TP53"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "TP53 SNVs are found in 31 cancer types. It has most SNVs in Uterine Carcinosarcoma at 61.4 percent followed by Ovarian serous cystadenocarcinoma at 58.7 percent."
+
+
+--- 
 - test: NavigateJoinFilterIntent_Domains_TP53_SNV
 - NavigateJoinFilterIntent:
   - request.session.attributes:
