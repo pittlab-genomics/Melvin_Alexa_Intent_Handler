@@ -1099,7 +1099,7 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I'm still working on implementing this analysis. Please try again later."
+  - response.outputSpeech.ssml: "This compare operation is not supported."
 
 ---
 - test: NavigateCompareIntent_exp_GS_vs_G
@@ -1143,4 +1143,4 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I'm still working on implementing this analysis. Please try again later."
+  - response.outputSpeech.ssml: "This compare operation is not supported."
