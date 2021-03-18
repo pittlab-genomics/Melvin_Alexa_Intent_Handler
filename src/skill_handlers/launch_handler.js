@@ -14,9 +14,9 @@ const { supportsAPL } = require("../utils/APL_utils.js");
 const sessions_doc = require("../dao/sessions.js");
 
 function add_launch_apl_docs(handlerInput) {
+    const melvin_img_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png";
+    const melvin_logo_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_smallIconUri.png";
     if (supportsAPL(handlerInput)) {
-        const melvin_img_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png";
-        const melvin_logo_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_smallIconUri.png";
         handlerInput.responseBuilder.addDirective({
             type:        "Alexa.Presentation.APL.RenderDocument",
             token:       "welcomeToken",
@@ -48,7 +48,12 @@ function add_launch_apl_docs(handlerInput) {
 
     } else {
         handlerInput.responseBuilder
-            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, "You can start with a gene or cancer type.");
+            .withStandardCard(
+                `Welcome to ${MELVIN_APP_NAME}`,
+                "You can start with a gene or cancer type.",
+                melvin_logo_url,
+                melvin_img_url
+            );
     }
 }
 

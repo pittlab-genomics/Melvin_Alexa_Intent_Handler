@@ -202,7 +202,7 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
     } else {
         handlerInput.responseBuilder.withStandardCard(
             "Melvin",
-            "Image response",
+            build_APL_footer_text(handlerInput),
             url_list[0],
             url_list[0]
         );
