@@ -28,7 +28,7 @@ configuration:
 - how about amplifications: SFTA3 has the greatest number of amplifications in Lung adenocarcinoma at 22.3 percent.
 - show me MYC: In Lung adenocarcinoma patients, MYC is amplified at 17.2 percent.
 - split by expression: Which gene would you like to split by?
-- MYC: In Lung adenocarcinoma, MYC is not differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01
+- MYC: In Lung adenocarcinoma, MYC is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01
 
 ---
 - test: Test 4
@@ -75,7 +75,7 @@ configuration:
 - show me CTNNB1: Ok, Catenin Beta 1.
 - show me mutations: Catenin Beta 1 mutations are found in 25.4 percent of Liver hepatocellular carcinoma patients with 10 amino acid residues recurrently mutated.
 - split by expression: Which gene would you like to split by?
-- CCND1: In Liver hepatocellular carcinoma, Catenin Beta 1 is not differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0
+- CCND1: In Liver hepatocellular carcinoma, Catenin Beta 1 is differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0
 
 ---
 - test: Test 10
@@ -84,4 +84,4 @@ configuration:
 - show me mutations: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively.
 - show me KRAS: <speak>* mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated.</speak>
 - split by amplifications: Which gene would you like to split by?
-- M.Y.C: <speak>In Colon adenocarcinoma, * is not differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.02</speak>
+- M.Y.C: <speak>In Colon adenocarcinoma, * is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.02</speak>
