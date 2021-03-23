@@ -34,13 +34,13 @@ const send_request_async = function(url, timeout) {
         } else {
             throw melvin_error(
                 `[send_request_async] oov response not ok | ${JSON.stringify(response)}`,
-                MelvinIntentErrors.INVALID_API_RESPOSE,
+                MelvinIntentErrors.INVALID_API_RESPONSE,
                 DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
         }
     }).catch((err) => {
         throw melvin_error(
             `[send_request_async] oov connect error: ${JSON.stringify(err)}`,
-            MelvinIntentErrors.INVALID_API_RESPOSE,
+            MelvinIntentErrors.INVALID_API_RESPONSE,
             DEFAULT_OOV_CONNECT_ERROR_RESPONSE);
     });
 };

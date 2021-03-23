@@ -35,7 +35,7 @@ const send_request_async = function(url, signal) {
         } else {
             throw melvin_error(
                 `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
-                MelvinIntentErrors.INVALID_API_RESPOSE,
+                MelvinIntentErrors.INVALID_API_RESPONSE,
                 DEFAULT_AE_ACCESS_ERROR_RESPONSE
             );
         }

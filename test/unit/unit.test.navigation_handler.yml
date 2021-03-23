@@ -1114,7 +1114,7 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, Braca one is expressed lower than TP53 with mean TPM of 9.1 and 11.3, respectively."
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, Braca one is expressed lower than TP53 with mean FPKM of 9.1 and 11.3, respectively."
 
 ---
 - test: NavigateCompareIntent_exp_GS_vs_S
@@ -1129,7 +1129,7 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one is expressed higher in Breast invasive carcinoma compared to Ovarian serous cystadenocarcinoma with mean TPMs of 9.1 and 8.3, respectively."
+  - response.outputSpeech.ssml: "Braca one is expressed higher in Breast invasive carcinoma compared to Ovarian serous cystadenocarcinoma with mean FPKMs of 9.1 and 8.3, respectively."
 
 ---
 - test: NavigateCompareIntent_exp_S_vs_S

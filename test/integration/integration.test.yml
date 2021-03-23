@@ -43,8 +43,8 @@ configuration:
 - show me esophageal cancer:  <speak>Ok, Esophageal carcinoma. <prosody rate='110%'>What would you like to know?</prosody></speak>
 - tell me about gene expression:  The gene with the highest mean log2 normalized expression count in Esophageal carcinoma is ACTB at 18.1
 - show me CCND1: The mean log2 normalized expression count of CCND1 in Esophageal carcinoma is 13.8
-- compare to breast cancer: CCND1 is expressed higher in Esophageal carcinoma compared to Breast invasive carcinoma with mean TPMs of 13.8 and 13.6, respectively.
-- compare to TERT: In Esophageal carcinoma, CCND1 is expressed higher than TERT with mean TPM of 13.8 and 4.7, respectively.
+- compare to breast cancer: CCND1 is expressed higher in Esophageal carcinoma compared to Breast invasive carcinoma with mean FPKMs of 13.8 and 13.6, respectively.
+- compare to TERT: In Esophageal carcinoma, CCND1 is expressed higher than TERT with mean FPKM of 13.8 and 4.7, respectively.
 - compare to mutations: This data type comparison analysis is not yet supported
 
 ---
