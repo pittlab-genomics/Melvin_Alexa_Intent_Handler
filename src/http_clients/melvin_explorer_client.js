@@ -42,7 +42,7 @@ const send_request_async = function(url, signal) {
     }).catch((err) => {
         throw melvin_error(
             `[send_request_async] AE connect error: ${JSON.stringify(err)}`,
-            MelvinIntentErrors.INVALID_API_RESPOSE,
+            MelvinIntentErrors.INVALID_API_RESPONSE,
             DEFAULT_AE_CONNECT_ERROR_RESPONSE
         );
     });
@@ -217,8 +217,120 @@ const get_mutations_clinvar_stats = async function (handlerInput, params) {
     return result;
 };
 
-const get_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
-    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
+const get_gain_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_gain_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_loss_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_cna_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_cna_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_cna_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_ind_ind_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_ind_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_ind_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_ind_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_snv_snv_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_snv_ind_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_snv_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_snv_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
     const result = await process_repeat_requests(handlerInput, splitby_url);
@@ -321,7 +433,21 @@ module.exports = {
     get_gain_tcga_stats,
     get_loss_tcga_stats,
     get_gene_expression_tcga_stats,
-    get_splitby_tcga_stats,
+    get_gain_gain_splitby_tcga_stats,
+    get_gain_loss_splitby_tcga_stats,
+    get_loss_loss_splitby_tcga_stats,
+    get_cna_cna_splitby_tcga_stats,
+    get_cna_gain_splitby_tcga_stats,
+    get_cna_loss_splitby_tcga_stats,
+    get_ind_ind_splitby_tcga_stats,
+    get_ind_cna_splitby_tcga_stats,
+    get_ind_gain_splitby_tcga_stats,
+    get_ind_loss_splitby_tcga_stats,
+    get_snv_snv_splitby_tcga_stats,
+    get_snv_ind_splitby_tcga_stats,
+    get_snv_cna_splitby_tcga_stats,
+    get_snv_gain_splitby_tcga_stats,
+    get_snv_loss_splitby_tcga_stats,
     get_mutations_clinvar_stats,
     get_cna_clinvar_stats,
     get_gene_expression_clinvar_stats,

@@ -87,8 +87,22 @@ const SUPPORTED_SPLITBY_DTYPES = [
     [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
     [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
     [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
+    //new
     [DataTypes.GAIN, DataTypes.GAIN],
+    [DataTypes.GAIN, DataTypes.LOSS],
     [DataTypes.LOSS, DataTypes.LOSS],
+    [DataTypes.CNA, DataTypes.CNA],
+    [DataTypes.CNA, DataTypes.GAIN],
+    [DataTypes.CNA, DataTypes.LOSS],
+    [DataTypes.INDELS, DataTypes.INDELS],
+    [DataTypes.INDELS, DataTypes.CNA],
+    [DataTypes.INDELS, DataTypes.GAIN],
+    [DataTypes.INDELS, DataTypes.LOSS],
+    [DataTypes.SNV, DataTypes.SNV],
+    [DataTypes.SNV, DataTypes.INDELS],
+    [DataTypes.SNV, DataTypes.CNA],
+    [DataTypes.SNV, DataTypes.GAIN],
+    [DataTypes.SNV, DataTypes.LOSS]
 ];
 
 const get_gene_speech_text = function (gene_name) {
