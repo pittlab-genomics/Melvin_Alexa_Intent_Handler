@@ -766,76 +766,215 @@ const MelvinExplorerInterceptor = {
             }).persist();
     }, splitby_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
-            .get("/v0.1/analysis/splitby/tcga/stats")
+            .get("/v0.1/analysis/splitby/tcga/LOSSsLOSS_stats")
             .query(true)
             .reply(function(uri, requestBody) {
-                const parsed = new url.URL(this.req.path, "http://example.com");
-                const melvin_state = JSON.parse(parsed.searchParams.get("melvin_state"));
-                const splitby_state = JSON.parse(parsed.searchParams.get("splitby_state"));
-
-                const ms_data_type = melvin_state.data_type;
-                const ss_data_type = splitby_state.data_type;
-
                 var jsonResult = { data: { records: []}};
-
-                if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "MUTATIONS")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        statistic: 45551.0,
-                        pvalue:    0.04471175703426707,
-                        method:    "mannwhit"
-                    }});
-                } else if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "GAIN")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        statistic: 21940.0,
-                        pvalue:    0.11903585460026533,
-                        method:    "mannwhit"
-                    }});
-                } else if(isEqual(ms_data_type, "GENE_EXPRESSION") && isEqual(ss_data_type, "LOSS")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        statistic: 26989.5,
-                        pvalue:    0.2655149373075927,
-                        method:    "mannwhit"
-                    }});
-                } else if(isEqual(ms_data_type, "GAIN") && isEqual(ss_data_type, "GAIN")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        oddsratio: 7.335664335664336,
-                        pvalue:    0.013521281907155201,
-                        method:    "fishers"
-                    }});
-                } else if(isEqual(ms_data_type, "LOSS") && isEqual(ss_data_type, "LOSS")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        oddsratio: 0.4859903381642512,
-                        pvalue:    0.7172876350133848,
-                        method:    "fishers"
-                    }});
-                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "GENE_EXPRESSION")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        statistic: 102906.0,
-                        pvalue:    0.4382316176955987,
-                        method:    "mannwhit"
-                    }});
-                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "GAIN")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        oddsratio: 2.945080091533181,
-                        pvalue:    0.004706783810086384,
-                        method:    "fishers"
-                    }});
-                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "LOSS")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        oddsratio: 1.5968620974401322,
-                        pvalue:    0.22301587161377634,
-                        method:    "fishers"
-                    }});
-                } else if(isEqual(ms_data_type, "MUTATIONS") && isEqual(ss_data_type, "MUTATIONS")) {
-                    jsonResult = Object.assign(jsonResult, { data: {
-                        oddsratio: 0.48717948717948717,
-                        pvalue:    0.069462458766369,
-                        method:    "fishers"
-                    }});
-                }
+                jsonResult = Object.assign(jsonResult, { data: {
+                    oddsratio: 0.4859903381642512,
+                    pvalue:    0.7172876350133848,
+                    method:    "fishers"
+                }});
 
                 return [ 200, jsonResult];
             }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/GAINsGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { data: {
+                    oddsratio: 7.335664335664336,
+                    pvalue:    0.013521281907155201,
+                    method:    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/GAINsLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { data: {
+                    oddsratio: 1.5362962962962963,
+                    pvalue:    0.49821369817681715,
+                    method:    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/CNAsCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 1.3282548476454294,
+                    "pvalue":    0.46203809718888533,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/CNAsGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 2.125,
+                    "pvalue":    0.14650251972583425,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/CNAsLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 0.7384500745156483,
+                    "pvalue":    1.0,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/INDsIND_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 0.0,
+                    "pvalue":    0.07200739926096636,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/INDsCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 2.5418245409501603,
+                    "pvalue":    0.030733106350417025,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/INDsGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 2.4278846153846154,
+                    "pvalue":    0.10614569479243083,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/INDsLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 2.3935915829746532,
+                    "pvalue":    0.0796261094784253,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/SNVsSNV_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 0.4130162703379224,
+                    "pvalue":    0.10845968480195148,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/SNVsIND_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 0.22267178235088944,
+                    "pvalue":    0.0009204201491853142,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/SNVsCNA_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 1.750335345405768,
+                    "pvalue":    0.03579178905116308,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/SNVsGAIN_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 1.8392070484581498,
+                    "pvalue":    0.09983419310840444,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/SNVsLOSS_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                var jsonResult = { data: { records: []}};
+                jsonResult = Object.assign(jsonResult, { "data": {
+                    "oddsratio": 1.6080555555555556,
+                    "pvalue":    0.14689719474072704,
+                    "method":    "fishers"
+                }});
+
+                return [ 200, jsonResult];
+            }).persist();
+
     }, compare_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")
             .get("/v0.1/analysis/comparison/tcga/MUTvCNA_stats")
@@ -1234,4 +1373,5 @@ const MelvinExplorerInterceptor = {
             }).persist();
     }
 };
+
 module.exports = { MelvinExplorerInterceptor };

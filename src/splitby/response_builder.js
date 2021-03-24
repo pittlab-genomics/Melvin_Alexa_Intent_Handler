@@ -530,12 +530,14 @@ async function build_splitby_response(handlerInput, melvin_state, splitby_state)
             response = await build_exp_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
         } else if(match_either_splitby_dtype(query_dtypes, DataTypes.MUTATIONS)) {
             response = await build_mut_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
-        } throw melvin_error(
-            `[build_splitby_response] invalid state | melvin_state: ${JSON.stringify(melvin_state)}` +
+        } else {
+            throw melvin_error(
+                `[build_splitby_response] invalid state | melvin_state: ${JSON.stringify(melvin_state)}` +
                 `splitby_state: ${JSON.stringify(splitby_state)}`,
-            MelvinIntentErrors.INVALID_STATE,
-            DEFAULT_INVALID_STATE_RESPONSE
-        );
+                MelvinIntentErrors.INVALID_STATE,
+                DEFAULT_INVALID_STATE_RESPONSE
+            );
+        }
 
     } else if (melvin_state[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         response = await build_splitby_clinvar_response(handlerInput, melvin_state, splitby_state);
