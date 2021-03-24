@@ -974,6 +974,118 @@ const MelvinExplorerInterceptor = {
 
                 return [ 200, jsonResult];
             }).persist();
+        
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/MUT_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const melvin_state = JSON.parse(parsed.searchParams.get("melvin_state"));
+                const splitby_state = JSON.parse(parsed.searchParams.get("splitby_state"));
+                const ms_data_type = melvin_state.data_type;
+                const ss_data_type = splitby_state.data_type;
+
+                var jsonResult = { data: { records: []}};
+                if(ms_data_type == "INDELS" || ss_data_type == "INDELS") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 0.16800452232899943,
+                        "pvalue":    3.318946463241838e-05,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "SNV" || ss_data_type == "SNV") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 0.6081825334382376,
+                        "pvalue":    0.26870611165768515,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "CNA" || ss_data_type == "CNA") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 2.1765382403680276,
+                        "pvalue":    0.001133363680891674,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "GAIN" || ss_data_type == "GAIN") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 2.256115107913669,
+                        "pvalue":    0.02070100713122481,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "LOSS" || ss_data_type == "LOSS") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 1.9882828282828282,
+                        "pvalue":    0.027307935432296454,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "MUTATIONS" && ss_data_type == "MUTATIONS"){
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "oddsratio": 0.3008142571823629,
+                        "pvalue":    5.5409170203454464e-05,
+                        "method":    "fishers"
+                    }});
+                    return [ 200, jsonResult];
+                }
+            }).persist();
+
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/analysis/splitby/tcga/EXP_stats")
+            .query(true)
+            .reply(function(uri, requestBody) {
+                const parsed = new url.URL(this.req.path, "http://example.com");
+                const melvin_state = JSON.parse(parsed.searchParams.get("melvin_state"));
+                const splitby_state = JSON.parse(parsed.searchParams.get("splitby_state"));
+                const ms_data_type = melvin_state.data_type;
+                const ss_data_type = splitby_state.data_type;
+
+                var jsonResult = { data: { records: []}};
+                if(ms_data_type == "INDELS" || ss_data_type == "INDELS") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 37128.0,
+                        "pvalue":    0.26424683653507663,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "SNV" || ss_data_type == "SNV") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 22363.0,
+                        "pvalue":    0.22802864323819294,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "CNA" || ss_data_type == "CNA") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 49879.5,
+                        "pvalue":    0.3629834934450639,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "GAIN" || ss_data_type == "GAIN") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 21940.0,
+                        "pvalue":    0.11903585460026533,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "LOSS" || ss_data_type == "LOSS") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 26989.5,
+                        "pvalue":    0.2655149373075927,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                } else if(ms_data_type == "MUTATIONS" || ss_data_type == "MUTATIONS") {
+                    jsonResult = Object.assign(jsonResult, { "data": {
+                        "statistic": 56703.0,
+                        "pvalue":    0.16399552339626267,
+                        "method":    "mannwhit"
+                    }});
+                    return [ 200, jsonResult];
+                }
+            }).persist();
 
     }, compare_tcga_stats() {
         nock("https://api.test.melvin.pittlabgenomics.com")

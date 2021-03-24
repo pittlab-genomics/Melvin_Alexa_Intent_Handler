@@ -3,164 +3,264 @@ configuration:
   locale: en-US
   dynamo: mock
 
-# --- 
-# - test: NavigateSplitbyIntent_exp_mut_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "MUTATIONS"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "GENE_EXPRESSION"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.04"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_mut_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "MUTATIONS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.16"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_exp_gain_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "GAIN"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "GENE_EXPRESSION"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.12"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_gain_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "GAIN"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.12"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_exp_loss_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "LOSS"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "GENE_EXPRESSION"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.27"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_loss_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "LOSS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.27"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_mut_exp_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "GENE_EXPRESSION"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "MUTATIONS"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.44"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_cna_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "CNA"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.36"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_mut_gain_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "GAIN"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "MUTATIONS"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_ind_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "INDELS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.26"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_mut_loss_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "LOSS"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "MUTATIONS"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.22"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_exp_snv_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "SNV"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.23"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_mut_loss_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "LOSS"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         data_type: "MUTATIONS"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "I need to know a cancer type first. What cancer type are you interested in?"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_mut_gain_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "GAIN"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.shouldEndSession: false
 
-# --- 
-# - test: NavigateSplitbyIntent_mut_loss_G1_G2 
-# - NavigateSplitbyIntent:
-#   - request.session.attributes:
-#       MELVIN.AUX.STATE:
-#         data_type: "MUTATIONS"
-#       MELVIN.STATE:
-#         gene_name: "TP53"
-#         study_abbreviation: "BRCA"
-#         data_type: "MUTATIONS"
-#         data_source: "TCGA"
-#   - request.request.intent.slots:
-#       gene_query:
-#         name: "gene_query"
-#         value: "CDH1"
-#         confirmationStatus: "NONE"
-#   - request.request.dialogState: "COMPLETED"
-#   - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.07"
-#   - response.shouldEndSession: false
+--- 
+- test: NavigateSplitbyIntent_mut_loss_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "LOSS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.03"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateSplitbyIntent_mut_loss_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "LOSS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "I need to know a cancer type first. What cancer type are you interested in?"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateSplitbyIntent_mut_mut_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "MUTATIONS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateSplitbyIntent_mut_ind_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "INDELS"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateSplitbyIntent_mut_snv_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "SNV"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.27"
+  - response.shouldEndSession: false
+
+--- 
+- test: NavigateSplitbyIntent_mut_cna_G1_G2 
+- NavigateSplitbyIntent:
+  - request.session.attributes:
+      MELVIN.AUX.STATE:
+        data_type: "CNA"
+      MELVIN.STATE:
+        gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      gene_query:
+        name: "gene_query"
+        value: "CDH1"
+        confirmationStatus: "NONE"
+  - request.request.dialogState: "COMPLETED"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.shouldEndSession: false
 
 --- 
 - test: NavigateSplitbyIntent_loss_loss_G1_G2 
@@ -249,17 +349,17 @@ configuration:
       MELVIN.AUX.STATE:
         data_type: "CNA"
       MELVIN.STATE:
-        gene_name: "TP53"
+        gene_name: "CDH1"
         study_abbreviation: "BRCA"
         data_type: "GAIN"
         data_source: "TCGA"
   - request.request.intent.slots:
       gene_query:
         name: "gene_query"
-        value: "CDH1"
+        value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.15"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.15"
   - response.shouldEndSession: false
 
 --- 
@@ -309,17 +409,17 @@ configuration:
       MELVIN.AUX.STATE:
         data_type: "INDELS"
       MELVIN.STATE:
-        gene_name: "TP53"
+        gene_name: "CDH1"
         study_abbreviation: "BRCA"
         data_type: "CNA"
         data_source: "TCGA"
   - request.request.intent.slots:
       gene_query:
         name: "gene_query"
-        value: "CDH1"
+        value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.03"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.03"
   - response.shouldEndSession: false
 
 --- 
@@ -329,17 +429,17 @@ configuration:
       MELVIN.AUX.STATE:
         data_type: "INDELS"
       MELVIN.STATE:
-        gene_name: "TP53"
+        gene_name: "CDH1"
         study_abbreviation: "BRCA"
         data_type: "GAIN"
         data_source: "TCGA"
   - request.request.intent.slots:
       gene_query:
         name: "gene_query"
-        value: "CDH1"
+        value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.11"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.11"
   - response.shouldEndSession: false
 
 --- 
@@ -389,17 +489,17 @@ configuration:
       MELVIN.AUX.STATE:
         data_type: "SNV"
       MELVIN.STATE:
-        gene_name: "TP53"
+        gene_name: "CDH1"
         study_abbreviation: "BRCA"
         data_type: "INDELS"
         data_source: "TCGA"
   - request.request.intent.slots:
       gene_query:
         name: "gene_query"
-        value: "CDH1"
+        value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0"
   - response.shouldEndSession: false
 
 --- 
@@ -429,17 +529,17 @@ configuration:
       MELVIN.AUX.STATE:
         data_type: "SNV"
       MELVIN.STATE:
-        gene_name: "TP53"
+        gene_name: "CDH1"
         study_abbreviation: "BRCA"
         data_type: "GAIN"
         data_source: "TCGA"
   - request.request.intent.slots:
       gene_query:
         name: "gene_query"
-        value: "CDH1"
+        value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.1"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.1"
   - response.shouldEndSession: false
 
 --- 
