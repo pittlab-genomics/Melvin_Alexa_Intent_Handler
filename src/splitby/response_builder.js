@@ -25,7 +25,9 @@ const {
     get_snv_ind_splitby_tcga_stats,
     get_snv_cna_splitby_tcga_stats,
     get_snv_gain_splitby_tcga_stats,
-    get_snv_loss_splitby_tcga_stats
+    get_snv_loss_splitby_tcga_stats,
+    get_mut_splitby_tcga_stats,
+    get_exp_splitby_tcga_stats
 } = require("../http_clients/melvin_explorer_client.js");
 
 const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
@@ -432,6 +434,58 @@ async function build_snv_loss_splitby_tcga_response(handlerInput, melvin_state, 
     return { "speech_text": speech_ssml };
 }
 
+const add_exp_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    image_list.push(splitby_url);
+};
+
+async function build_exp_splitby_tcga_response(handlerInput, melvin_state, splitby_state) {
+    const image_list = [];
+    const m_state = convert(melvin_state);
+    const s_state = convert(splitby_state);
+    const response = await get_exp_splitby_tcga_stats(handlerInput, m_state, s_state);
+
+    const nunjucks_context = {
+        MelvinAttributes,
+        melvin_state:     melvin_state,
+        splitby_state:    splitby_state,
+        splitby_response: response
+    };
+    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_exp_tcga.njk", nunjucks_context);
+
+    add_exp_splitby_tcga_stats_plot(image_list, m_state, s_state);
+    add_to_APL_image_pager(handlerInput, image_list);
+    return { "speech_text": speech_ssml };
+}
+
+const add_mut_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    image_list.push(splitby_url);
+};
+
+async function build_mut_splitby_tcga_response(handlerInput, melvin_state, splitby_state) {
+    const image_list = [];
+    const m_state = convert(melvin_state);
+    const s_state = convert(splitby_state);
+    const response = await get_mut_splitby_tcga_stats(handlerInput, m_state, s_state);
+
+    const nunjucks_context = {
+        MelvinAttributes,
+        melvin_state:     melvin_state,
+        splitby_state:    splitby_state,
+        splitby_response: response
+    };
+    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
+
+    add_mut_splitby_tcga_stats_plot(image_list, m_state, s_state);
+    add_to_APL_image_pager(handlerInput, image_list);
+    return { "speech_text": speech_ssml };
+}
+
 async function build_splitby_response(handlerInput, melvin_state, splitby_state) {
     console.info(`[build_splitby_response] melvin_state: ${JSON.stringify(melvin_state)}, ` + 
         `splitby_state: ${JSON.stringify(splitby_state)}`);
@@ -472,7 +526,16 @@ async function build_splitby_response(handlerInput, melvin_state, splitby_state)
             response = await build_snv_gain_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
         } else if (match_splitby_dtype(query_dtypes, [DataTypes.SNV, DataTypes.LOSS])) {
             response = await build_snv_loss_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
-        }
+        } else if(match_either_splitby_dtype(query_dtypes, DataTypes.GENE_EXPRESSION)) {
+            response = await build_exp_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
+        } else if(match_either_splitby_dtype(query_dtypes, DataTypes.MUTATIONS)) {
+            response = await build_mut_splitby_tcga_response(handlerInput, melvin_state, splitby_state);
+        } throw melvin_error(
+            `[build_splitby_response] invalid state | melvin_state: ${JSON.stringify(melvin_state)}` +
+                `splitby_state: ${JSON.stringify(splitby_state)}`,
+            MelvinIntentErrors.INVALID_STATE,
+            DEFAULT_INVALID_STATE_RESPONSE
+        );
 
     } else if (melvin_state[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         response = await build_splitby_clinvar_response(handlerInput, melvin_state, splitby_state);
@@ -487,6 +550,13 @@ async function build_splitby_response(handlerInput, melvin_state, splitby_state)
     }
     return response;
 }
+
+const match_either_splitby_dtype = function(query_dtypes, target) {
+    if (query_dtypes[0] === target || query_dtypes[1] === target) {
+        return true;
+    }
+    return false;
+};
 
 const match_splitby_dtype = function (query_dtypes, target_dtypes) {
     if ((query_dtypes[0] === target_dtypes[0] && query_dtypes[1] === target_dtypes[1])

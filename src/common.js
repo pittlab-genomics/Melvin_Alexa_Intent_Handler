@@ -81,13 +81,6 @@ const CNATypes = {
 };
 
 const SUPPORTED_SPLITBY_DTYPES = [
-    [DataTypes.MUTATIONS, DataTypes.LOSS],
-    [DataTypes.MUTATIONS, DataTypes.GAIN],
-    [DataTypes.MUTATIONS, DataTypes.MUTATIONS],
-    [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
-    [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
-    [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
-    //new
     [DataTypes.GAIN, DataTypes.GAIN],
     [DataTypes.GAIN, DataTypes.LOSS],
     [DataTypes.LOSS, DataTypes.LOSS],
@@ -102,7 +95,19 @@ const SUPPORTED_SPLITBY_DTYPES = [
     [DataTypes.SNV, DataTypes.INDELS],
     [DataTypes.SNV, DataTypes.CNA],
     [DataTypes.SNV, DataTypes.GAIN],
-    [DataTypes.SNV, DataTypes.LOSS]
+    [DataTypes.SNV, DataTypes.LOSS],
+    [DataTypes.MUTATIONS, DataTypes.MUTATIONS],
+    [DataTypes.MUTATIONS, DataTypes.SNV],
+    [DataTypes.MUTATIONS, DataTypes.INDELS],
+    [DataTypes.MUTATIONS, DataTypes.CNA],
+    [DataTypes.MUTATIONS, DataTypes.GAIN],
+    [DataTypes.MUTATIONS, DataTypes.LOSS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.MUTATIONS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.SNV],
+    [DataTypes.GENE_EXPRESSION, DataTypes.INDELS],
+    [DataTypes.GENE_EXPRESSION, DataTypes.CNA],
+    [DataTypes.GENE_EXPRESSION, DataTypes.GAIN],
+    [DataTypes.GENE_EXPRESSION, DataTypes.LOSS],
 ];
 
 const get_gene_speech_text = function (gene_name) {

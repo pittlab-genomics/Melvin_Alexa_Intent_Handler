@@ -337,6 +337,22 @@ const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     return result;
 };
 
+const get_mut_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
+const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
+    const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
+    splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const result = await process_repeat_requests(handlerInput, splitby_url);
+    return result;
+};
+
 const get_sv_clinvar_stats = async function (handlerInput, params) {
     const sv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/structural_variants/clinvar/stats`);
     add_query_params(sv_url, params);
@@ -448,6 +464,8 @@ module.exports = {
     get_snv_cna_splitby_tcga_stats,
     get_snv_gain_splitby_tcga_stats,
     get_snv_loss_splitby_tcga_stats,
+    get_mut_splitby_tcga_stats,
+    get_exp_splitby_tcga_stats,
     get_mutations_clinvar_stats,
     get_cna_clinvar_stats,
     get_gene_expression_clinvar_stats,
