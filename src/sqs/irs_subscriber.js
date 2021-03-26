@@ -42,8 +42,9 @@ async function process_message(msg_data) {
     console.info(`[process_message] processing msg_data: ${JSON.stringify(msg_data)}`);
     var date_str = moment(msg_data["timestamp"]).format("YYYY-MM-DD HH:mm Z");
     const sub_text = `Melvin results export on ${date_str}`;
-    const body_part_text = "Hi Akila,\r\nPlease find your Melvin analyses data below.";
-    const greeting_text = "Hi Akila, <br/><br/>Please find your Melvin analyses data below.<br/><br/>";
+    const body_part_text = "Hi,\r\nPlease find your Melvin analyses data below.";
+    const greeting_text = "Hi, <br/><br/>Please find your Melvin analyses data below.<br/><br/>";
+    const user_email = msg_data["user_email"];
 
     let utterance_list = [];
     if (!_.isEmpty(msg_data["irs_duration_sec"])) {
@@ -58,7 +59,7 @@ async function process_message(msg_data) {
     }
 
     const html_part_text = await get_utterances_html(greeting_text, utterance_list);
-    await irs_send_email(sub_text, body_part_text, html_part_text);
+    await irs_send_email(user_email, sub_text, body_part_text, html_part_text);
 }
 
 async function get_utterances_html(greeting_text, utterance_list) {
@@ -101,10 +102,10 @@ async function get_utterances_html(greeting_text, utterance_list) {
     return html_data;
 }
 
-async function irs_send_email(subjectText, bodyText, bodyHTML) {
+async function irs_send_email(user_email, subjectText, bodyText, bodyHTML) {
     var payload = {
         Destination: { ToAddresses: [
-            "ravihansa3000@hotmail.com"
+            user_email
         ]},
         Message: { /* required */
             Body: { /* required */
@@ -122,7 +123,7 @@ async function irs_send_email(subjectText, bodyText, bodyHTML) {
                 Data:    subjectText
             }
         },
-        Source: "csipav@nus.edu.sg",
+        Source: "no-reply@melvin.pittlabgenomics.com",
         Tags:   [
             {
                 Name:  "source", /* required */

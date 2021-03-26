@@ -1,26 +1,12 @@
 const AWS = require("aws-sdk");
 const sqs = new AWS.SQS({ region: "eu-west-1", });
 
-
-const Speech = require("ssml-builder");
 const _ = require("lodash");
 const moment = require("moment");
 
 const {
     parse, toSeconds 
 } = require("iso8601-duration");
-
-const {
-    MelvinAttributes,
-    MelvinExplorerErrors,
-    DataTypes,
-    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
-} = require("../common.js");
-
-const {
-    validate_navigation_intent_state,
-    update_melvin_state
-} = require("../utils/navigation_utils.js");
 
 
 const NavigateEmailIntentHandler = {
@@ -37,6 +23,9 @@ const NavigateEmailIntentHandler = {
             // const state_change = await update_melvin_state(handlerInput);
             // validate_navigation_intent_state(handlerInput, state_change);
 
+            const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
+            const profileEmail = await upsServiceClient.getProfileEmail();
+
             const queue_url = get_irs_queue_url();
             const timestamp = moment().valueOf();
             const user_id = handlerInput.requestEnvelope.session.user.userId;
@@ -45,10 +34,12 @@ const NavigateEmailIntentHandler = {
             const msg_data = {
                 "irs_channel": "EMAIL",
                 "timestamp":   timestamp,
-                "user_id":     user_id
+                "user_id":     user_id,
+                "user_email":  profileEmail
             };
 
-            const results_count = _.get(handlerInput, "requestEnvelope.request.intent.slots.count.value", DEFAULT_RESULT_COUNT);
+            const results_count = _.get(handlerInput, "requestEnvelope.request.intent.slots.count.value",
+                DEFAULT_RESULT_COUNT);
             const results_duration = _.get(handlerInput, "requestEnvelope.request.intent.slots.duration.value");
 
             if (!_.isEmpty(results_duration)) {
@@ -73,7 +64,15 @@ const NavigateEmailIntentHandler = {
             await publish_irs_message(JSON.stringify(msg_data), queue_url);
 
         } catch (error) {
-            if (error["speech"]) {
+            if (error.statusCode === 403) {
+                repromptText = speechText = "Please enable profile permissions in the Amazon Alexa app.";
+                return handlerInput.responseBuilder
+                    .speak(speechText)
+                    .reprompt(repromptText)
+                    .withAskForPermissionsConsentCard(["alexa::profile:email:read"])
+                    .getResponse();
+            }
+            else if (error["speech"]) {
                 repromptText = speechText = error["speech"];
             } else {
                 repromptText = speechText = "Something went wrong while sending the results. Please try again later.";

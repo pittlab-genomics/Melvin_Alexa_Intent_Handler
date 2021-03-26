@@ -2,6 +2,7 @@ var AWS = require("aws-sdk-mock");
 const nock = require("nock");
 const { MelvinExplorerInterceptor } = require("./melvin_explorer");
 const { oovMapperInterceptor } = require("./oov_mapper");
+const { alexaProfileInterceptor } = require("./alexa_profile");
 
 module.exports = { 
     onTestSuiteStart: (test) => {
@@ -16,6 +17,7 @@ module.exports = {
         MelvinExplorerInterceptor.snv_tcga_stats();
         MelvinExplorerInterceptor.splitby_tcga_stats();
         MelvinExplorerInterceptor.compare_tcga_stats();
+        alexaProfileInterceptor();
 
         AWS.mock("DynamoDB.DocumentClient", "put", function(params, callback) {
             callback(null, "successfully put item in database");
