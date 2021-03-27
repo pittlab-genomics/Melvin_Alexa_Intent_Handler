@@ -77,12 +77,16 @@ async function get_utterances_html(greeting_text, utterance_list) {
         let ssml_text = JSON.stringify(melvin_response["outputSpeech"]["ssml"]);
         let response_text = ssml_text.replace(ssml_regex, "");
         let apl_directives = melvin_response["directives"];
+        let image_properties;
+        let params_text;
         if (!Array.isArray(apl_directives) || apl_directives.length == 0) {
-            continue;
+            let card = melvin_response["card"];
+            image_properties = { "image0": { "URL": card["image"]["largeImageUrl"] }};
+            params_text = card["text"];
+        } else {
+            image_properties = apl_directives[0]["datasources"]["pagerTemplateData"]["properties"];
+            params_text = apl_directives[0]["datasources"]["pagerTemplateData"]["footer_text"];
         }
-
-        let image_properties = apl_directives[0]["datasources"]["pagerTemplateData"]["properties"];
-        let params_text = apl_directives[0]["datasources"]["pagerTemplateData"]["footer_text"];
 
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${counter}. ${params_text}</td></tr>\n`;
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`;

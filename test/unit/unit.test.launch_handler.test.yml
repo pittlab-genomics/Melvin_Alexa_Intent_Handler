@@ -2,6 +2,8 @@
 configuration: 
   locale: en-US
   dynamo: mock
+  userProfile:
+    email:
 
 --- 
 - test: Launch request, no further interaction. 
@@ -29,3 +31,11 @@ configuration:
 - LaunchRequest
 - SessionEndedRequest:
   - response: undefined
+
+--- 
+- test: NavigateEmailIntent_no_permissions
+- NavigateEmailIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "Please enable email permissions in the Amazon Alexa app."

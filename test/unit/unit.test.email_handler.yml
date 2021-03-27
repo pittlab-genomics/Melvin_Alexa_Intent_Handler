@@ -2,6 +2,8 @@
 configuration: 
   locale: en-US
   dynamo: mock
+  userProfile:
+    email: melvin.test@test.com
 
 --- 
 - test: NavigateEmailIntent_count 
