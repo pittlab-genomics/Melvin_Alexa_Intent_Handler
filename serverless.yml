@@ -86,7 +86,7 @@ functions:
     events:
       - schedule:
           description: 'warmup service scheduled event rule'
-          rate: rate(15 minutes)
+          rate: rate(1 hour)
           enabled: true
           input:
             stage: ${self:custom.stage}

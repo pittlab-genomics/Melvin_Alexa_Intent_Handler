@@ -5,10 +5,10 @@ const fetch = require("node-fetch");
 const allSettled = require("promise.allsettled");
 const AbortController = require("abort-controller");
 const https = require("https");
-const moment = require("moment");
-const _ = require("lodash");
+// const moment = require("moment");
+// const _ = require("lodash");
 
-const sessions_doc = require("../dao/sessions.js");
+// const sessions_doc = require("../dao/sessions.js");
 
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
@@ -18,13 +18,13 @@ const {
     SUPPORTED_SPLITBY_DTYPES,
     MELVIN_EXPLORER_ENDPOINT,
     OOV_MAPPER_ENDPOINT,
-    STAGE
+    // STAGE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
 const plot_ep_timeout = 5000;
 const mapper_ep_timeout = 5000;
-const warmup_session_timeout = 600; // disable warmup rule if there is no new user sessions after X mins
+// const warmup_session_timeout = 600; // disable warmup rule if there is no new user sessions after X mins
 
 /*
     make sure to include at least N number of entries for each unique path 
@@ -256,74 +256,74 @@ const send_parallel_requests = async function() {
     return response;
 };
 
-async function disable_warmup_cloudwatch_rule() {
-    const cloudwatchevents = new AWS.CloudWatchEvents();
-    var params = {
-        NamePrefix: "melvin",
-        Limit:      10,
-    };
+// async function disable_warmup_cloudwatch_rule() {
+//     const cloudwatchevents = new AWS.CloudWatchEvents();
+//     var params = {
+//         NamePrefix: "melvin",
+//         Limit:      10,
+//     };
 
-    try {
-        const list_result = await cloudwatchevents.listRules(params).promise();
-        console.log(`[warmup_handler] listRules | success: ${JSON.stringify(list_result)}`);
+//     try {
+//         const list_result = await cloudwatchevents.listRules(params).promise();
+//         console.log(`[warmup_handler] listRules | success: ${JSON.stringify(list_result)}`);
 
-        const rule_list = list_result["Rules"];
-        let warmup_rule_name = null;
-        for (const rule_item of rule_list) {
-            console.log(`[warmup_handler] rule_item | success: ${JSON.stringify(rule_item)}`);
-            var tag_params = { ResourceARN: rule_item["Arn"] };
-            const tag_result = await cloudwatchevents.listTagsForResource(tag_params).promise();
-            console.log(`[warmup_handler] tag_result | success: ${JSON.stringify(tag_result)}`);
-            const tag_list = tag_result["Tags"];
-            for (const tag_item of tag_list) {
-                if (tag_item["Key"] === "label" && tag_item["Value"] === process.env.WARMUP_RULE_LABEL) {
-                    warmup_rule_name = rule_item["Name"];
-                }
-            }
-        }
+//         const rule_list = list_result["Rules"];
+//         let warmup_rule_name = null;
+//         for (const rule_item of rule_list) {
+//             console.log(`[warmup_handler] rule_item | success: ${JSON.stringify(rule_item)}`);
+//             var tag_params = { ResourceARN: rule_item["Arn"] };
+//             const tag_result = await cloudwatchevents.listTagsForResource(tag_params).promise();
+//             console.log(`[warmup_handler] tag_result | success: ${JSON.stringify(tag_result)}`);
+//             const tag_list = tag_result["Tags"];
+//             for (const tag_item of tag_list) {
+//                 if (tag_item["Key"] === "label" && tag_item["Value"] === process.env.WARMUP_RULE_LABEL) {
+//                     warmup_rule_name = rule_item["Name"];
+//                 }
+//             }
+//         }
         
-        if (!_.isEmpty(warmup_rule_name)) {
-            const timestamp = moment().valueOf().toString();
-            const description = "warmup service cloudwatch rule | " + 
-                `stage: ${STAGE}, last_updated: ${timestamp}`;
-            const cloudwatchevent_params = {
-                Name:               warmup_rule_name,
-                Description:        description,
-                ScheduleExpression: "rate(1 minute)",
-                State:              "DISABLED",
-                Tags:               [
-                    {
-                        Key:   "last_updated",
-                        Value: timestamp
-                    }
-                ]
-            };
-            const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
-            console.log(`[warmup_handler] putRule | success: ${JSON.stringify(update_result)}`);
-        } else {
-            console.log("[warmup_handler] failed to find warmup event rule");
-        }
-    } catch(err) {
-        console.log(`[warmup_handler] event error: ${JSON.stringify(err)}`, err.stack);
-    }
-}
+//         if (!_.isEmpty(warmup_rule_name)) {
+//             const timestamp = moment().valueOf().toString();
+//             const description = "warmup service cloudwatch rule | " + 
+//                 `stage: ${STAGE}, last_updated: ${timestamp}`;
+//             const cloudwatchevent_params = {
+//                 Name:               warmup_rule_name,
+//                 Description:        description,
+//                 ScheduleExpression: "rate(1 minute)",
+//                 State:              "DISABLED",
+//                 Tags:               [
+//                     {
+//                         Key:   "last_updated",
+//                         Value: timestamp
+//                     }
+//                 ]
+//             };
+//             const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
+//             console.log(`[warmup_handler] putRule | success: ${JSON.stringify(update_result)}`);
+//         } else {
+//             console.log("[warmup_handler] failed to find warmup event rule");
+//         }
+//     } catch(err) {
+//         console.log(`[warmup_handler] event error: ${JSON.stringify(err)}`, err.stack);
+//     }
+// }
 
 const handler = async function (event, context, callback) {
     console.info(`[warmup_handler] event: ${JSON.stringify(event)}, context: ${JSON.stringify(context)}`);
     const result = await send_parallel_requests();
 
-    try {
-        let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
-        if (recent_sessions.length == 0) {
-            console.error("[warmup_handler] Recent user sessions do not exist. Disabling warmup cloudwatch rules...");
-            await disable_warmup_cloudwatch_rule();
-        } else {
-            console.error("[warmup_handler] Recent user sessions exist, " + 
-                `no changes will be made to cloudwatch rules | ${JSON.stringify(recent_sessions)}`);
-        }
-    } catch (err) {
-        console.error(`[warmup_handler] Failed to perform idle check | ${JSON.stringify(err)}`);
-    }
+    // try {
+    //     let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
+    //     if (recent_sessions.length == 0) {
+    //         console.error("[warmup_handler] Recent user sessions do not exist. Disabling warmup cloudwatch rules...");
+    //         await disable_warmup_cloudwatch_rule();
+    //     } else {
+    //         console.error("[warmup_handler] Recent user sessions exist, " + 
+    //             `no changes will be made to cloudwatch rules | ${JSON.stringify(recent_sessions)}`);
+    //     }
+    // } catch (err) {
+    //     console.error(`[warmup_handler] Failed to perform idle check | ${JSON.stringify(err)}`);
+    // }
 
     const response = {
         statusCode: 200,
