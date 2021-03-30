@@ -4,8 +4,12 @@ configuration:
   dynamo: mock
 
 --- 
-- test: NavigateMutationsIntent_S 
-- NavigateMutationsIntent:
+- test: Mutations_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -15,23 +19,19 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateMutationsIntent_G
-- NavigateMutationsIntent:
+- test: Mutations_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 mutations are found in 31 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateMutationsIntent_Error
-- NavigateMutationsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateMutationsIntent_GS
-- NavigateMutationsIntent:
+- test: Mutations_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -40,50 +40,76 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateMutationDomainsIntent_G
-- NavigateMutationDomainsIntent:
+- test: Domains_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_source: "TCGA"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateMutationDomainsIntent_GS
-- NavigateMutationsIntent:
+- test: MutationDomains_G
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+        data_type: "MUTATIONS"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "breast cancer"
+        value: "domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
+  - response.shouldEndSession: false
+
+--- 
+- test: MutationDomains_GS
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
         confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated."
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateMutationDomainsIntent_Error
-- NavigateMutationDomainsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateIndelsIntent_G
-- NavigateIndelsIntent:
+- test: Indels_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "INDELS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 indels are found in 26 cancer types. It has most indels in Esophageal carcinoma at 12.1 percent followed by Ovarian serous cystadenocarcinoma at 11.7 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelsIntent_S 
-- NavigateIndelsIntent:
+- test: Indels_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "INDELS"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -93,8 +119,8 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelsIntent_GS
-- NavigateIndelsIntent:
+- test: Indels_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -103,67 +129,75 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "INDELS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 indels are found in 5.7 percent of Breast invasive carcinoma patients with 6 amino acid residues recurrently mutated."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelsIntent_Error
-- NavigateIndelsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateIndelDomainsIntent_G
-- NavigateIndelDomainsIntent:
+- test: IndelDomains_G
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "INDELS"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelDomainsIntent_S 
-- NavigateIndelDomainsIntent:
+- test: IndelDomains_S
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "ovarian cancer"
+        value: "domains"
         confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "INDELS"
+        study_abbreviation: "OV"
   - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelDomainsIntent_GS
-- NavigateIndelDomainsIntent:
+- test: IndelDomains_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "breast cancer"
+        value: "domains"
         confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        study_abbreviation: "BRCA"
+        data_type: "INDELS"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and none are the most affected domains containing 75 percent and 17.9 percent of indels respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateIndelDomainsIntent_Error
-- NavigateIndelDomainsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateSNVsIntent_G
-- NavigateSNVsIntent:
+- test: SNVs_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "SNV"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 SNVs are found in 31 cancer types. It has most SNVs in Uterine Carcinosarcoma at 61.4 percent followed by Ovarian serous cystadenocarcinoma at 58.7 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVsIntent_S 
-- NavigateSNVsIntent:
+- test: SNVs_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "SNV"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -173,8 +207,8 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVsIntent_GS
-- NavigateSNVsIntent:
+- test: SNVs_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -183,51 +217,97 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "SNV"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 SNVs are found in 24.4 percent of Breast invasive carcinoma patients with 44 amino acid residues recurrently mutated."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVsIntent_Error
-- NavigateSNVsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateSNVDomainsIntent_G
-- NavigateSNVDomainsIntent:
+- test: SNVDomains_G
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "SNV"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.1 percent and 5.1 percent of SNVs respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVDomainsIntent_S 
-- NavigateSNVDomainsIntent:
+- test: SNVDomains_S
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "ovarian cancer"
+        value: "domains"
         confirmationStatus: "NONE"
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "SNV"
+        study_abbreviation: "OV"
   - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVDomainsIntent_GS
-- NavigateSNVDomainsIntent:
+- test: SNVDomains_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "breast cancer"
+        value: "domains"
         confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "SNV"
+        study_abbreviation: "BRCA"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 91 percent and 4.9 percent of SNVs respectively."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateSNVDomainsIntent_Error
-- NavigateSNVDomainsIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+- test: Domains_nodata
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "domains"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>Ok, protein domains. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.shouldEndSession: false
+
+---
+- test: Mutations_nodata
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "mutations"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>Ok, mutations. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.shouldEndSession: false
+
+---
+- test: Indels_nodata
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "indels"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>Ok, indels. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.shouldEndSession: false
+
+---
+- test: SNVs_nodata
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "SNVs"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>Ok, single nucleotide variants. <prosody rate='110%'>What would you like to know?</prosody></speak>"
   - response.shouldEndSession: false

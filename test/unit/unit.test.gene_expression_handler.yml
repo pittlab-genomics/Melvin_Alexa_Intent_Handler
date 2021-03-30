@@ -4,8 +4,12 @@ configuration:
   dynamo: mock
 
 --- 
-- test: NavigateExpressionIntent_S 
-- NavigateExpressionIntent:
+- test: Expression_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -15,17 +19,19 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateExpressionIntent_G
-- NavigateExpressionIntent:
+- test: Expression_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
         gene_name: "TP53"
   - response.outputSpeech.ssml: "The highest mean expression of TP53 is found in Acute Myeloid Leukemia with a log2 normalized count of 11.9."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateExpressionIntent_GS
-- NavigateExpressionIntent:
+- test: Expression_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -34,11 +40,18 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "GENE_EXPRESSION"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "The mean log2 normalized expression count of TP53 in Breast invasive carcinoma is 11.3"
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateExpressionIntent_Error
-- NavigateExpressionIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+- test: Exp_nodata
+- NavigateJoinFilterIntent:
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "gene expression"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "<speak>Ok, gene expression. <prosody rate='110%'>What would you like to know?</prosody></speak>"
   - response.shouldEndSession: false

@@ -27,30 +27,30 @@ const {
 const { LaunchRequestHandler } = require("./skill_handlers/launch_handler.js");
 const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handler.js");
 
-const {
-    NavigateCNAIntentHandler,
-    NavigateGainIntentHandler,
-    NavigateLossIntentHandler
-} = require("./skill_handlers/cna_handler.js");
+// const {
+//     NavigateCNAIntentHandler,
+//     NavigateGainIntentHandler,
+//     NavigateLossIntentHandler
+// } = require("./skill_handlers/cna_handler.js");
 
-const {
-    NavigateMutationsIntentHandler,
-    NavigateMutationDomainsIntentHandler,
-    NavigateIndelsIntentHandler,
-    NavigateIndelDomainsIntentHandler,
-    NavigateSNVsIntentHandler,
-    NavigateSNVDomainsIntentHandler
-} = require("./skill_handlers/mutations_handler.js");
+// const {
+//     NavigateMutationsIntentHandler,
+//     NavigateMutationDomainsIntentHandler,
+//     NavigateIndelsIntentHandler,
+//     NavigateIndelDomainsIntentHandler,
+//     NavigateSNVsIntentHandler,
+//     NavigateSNVDomainsIntentHandler
+// } = require("./skill_handlers/mutations_handler.js");
 
-const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
+// const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
 
 const { NavigateEmailIntentHandler } = require("./skill_handlers/email_handler.js");
 
-const {
-    ClinicalTrialsNearbyIntentHandler,
-    ClinicalTrialsWithinIntentHandler,
-    ClinicalTrialClosestIntentHandler
-} = require("./skill_handlers/clinical_trials_handler.js");
+// const {
+//     ClinicalTrialsNearbyIntentHandler,
+//     ClinicalTrialsWithinIntentHandler,
+//     ClinicalTrialClosestIntentHandler
+// } = require("./skill_handlers/clinical_trials_handler.js");
 
 
 const HelpIntentHandler = {
@@ -141,29 +141,29 @@ add_event_configuration("NavigateGeneTargetIntent", MelvinEventTypes.ANALYSIS_EV
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
 add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSplitbyIntentHandler);
-add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
-add_event_configuration("NavigateMutationDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateMutationDomainsIntentHandler);
-add_event_configuration("NavigateIndelsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateIndelsIntentHandler);
-add_event_configuration("NavigateIndelDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateIndelDomainsIntentHandler);
-add_event_configuration("NavigateSNVsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSNVsIntentHandler);
-add_event_configuration("NavigateSNVDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateSNVDomainsIntentHandler);
+// add_event_configuration("NavigateMutationsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateMutationsIntentHandler);
+// add_event_configuration("NavigateMutationDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     NavigateMutationDomainsIntentHandler);
+// add_event_configuration("NavigateIndelsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateIndelsIntentHandler);
+// add_event_configuration("NavigateIndelDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     NavigateIndelDomainsIntentHandler);
+// add_event_configuration("NavigateSNVsIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateSNVsIntentHandler);
+// add_event_configuration("NavigateSNVDomainsIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     NavigateSNVDomainsIntentHandler);
 
-add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
-add_event_configuration("NavigateGainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateGainIntentHandler);
-add_event_configuration("NavigateLossIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    NavigateLossIntentHandler);
-add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
+// add_event_configuration("NavigateCNAIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCNAIntentHandler);
+// add_event_configuration("NavigateGainIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     NavigateGainIntentHandler);
+// add_event_configuration("NavigateLossIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     NavigateLossIntentHandler);
+// add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
 
-add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    ClinicalTrialsNearbyIntentHandler);
-add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    ClinicalTrialsWithinIntentHandler);
-add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_EVENT, 
-    ClinicalTrialClosestIntentHandler);
+// add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     ClinicalTrialsNearbyIntentHandler);
+// add_event_configuration("ClinicalTrialsWithinIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     ClinicalTrialsWithinIntentHandler);
+// add_event_configuration("ClinicalTrialClosestIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+//     ClinicalTrialClosestIntentHandler);
 
 
 add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_RESET_EVENT, NavigateResetIntentHandler);
@@ -203,21 +203,21 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateJoinFilterIntentHandler,
         NavigateCompareIntentHandler,
         NavigateSplitbyIntentHandler,
-        NavigateMutationsIntentHandler,
-        NavigateMutationDomainsIntentHandler,
-        NavigateIndelsIntentHandler,
-        NavigateIndelDomainsIntentHandler,
-        NavigateSNVsIntentHandler,
-        NavigateSNVDomainsIntentHandler,
-        NavigateCNAIntentHandler,
-        NavigateGainIntentHandler,
-        NavigateLossIntentHandler,
-        NavigateExpressionIntentHandler,
+        // NavigateMutationsIntentHandler,
+        // NavigateMutationDomainsIntentHandler,
+        // NavigateIndelsIntentHandler,
+        // NavigateIndelDomainsIntentHandler,
+        // NavigateSNVsIntentHandler,
+        // NavigateSNVDomainsIntentHandler,
+        // NavigateCNAIntentHandler,
+        // NavigateGainIntentHandler,
+        // NavigateLossIntentHandler,
+        // NavigateExpressionIntentHandler,
         NavigateEmailIntentHandler,
 
-        ClinicalTrialsNearbyIntentHandler,
-        ClinicalTrialsWithinIntentHandler,
-        ClinicalTrialClosestIntentHandler,
+        // ClinicalTrialsNearbyIntentHandler,
+        // ClinicalTrialsWithinIntentHandler,
+        // ClinicalTrialClosestIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

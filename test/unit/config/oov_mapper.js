@@ -79,6 +79,11 @@ const oovMapperInterceptor = function() {
                 type:  "DTYPE",
                 val:   "GAIN"
             }}];
+            case "gene expression": return[200, { data: {
+                query: "gene expression",
+                type:  "DTYPE",
+                val:   "GENE_EXPRESSION"
+            }}];
             }
         }).persist();
 };

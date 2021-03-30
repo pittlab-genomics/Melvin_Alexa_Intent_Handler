@@ -4,7 +4,10 @@ const DATA_TYPES = {
     "GAIN":                "copy number gains",
     "LOSS":                "copy number losses",
     "GENE_EXPRESSION":     "gene expression",
-    "STRUCTURAL_VARIANTS": "structural variants"
+    "STRUCTURAL_VARIANTS": "structural variants",
+    "PROTEIN_DOMAINS":     "protein domains",
+    "INDELS":              "indels",
+    "SNV":                 "single nucleotide variants"
 };
 
 module.exports = { DATA_TYPES };

@@ -4,26 +4,30 @@ configuration:
   dynamo: mock
 
 --- 
-- test: NavigateCNAIntent_S 
-- NavigateCNAIntent:
+- test: CNA_S
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
+        data_type: "CNA"
+        data_source: "TCGA"
         study_abbreviation: "OV"
   - response.outputSpeech.ssml: "HCN2 has the greatest number of copy number alterations in Ovarian serous cystadenocarcinoma at 59.5 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateCNAIntent_G
-- NavigateCNAIntent:
+- test: CNA_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
+        data_type: "CNA"
+        data_source: "TCGA"
         gene_name: "TP53"
   - response.outputSpeech.ssml: "For TP53 the greatest number of copy number alterations occur in Sarcoma patients at 37.6 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateCNAIntent_GS
-- NavigateCNAIntent:
+- test: CNA_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -31,19 +35,19 @@ configuration:
         confirmationStatus: "NONE"
   - request.session.attributes:
       MELVIN.STATE:
+        data_type: "CNA"
+        data_source: "TCGA"
         gene_name: "BRCA1"
   - response.outputSpeech.ssml: "In Ovarian serous cystadenocarcinoma patients, Braca one is amplified at 4.5 percent and deleted in 8 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateCNAIntent_Error
-- NavigateCNAIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateGainIntent_S 
-- NavigateGainIntent:
+- test: Gain_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "GAIN"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -53,17 +57,19 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateGainIntent_G
-- NavigateGainIntent:
+- test: Gain_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "GAIN"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "For TP53 the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 9.4 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateGainIntent_GS
-- NavigateGainIntent:
+- test: Gain_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -72,18 +78,18 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "GAIN"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "In Breast invasive carcinoma patients, TP53 is amplified at 1.5 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateGainIntent_Error
-- NavigateGainIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateLossIntent_S 
-- NavigateLossIntent:
+- test: Loss_S
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        data_type: "LOSS"
+        data_source: "TCGA"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -93,17 +99,19 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateLossIntent_G
-- NavigateLossIntent:
+- test: Loss_G
+- NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "LOSS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "For TP53 greatest number of deletions are found in Sarcoma patients at 34.1 percent."
   - response.shouldEndSession: false
 
 --- 
-- test: NavigateLossIntent_GS
-- NavigateLossIntent:
+- test: Loss_GS
+- NavigateJoinFilterIntent:
   - request.request.intent.slots:
       query:
         name: "query"
@@ -112,11 +120,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_type: "LOSS"
+        data_source: "TCGA"
   - response.outputSpeech.ssml: "TP53 is deleted in 4.3 percent of Breast invasive carcinoma patients."
-  - response.shouldEndSession: false
-
---- 
-- test: NavigateLossIntent_Error
-- NavigateLossIntent:
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
   - response.shouldEndSession: false
