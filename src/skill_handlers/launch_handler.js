@@ -90,7 +90,7 @@ async function update_cloudwatch_events() {
             const cloudwatchevent_params = {
                 Name:               warmup_rule_name,
                 Description:        description,
-                ScheduleExpression: "rate(1 minute)",
+                ScheduleExpression: "rate(5 minutes)",
                 State:              "ENABLED",
                 Tags:               [
                     {

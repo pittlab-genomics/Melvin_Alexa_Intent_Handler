@@ -18,7 +18,7 @@ const {
     SUPPORTED_SPLITBY_DTYPES,
     MELVIN_EXPLORER_ENDPOINT,
     OOV_MAPPER_ENDPOINT,
-    // STAGE
+    STAGE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
@@ -289,7 +289,7 @@ async function disable_warmup_cloudwatch_rule() {
             const cloudwatchevent_params = {
                 Name:               warmup_rule_name,
                 Description:        description,
-                ScheduleExpression: "rate(1 minute)",
+                ScheduleExpression: "rate(5 minutes)",
                 State:              "DISABLED",
                 Tags:               [
                     {
