@@ -45,18 +45,20 @@ const NavigateEmailIntentHandler = {
             if (!_.isEmpty(results_duration)) {
                 const duration_sec = toSeconds(parse(results_duration));
                 msg_data["irs_duration_sec"] = duration_sec;
-                console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url} msg_data: ${JSON.stringify(msg_data)}`);
+                console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url}
+                    msg_data: ${JSON.stringify(msg_data)}`);
                 speechText = "Ok, I'm emailing results during that period.";
 
             } else {
                 msg_data["irs_results_count"] = results_count;
-                console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url} msg_data: ${JSON.stringify(msg_data)}`);
+                console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url} 
+                    msg_data: ${JSON.stringify(msg_data)}`);
 
-                if (results_count == DEFAULT_RESULT_COUNT) {
-                    speechText = "Ok, I'm emailing that to you now.";
-                } else {
-                    speechText = `Ok, I'm emailing last ${results_count} results to you now.`;
-                }
+                // if (results_count == DEFAULT_RESULT_COUNT) {
+                speechText = "Ok, I'm emailing that to you now.";
+                // } else {
+                //     speechText = `Ok, I'm emailing last ${results_count} results to you now.`;
+                // }
             }
             repromptText = "Please check your inbox in a while.";
 

@@ -81,16 +81,23 @@ async function get_utterances_html(greeting_text, utterance_list) {
         let params_text;
         if (!Array.isArray(apl_directives) || apl_directives.length == 0) {
             let card = melvin_response["card"];
-            image_properties = { "image0": { "URL": card["image"]["largeImageUrl"] }};
-            params_text = card["text"];
+            if(card && card["image"]) {
+                image_properties = { "image0": { "URL": card["image"]["largeImageUrl"] }};
+                params_text = card["text"];
+            } else {
+                continue;
+            }
         } else {
-            image_properties = apl_directives[0]["datasources"]["pagerTemplateData"]["properties"];
-            params_text = apl_directives[0]["datasources"]["pagerTemplateData"]["footer_text"];
+            if(apl_directives[0] && apl_directives[0]["datasources"]) {
+                image_properties = apl_directives[0]["datasources"]["pagerTemplateData"]["properties"];
+                params_text = apl_directives[0]["datasources"]["pagerTemplateData"]["footer_text"];
+            } else {
+                continue;
+            }
         }
 
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${counter}. ${params_text}</td></tr>\n`;
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`;
-        counter += 1;
 
         for (let image_item in image_properties) {
             let image_url = image_properties[image_item]["URL"]["href"];
@@ -100,6 +107,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
             results_table_html += "</td></tr>\n";
         }
         results_table_html += "<tr><td style=\"padding: 20px 0 30px 0;\"><hr/></td></tr>\n";
+        counter += 1;
     }
     const html_data = html_template_content.toString().replace("_TEMPLATE_PLACEHOLDER_", results_table_html);
     console.info(`[sqs_irs_handler] get_utterances_html | html_data: ${html_data}`);
