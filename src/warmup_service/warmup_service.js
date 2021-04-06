@@ -126,25 +126,20 @@ const stats_ep_path_dict = {
 };
 
 const plots_ep_path_dict = {
-    "profile_plot": [
-        "/analysis/mutations/tcga/profile_plot?gene=BRCA1&study=BRCA",
-        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=BRCA",
-        "/analysis/mutations/tcga/profile_plot?gene=TP53&study=OV"
+    "MUT_plot": [
+        "/analysis/mutations/tcga/MUT_plot?gene=BRCA1&study=BRCA",
+        "/analysis/mutations/tcga/MUT_plot?gene=TP53&study=BRCA",
+        "/analysis/mutations/tcga/MUT_plot?gene=TP53&study=OV"
     ],
-    "domain_pie_plot": [
-        "/analysis/mutations/tcga/domain_pie_plot?gene=BRCA1&study=BRCA",
-        "/analysis/mutations/tcga/domain_pie_plot?gene=TP53&study=OV",
-        "/analysis/mutations/tcga/domain_pie_plot?gene=CDH1&study=BRCA"
+    "IND_plot": [
+        "/analysis/mutations/tcga/IND_plot?gene=BRCA1&study=BRCA",
+        "/analysis/mutations/tcga/IND_plot?gene=TP53&study=OV",
+        "/analysis/mutations/tcga/IND_plot?gene=CDH1&study=BRCA"
     ],
-    "domain_stack_plot": [
-        "/analysis/mutations/tcga/domain_stack_plot?gene=TP53&study=BRCA",
-        "/analysis/mutations/tcga/domain_stack_plot?gene=HIF1A&study=BRCA",
-        "/analysis/mutations/tcga/domain_stack_plot?gene=BRCA1&study=BRCA"
-    ],
-    "treemap_plot": [
-        "/analysis/mutations/tcga/treemap_plot?gene=TP53",
-        "/analysis/mutations/tcga/treemap_plot?gene=CDH1",
-        "/analysis/mutations/tcga/treemap_plot?gene=BRCA1&study=BRCA"
+    "SNV_plot": [
+        "/analysis/mutations/tcga/SNV_plot?gene=TP53&study=BRCA",
+        "/analysis/mutations/tcga/SNV_plot?gene=HIF1A&study=BRCA",
+        "/analysis/mutations/tcga/SNV_plot?gene=BRCA1&study=BRCA"
     ],
     "cna_plot": [
         "/analysis/cna/tcga/cna_plot?gene=CDH17&study=BRCA",
@@ -166,10 +161,60 @@ const plots_ep_path_dict = {
         "/analysis/gene_expression/tcga/plot?gene=TP53",        
         "/analysis/gene_expression/tcga/plot?study=BRCA"
     ],
-    "mutations_cna_plot": [
+    "mut_cna_compare_plot": [
         "/analysis/comparison/tcga/MUTvCNA_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_plot?study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_plot?gene=TP53"
+    ],
+    "mut_gain_compare_plot": [
+        "/analysis/comparison/tcga/MUTvGAIN_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/MUTvGAIN_plot?study=BRCA",
+        "/analysis/comparison/tcga/MUTvGAIN_plot?gene=TP53"
+    ],
+    "mut_loss_compare_plot": [
+        "/analysis/comparison/tcga/MUTvLOSS_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/MUTvLOSS_plot?study=BRCA",
+        "/analysis/comparison/tcga/MUTvLOSS_plot?gene=TP53"
+    ],
+    "snv_indel_compare_plot": [
+        "/analysis/comparison/tcga/SNVvIND_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/SNVvIND_plot?study=BRCA",
+        "/analysis/comparison/tcga/SNVvIND_plot?gene=TP53"
+    ],
+    "snv_cna_compare_plot": [
+        "/analysis/comparison/tcga/SNVvCNA_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/SNVvCNA_plot?study=BRCA",
+        "/analysis/comparison/tcga/SNVvCNA_plot?gene=TP53"
+    ],
+    "snv_gain_compare_plot": [
+        "/analysis/comparison/tcga/SNVvGAIN_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/SNVvGAIN_plot?study=BRCA",
+        "/analysis/comparison/tcga/SNVvGAIN_plot?gene=TP53"
+    ],
+    "snv_loss_compare_plot": [
+        "/analysis/comparison/tcga/SNVvLOSS_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/SNVvLOSS_plot?study=BRCA",
+        "/analysis/comparison/tcga/SNVvLOSS_plot?gene=TP53"
+    ],
+    "ind_cna_compare_plot": [
+        "/analysis/comparison/tcga/INDvCNA_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/INDvCNA_plot?study=BRCA",
+        "/analysis/comparison/tcga/INDvCNA_plot?gene=TP53"
+    ],
+    "ind_gain_compare_plot": [
+        "/analysis/comparison/tcga/INDvGAIN_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/INDvGAIN_plot?study=BRCA",
+        "/analysis/comparison/tcga/INDvGAIN_plot?gene=TP53"
+    ],
+    "ind_loss_compare_plot": [
+        "/analysis/comparison/tcga/INDvLOSS_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/INDvLOSS_plot?study=BRCA",
+        "/analysis/comparison/tcga/INDvLOSS_plot?gene=TP53"
+    ],
+    "gain_loss_compare_plot": [
+        "/analysis/comparison/tcga/GAINvLOSS_plot?gene=CDH17&study=BRCA",
+        "/analysis/comparison/tcga/GAINvLOSS_plot?study=BRCA",
+        "/analysis/comparison/tcga/GAINvLOSS_plot?gene=TP53"
     ]
 };
 
