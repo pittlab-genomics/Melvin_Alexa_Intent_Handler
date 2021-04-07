@@ -8,7 +8,11 @@ const util = require("util");
 const moment = require("moment");
 const _ = require("lodash");
 
-const { MelvinEventTypes } = require("../common.js");
+const {
+    MelvinEventTypes,
+    MAX_EMAIL_RESULT_COUNT,
+    MAX_EMAIL_DURATION
+} = require("../common.js");
 const utterances_doc = require("../dao/utterances.js");
 
 
@@ -45,24 +49,29 @@ async function process_message(msg_data) {
     const body_part_text = "Hi,\r\nPlease find your Melvin analyses data below.";
     const greeting_text = "Hi, <br/><br/>Please find your Melvin analyses data below.<br/><br/>";
     const user_email = msg_data["user_email"];
+    var count = MAX_EMAIL_RESULT_COUNT;
+    var duration = MAX_EMAIL_DURATION;
 
     let utterance_list = [];
-    if (!_.isEmpty(msg_data["irs_duration_sec"])) {
-        // TODO
+    if (_.has(msg_data, "irs_duration_sec")) {
+        const duration = Math.min(msg_data["irs_duration_sec"], MAX_EMAIL_DURATION);
+        console.log(`[process_message] irs_duration_sec: ${duration}`);
     } else {
-        utterance_list = await utterances_doc.get_last_n_events(
-            msg_data["user_id"],
-            msg_data["irs_results_count"],
-            MelvinEventTypes.ANALYSIS_EVENT);
-        utterance_list = utterance_list.slice(0, msg_data["irs_results_count"]);
-        console.info(`[process_message] utterance_list.len: ${utterance_list.length}`);
+        count = Math.min(msg_data["irs_results_count"], MAX_EMAIL_RESULT_COUNT);
+        console.info(`[process_message] count: ${count}`);
     }
 
-    const html_part_text = await get_utterances_html(greeting_text, utterance_list);
+    utterance_list = await utterances_doc.get_events_in_period_with_count(
+        msg_data["user_id"],
+        duration,
+        count,
+        MelvinEventTypes.ANALYSIS_EVENT);
+    console.log(`[process_message] utterrance_list.len: ${utterance_list.length}`);
+    const html_part_text = await get_utterances_html(greeting_text, utterance_list, count);
     await irs_send_email(user_email, sub_text, body_part_text, html_part_text);
 }
 
-async function get_utterances_html(greeting_text, utterance_list) {
+async function get_utterances_html(greeting_text, utterance_list, count) {
     if (utterance_list.length == 0) {
         return "Sorry, I could not find any analyses.";
     }
@@ -108,6 +117,7 @@ async function get_utterances_html(greeting_text, utterance_list) {
         }
         results_table_html += "<tr><td style=\"padding: 20px 0 30px 0;\"><hr/></td></tr>\n";
         counter += 1;
+        if(counter > count) break;
     }
     const html_data = html_template_content.toString().replace("_TEMPLATE_PLACEHOLDER_", results_table_html);
     console.info(`[sqs_irs_handler] get_utterances_html | html_data: ${html_data}`);

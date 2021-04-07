@@ -9,6 +9,8 @@ const { DATA_TYPES } = require("./utils/data_types.js");
 
 const MELVIN_MAX_HISTORY_ITEMS = 30;
 const FOLLOW_UP_TEXT_THRESHOLD = 2;
+const MAX_EMAIL_RESULT_COUNT = 1000;
+const MAX_EMAIL_DURATION = 604800; //1 week
 
 const MelvinEventTypes = {
     ANALYSIS_EVENT:          "analysis_event",
@@ -231,5 +233,7 @@ module.exports = {
     RequiredAttributesClinvar,
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
+    MAX_EMAIL_RESULT_COUNT,
+    MAX_EMAIL_DURATION,
     nunjucks_env
 };

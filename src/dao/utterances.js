@@ -1,5 +1,6 @@
 var AWS = require("aws-sdk");
 var _ = require("lodash");
+const moment = require("moment");
 
 const {
     queryEntireTable, scanEntireTable 
@@ -53,32 +54,39 @@ utterances_doc.prototype.getUtteranceByTimestamp = async function (user_id, time
     return utterance_list;
 };
 
-utterances_doc.prototype.get_last_n_events = async function (user_id, count, event_type) {
+utterances_doc.prototype.get_events_in_period_with_count = async function (user_id, period, count, event_type) {
     let utterance_list = [];
 
-    console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, count: ${count}`);
+    const timestamp = moment().valueOf();
+    const duration_ms = period * 1000;
+    const s_time = timestamp - duration_ms;
+    console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, s_time: ${s_time}, count: ${count}`);
     var query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
         ProjectionExpression:     "utterance_id, melvin_state, melvin_response, event_type",
         KeyConditionExpression:   "#user_id = :uid",
-        FilterExpression:         "#event_type = :event_type",
+        FilterExpression:         "#event_type = :event_type AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives)) AND #time > :s_time",
         ExpressionAttributeNames: {
             "#user_id":    "user_id",
-            "#event_type": "event_type"
+            "#event_type": "event_type",
+            "#time":       "createdAt",
+            "#response":   "melvin_response",
+            "#card":       "card",
+            "#directives": "directives"
         },
         ExpressionAttributeValues: {
             ":uid":        user_id,
-            ":event_type": event_type
+            ":event_type": event_type,
+            ":s_time":     s_time
         },
         ScanIndexForward: false,
         Limit:            count
     };
 
     utterance_list = await queryEntireTable(docClient, query_params);
-    console.info(`[utterances_doc] [get_last_n_events] utterance_list.len: ${utterance_list.length}`);
+    console.info(`[utterances_doc] [get_events_in_period_with_count] utterance_list.len: ${utterance_list.length}`);
     return utterance_list;
 };
-
 
 utterances_doc.prototype.getMostRecentUtterance = async function (user_id, session_id) {
     let utterance_list = [];
