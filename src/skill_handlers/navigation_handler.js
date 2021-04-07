@@ -69,7 +69,6 @@ const NavigateCompareIntentHandler = {
             const state_diff = get_state_change_diff(state_change);
             let response = await build_compare_response(handlerInput, melvin_state, compare_state, state_diff);
             speechText = response["speech_text"];
-            clean_melvin_aux_state(handlerInput);
 
         } catch (error) {
             if (error["speech"]) {
@@ -78,6 +77,8 @@ const NavigateCompareIntentHandler = {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.trace("[NavigateCompareIntentHandler] Error! except: ", error);
+        } finally {
+            clean_melvin_aux_state(handlerInput);
         }
 
         return handlerInput.responseBuilder

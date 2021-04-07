@@ -55,8 +55,6 @@ const NavigateSplitbyIntentHandler = {
             let response = await build_splitby_response(handlerInput, melvin_state, splitby_state);
             speechText = response["speech_text"];
 
-            // cleanup splitby state after dialog management flow is complete
-            clean_melvin_aux_state(handlerInput);
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -64,6 +62,9 @@ const NavigateSplitbyIntentHandler = {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.trace("[NavigateSplitbyIntentHandler] Error! except: ", error);
+        } finally {
+            // cleanup splitby state after dialog management flow is complete
+            clean_melvin_aux_state(handlerInput);
         }
 
         return handlerInput.responseBuilder

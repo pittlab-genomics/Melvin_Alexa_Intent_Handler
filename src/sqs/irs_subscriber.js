@@ -54,7 +54,7 @@ async function process_message(msg_data) {
 
     let utterance_list = [];
     if (_.has(msg_data, "irs_duration_sec")) {
-        const duration = Math.min(msg_data["irs_duration_sec"], MAX_EMAIL_DURATION);
+        duration = Math.min(msg_data["irs_duration_sec"], MAX_EMAIL_DURATION);
         console.log(`[process_message] irs_duration_sec: ${duration}`);
     } else {
         count = Math.min(msg_data["irs_results_count"], MAX_EMAIL_RESULT_COUNT);
