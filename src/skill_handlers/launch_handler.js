@@ -126,10 +126,13 @@ const LaunchRequestHandler = {
         }
         await update_cloudwatch_events();        
 
+        const speechText = MELVIN_WELCOME_GREETING + 
+            "What would you like to know? You can ask me about a gene or cancer type." +
+            "Try, Tell me about TP53";
         const reprompt_text = "What would you like to know? You can ask me about a gene or cancer type.";
         add_launch_apl_docs(handlerInput);
         return handlerInput.responseBuilder
-            .speak(MELVIN_WELCOME_GREETING)
+            .speak(speechText)
             .reprompt(reprompt_text)
             .getResponse();
     }

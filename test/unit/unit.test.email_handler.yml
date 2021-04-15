@@ -16,7 +16,7 @@ configuration:
         name: "count"
         value: "3"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Ok, I'm emailing last 3 results to you now."
+  - response.outputSpeech.ssml: "Ok, I'm emailing that to you now."
   - response.reprompt.outputSpeech.ssml: "Please check your inbox in a while."
   - response.shouldEndSession: false
 

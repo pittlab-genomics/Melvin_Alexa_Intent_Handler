@@ -140,7 +140,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 GAIN."
   - response.shouldEndSession: false
 
 --- 
@@ -160,7 +160,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.03"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 LOSS."
   - response.shouldEndSession: false
 
 --- 
@@ -199,7 +199,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 MUTATIONS."
   - response.shouldEndSession: false
 
 --- 
@@ -219,7 +219,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 INDELS."
   - response.shouldEndSession: false
 
 --- 
@@ -239,7 +239,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.27"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 SNV."
   - response.shouldEndSession: false
 
 --- 
@@ -259,7 +259,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 CNA."
   - response.shouldEndSession: false
 
 --- 
@@ -279,7 +279,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.72"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 LOSS and CDH1 LOSS."
   - response.shouldEndSession: false
 
 --- 
@@ -299,7 +299,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.01"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 GAIN and CDH1 GAIN."
   - response.shouldEndSession: false
 
 --- 
@@ -319,7 +319,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.5"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 GAIN and CDH1 LOSS."
   - response.shouldEndSession: false
 
 --- 
@@ -339,7 +339,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.46"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 CNA and CDH1 CNA."
   - response.shouldEndSession: false
 
 --- 
@@ -359,7 +359,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.15"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 CNA."
   - response.shouldEndSession: false
 
 --- 
@@ -379,7 +379,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 1"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 CNA and CDH1 LOSS."
   - response.shouldEndSession: false
 
 --- 
@@ -399,7 +399,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.07"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 INDELS and CDH1 INDELS."
   - response.shouldEndSession: false
 
 --- 
@@ -419,7 +419,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.03"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 CNA and TP53 INDELS."
   - response.shouldEndSession: false
 
 --- 
@@ -439,7 +439,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.11"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 INDELS."
   - response.shouldEndSession: false
 
 --- 
@@ -459,7 +459,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.08"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 INDELS and CDH1 LOSS."
   - response.shouldEndSession: false
 
 --- 
@@ -479,7 +479,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.11"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 SNV."
   - response.shouldEndSession: false
 
 --- 
@@ -499,7 +499,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 INDELS and TP53 SNV."
   - response.shouldEndSession: false
 
 --- 
@@ -519,7 +519,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.04"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 CNA."
   - response.shouldEndSession: false
 
 --- 
@@ -539,7 +539,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.1"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 SNV."
   - response.shouldEndSession: false
 
 --- 
@@ -559,5 +559,5 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.15"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 LOSS."
   - response.shouldEndSession: false
