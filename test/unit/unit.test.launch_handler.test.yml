@@ -16,8 +16,8 @@ configuration:
 - test: Launch, helpIntent and cancelIntent. 
 - LaunchRequest
 - AMAZON.HelpIntent: 
-  - response.outputSpeech.ssml: "You can say hello to me! How can I help?"
-  - response.reprompt.outputSpeech.ssml: "You can say hello to me! How can I help?"
+  - response.outputSpeech.ssml: "You can ask me about a gene or cancer type. Like, Tell me about TP53. How can I help?"
+  - response.reprompt.outputSpeech.ssml: "You can ask me about a gene or cancer type. Like, Tell me about TP53. How can I help?"
   - response.shouldEndSession: false
 - AMAZON.CancelIntent: Goodbye!
 
