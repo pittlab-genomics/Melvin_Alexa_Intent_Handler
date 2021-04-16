@@ -59,17 +59,16 @@ const HelpIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "AMAZON.HelpIntent";
     },
     handle(handlerInput) {
-        const speechText = "Melvin Alexa skill is a voice based genome analytics tool. " +
-            "You can ask me about any variations in a gene or a cancer type. " +
-            "The skill responses are based on the current state which could be a combination of gene, cancer and a variant. " +
-            "The current state can be updated using navigation commands to add in any gene, cancer or a variant using multi-turn conversations. " +
-            "Navigation commands are tell me about, show me or how about. " +
-            "Additionally, the user can navigate in a conversation using the `step back` command, " +
-            "restore a previous session at the beginning using the `resume session` command, " +
-            "reset the state to start from scratch using the `reset` command, " +
-            "and repeat the same response again using the `repeat that` command. " +
-            "You could also perform compare to and split by operations within and across the different variations. " +
-            "How can I help?";
+        const speechText = "Melvin is a voice-based tool that allows you to interrogate cancer genomics data. " +
+            "To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
+            "I am able to remember our conversation, so you can ask me to build compound queries one step at a time. " +
+            "For example, if you say, 'Tell me about TP53' followed by 'Show me breast cancer' I will provide an analytical summary of TP53 in breast cancer. " +
+            "If you subsequently ask 'Show me mutations' I will provided a detailed breakdown of TP53 mutations in breast cancer. " +
+            "You can swap any of these variables by providing another gene, cancer type, or data type. " +
+            "If you ever feel stuck, just say 'Alexa, reset' and I will reset the state to start from scratch. " +
+            "For more example conversations, please visit https://pittgenomics.gitlab.io/melvin_docs. " +
+            "Now, How can I help you?";
+
 
         return handlerInput.responseBuilder
             .speak(speechText)

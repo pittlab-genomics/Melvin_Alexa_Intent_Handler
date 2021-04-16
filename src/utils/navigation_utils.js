@@ -19,7 +19,8 @@ const {
     RequiredAttributesClinvar,
     DataTypes,
     DataSources,
-    melvin_error
+    melvin_error,
+    get_oov_mappings_response
 } = require("../common.js");
 
 const { get_event_type } = require("./handler_configuration.js");
@@ -74,23 +75,27 @@ const get_melvin_history = function (handlerInput) {
 const resolve_oov_entity = async function(handlerInput, query) {
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
-    const t0 = performance.now();
-    try {
-        const params = {
-            query, request_id, session_id, 
-        };
-        const query_response = await get_oov_mapping_by_query(params);
-        const t1 = performance.now();
-        console.log("[resolve_oov_entity] oov request took " + (t1 - t0) + " ms | " + 
+    const response = get_oov_mappings_response(query);
+    if(!response) {
+        const t0 = performance.now();
+        try {
+            const params = {
+                query, request_id, session_id, 
+            };
+            const query_response = await get_oov_mapping_by_query(params);
+            const t1 = performance.now();
+            console.log("[resolve_oov_entity] oov request took " + (t1 - t0) + " ms | " + 
             `query_response: ${JSON.stringify(query_response)}`);
-        return query_response;
-    } catch (error) {
-        const t2 = performance.now();
-        console.error("[resolve_oov_entity] oov request failed and took " + (t2 - t0) + " ms", error);
-        throw melvin_error(`Error while mapping query: ${query}`,
-            MelvinIntentErrors.OOV_ERROR,
-            DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
+            return query_response;
+        } catch (error) {
+            const t2 = performance.now();
+            console.error("[resolve_oov_entity] oov request failed and took " + (t2 - t0) + " ms", error);
+            throw melvin_error(`Error while mapping query: ${query}`,
+                MelvinIntentErrors.OOV_ERROR,
+                DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
+        }
     }
+    return response;
 };
 
 const update_melvin_state = async function (

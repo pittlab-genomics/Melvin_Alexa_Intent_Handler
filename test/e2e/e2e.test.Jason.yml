@@ -1,7 +1,7 @@
 
 ---
 - test: Jason Test 1
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_1/Test1.1.mp3: 
   - caption: Ok, TP53. What would you like to know?
@@ -16,7 +16,7 @@
 
 ---
 - test: Jason Test 2
-- melvin : 
+- melvin genomics : 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_2/Test2.1.mp3: 
   - caption: Ok, copy number alterations. What would you like to know?
@@ -27,7 +27,7 @@
 
 ---
 - test: Jason Test 3
-- melvin : 
+- melvin genomics : 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.1.mp3: 
   - caption: Ok, Lung adenocarcinoma. What would you like to know?
@@ -40,22 +40,22 @@
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.5.mp3: 
   - caption: Which gene would you like to split by?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_3/Test3.6.mp3: 
-  - caption: In Lung adenocarcinoma, MYC is not differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01
+  - caption: In Lung adenocarcinoma, MYC is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01
 
 ---
 - test: Jason Test 4
-- melvin : 
+- melvin genomics : 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.1.mp3: 
-  - caption: Ok, RAD51B. What would you like to know?
+  - caption: Ok, RAD51C. What would you like to know?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.2.mp3: 
-  - caption: Sorry, I don't have the gene definition for RAD51B.
+  - caption: RAD51C is at 17q22  This gene is a member of the RAD51 family.
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_4/Test4.3.mp3: 
-  - caption: For RAD51B the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 12.9 percent.
+  - caption: For RAD51C the greatest number of amplifications are found in Ovarian serous cystadenocarcinoma patients at 17.7 percent.
 
 ---
 - test: Jason Test 5
-- melvin : 
+- melvin genomics : 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.1.mp3: 
   - caption: Ok, Esophageal carcinoma. What would you like to know?
@@ -64,37 +64,37 @@
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.3.mp3: 
   - caption: The mean log2 normalized expression count of CCND1 in Esophageal carcinoma is 13.8
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.4.mp3: 
-  - caption: CCND1 has less copy number alterations in Breast invasive carcinoma at 28.6 percent while 38.9 percent of Esophageal carcinoma cases have alterations.
+  - caption: CCND1 is expressed higher in Esophageal carcinoma compared to Breast invasive carcinoma with mean FPKMs of 13.8 and 13.6, respectively.
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.5.mp3: 
-  - caption: Esophageal carcinoma patients have less copy number alterations in TERT at 21.6 percent while 38.9 percent of cases have alterations in CCND1.
+  - caption: In Esophageal carcinoma, CCND1 is expressed higher than TERT with mean FPKM of 13.8 and 4.7, respectively.
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_5/Test5.6.mp3: 
   - caption: This data type comparison analysis is not yet supported
 
 ---
 - test: Jason Test 6
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.1.mp3: 
   - caption: Ok, Mesothelioma. What would you like to know?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.2.mp3: 
   - caption: Among Mesothelioma patients, BAP1 and NF2 are the top 2 mutated genes found in 21.8 percent and 19.2 percent of the patients respectively.
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_6/Test6.3.mp3: 
-  - caption: Among Mesothelioma patients, records is the top mutated gene at NaN percent while BAP1 has the greatest number of copy number alterations at 50.6 percent.
+  - caption: Among Mesothelioma patients, BAP1 is the top mutated gene at 5.8 percent while BAP1 has the greatest number of copy number alterations at 36.8 percent.
 
 ---
 - test: Jason Test 7
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.1.mp3: 
   - caption: Ok, gene expression. What would you like to know?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.2.mp3: 
   - caption: The highest mean expression of Braca one is found in Acute Myeloid Leukemia with a log2 normalized count of 11.3.
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_7/Test7.3.mp3: 
-  - caption: Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent while Braca two has the greatest number of copy number alterations in Sarcoma at 23.4 percent
+  - caption: This compare operation is not supported.
 
 ---
 - test: Jason Test 8
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_8/Test8.1.mp3: 
   - caption: Ok, Breast invasive carcinoma. What would you like to know?
@@ -105,7 +105,7 @@
 
 ---
 - test: Jason Test 9
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.1.mp3: 
   - caption: Ok, Liver hepatocellular carcinoma. What would you like to know?
@@ -116,11 +116,11 @@
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.4.mp3: 
   - caption: Which gene would you like to split by?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_9/Test9.5.mp3: 
-  - caption: In Liver hepatocellular carcinoma, Catenin Beta 1 is not differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0.01
+  - caption: In Liver hepatocellular carcinoma, Catenin Beta 1 is differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0
 
 ---
 - test: Jason Test 10
-- melvin: 
+- melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.1.mp3: 
   - caption: Ok, Colon adenocarcinoma. What would you like to know?
@@ -131,4 +131,4 @@
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.4.mp3: 
   - caption: Which gene would you like to split by?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Jason/Test_10/Test10.5.mp3: 
-  - caption: In Colon adenocarcinoma,KRAS is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.24
+  - caption: In Colon adenocarcinoma, KRAS is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.02

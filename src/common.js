@@ -4,6 +4,7 @@ const nunjucks = require("nunjucks");
 const { GeneSSMLMappings } = require("./utils/gene_pronunciation_mappings.js");
 const { CANCER_TYPES } = require("./utils/cancer_types.js");
 const { DATA_TYPES } = require("./utils/data_types.js");
+const { OOVMappings } = require("./utils/oov_mappings.js");
 
 // common types
 
@@ -122,6 +123,16 @@ const get_gene_speech_text = function (gene_name) {
     return gene_speech_text;
 };
 
+const get_oov_mappings_response = function (query) {
+    let response = null;
+    if (_.has(OOVMappings, query)) {
+        response = OOVMappings[query];
+        console.log(`[get_oov_mappings_response] query: ${query}, response: ${response}`);
+    }
+    
+    return response;
+};
+
 const get_study_name_text = function (study_abbrv) {
     return (_.has(CANCER_TYPES, study_abbrv) ? CANCER_TYPES[study_abbrv] : study_abbrv);
 };
@@ -217,6 +228,7 @@ module.exports = {
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
     SUPPORTED_SPLITBY_DTYPES,
     get_gene_speech_text,
+    get_oov_mappings_response,
     get_study_name_text,
     get_dtype_name_text,
     melvin_round,
