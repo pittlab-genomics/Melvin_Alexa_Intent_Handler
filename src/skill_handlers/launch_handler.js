@@ -127,7 +127,7 @@ const LaunchRequestHandler = {
         await update_cloudwatch_events();        
 
         const speechText = MELVIN_WELCOME_GREETING + 
-            " Melvin Alexa skill is a voice based genomics analytics tool. " +
+            " Melvin Alexa skill is a voice based genome analytics tool. " +
             " You can ask me about a gene or cancer type. " +
             " For more informaton, say help. Now, What would you like to know? ";
         const reprompt_text = "What would you like to know? You can ask me about a gene or cancer type.";

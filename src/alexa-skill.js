@@ -59,8 +59,16 @@ const HelpIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "AMAZON.HelpIntent";
     },
     handle(handlerInput) {
-        const speechText = "You can ask me about a gene or cancer type. " +
-            "Like, Tell me about TP53. " +
+        const speechText = "Melvin Alexa skill is a voice based genome analytics tool. " +
+            "You can ask me about any variations in a gene or a cancer type. " +
+            "The skill responses are based on the current state which could be a combination of gene, cancer and a variant. " +
+            "The current state can be updated using navigation commands to add in any gene, cancer or a variant using multi-turn conversations. " +
+            "Navigation commands are tell me about, show me or how about. " +
+            "Additionally, the user can navigate in a conversation using the `step back` command, " +
+            "restore a previous session at the beginning using the `resume session` command, " +
+            "reset the state to start from scratch using the `reset` command, " +
+            "and repeat the same response again using the `repeat that` command. " +
+            "You could also perform compare to and split by operations within and across the different variations. " +
             "How can I help?";
 
         return handlerInput.responseBuilder
