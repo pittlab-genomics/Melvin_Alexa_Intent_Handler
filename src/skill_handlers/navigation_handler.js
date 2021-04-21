@@ -32,6 +32,7 @@ const NavigateJoinFilterIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             let response = await build_navigation_response(handlerInput, state_change);
@@ -46,9 +47,15 @@ const NavigateJoinFilterIntentHandler = {
             console.error("[NavigateJoinFilterIntentHandler] Error! except: ", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -60,6 +67,7 @@ const NavigateCompareIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
         try {
             const state_change = await update_melvin_aux_state(handlerInput);
             const melvin_state = get_melvin_state(handlerInput);
@@ -81,9 +89,15 @@ const NavigateCompareIntentHandler = {
             clean_melvin_aux_state(handlerInput);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -94,14 +108,16 @@ const NavigateResetIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateResetIntent";
     },
     async handle(handlerInput) {
-        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
-        const reprompt_text = "What would you like to know? You can ask me about a gene or a cancer type.";
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}` +
+            " To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
+            " Now, What would you like to know? ";
+        const repromptText = "You can say 'Tell me about' followed by the name of a gene, cancer type, or data type. What would you like to know? ";
         clean_melvin_state(handlerInput);
         clean_melvin_aux_state(handlerInput);
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(reprompt_text)
+            .reprompt(repromptText)
             .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, "You can start with a gene or cancer type.")
             .getResponse();
     }
@@ -121,8 +137,8 @@ const NavigateRestoreSessionIntentHandler = {
         let recent_session = await sessions_doc.getMostRecentSession(user_id);
         recent_session = recent_session.filter(item => item["session_id"] != curr_session_id); // filter current session
         if (recent_session.length == 0) {
-            speechText = "I could not find any previous sessions.";
-            repromptText = "There were no previous sessions. Please continue with current analysis.";
+            speechText = "I could not find any previous sessions. Please continue with current analysis. What else? ";
+            repromptText = "What else?";
             return handlerInput.responseBuilder
                 .speak(speechText)
                 .reprompt(repromptText)
@@ -133,8 +149,8 @@ const NavigateRestoreSessionIntentHandler = {
         console.debug(`[NavigateRestoreSessionIntentHandler] recent_utterance: ${JSON.stringify(utterance_list)}`);
 
         if (utterance_list.length == 0) {
-            speechText = "Something went wrong while restoring the session. Please try again later.";
-            repromptText = "Something went wrong while restoring the session. Please try again later.";
+            speechText = "Something went wrong while restoring the session. Please try again later. What else?";
+            repromptText = "What else? ";
             return handlerInput.responseBuilder
                 .speak(speechText)
                 .reprompt(repromptText)
@@ -148,8 +164,8 @@ const NavigateRestoreSessionIntentHandler = {
         sessionAttributes["MELVIN.STATE"] = melvin_state;
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-        speechText = "Ok. Your last session was restored.";
-        repromptText = "You may continue from your last analysis now.";
+        speechText = "Ok. Your last session was restored. You may continue from your last analysis now. What else? ";
+        repromptText = "What else? ";
 
         let card_text_list = [];
         for (let key in melvin_state) {
@@ -170,6 +186,7 @@ const NavigateRepeatIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
         try {
             const melvin_state = get_melvin_state(handlerInput);
             const prev_melvin_state = get_prev_melvin_state(handlerInput);
@@ -190,9 +207,15 @@ const NavigateRepeatIntentHandler = {
             console.error("[NavigateRepeatIntentHandler] Error! except: ", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -235,10 +258,11 @@ const NavigateGoBackIntentHandler = {
         console.debug("[NavigateGoBackIntentHandler] prev_item: " + JSON.stringify(prev_item));
 
         if (prev_item == 0) {
-            const speechText = "You have reached the end of analysis series. Please provide a new query.";
+            const speechText = "You have reached the end of analysis series. Please provide a new query. What else?";
+            const repromptText = "What else?";
             return handlerInput.responseBuilder
                 .speak(speechText)
-                .reprompt(speechText)
+                .reprompt(repromptText)
                 .getResponse();
         }
         // save current melvin state
@@ -256,6 +280,7 @@ const NavigateGoBackIntentHandler = {
         };
 
         let speechText = "";
+        let repromptText = "";
         try {
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
@@ -269,9 +294,15 @@ const NavigateGoBackIntentHandler = {
             console.error("[NavigateGoBackIntentHandler} Error! except: ", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
 
     }

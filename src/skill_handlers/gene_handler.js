@@ -20,6 +20,7 @@ const NavigateGeneDefinitionIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
 
         try {
             const state_change = await update_melvin_state(handlerInput);
@@ -37,9 +38,15 @@ const NavigateGeneDefinitionIntentHandler = {
             console.error("Error in NavigateGeneDefinitionIntent", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -51,6 +58,7 @@ const NavigateGeneTargetIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
 
         try {
             const state_change = await update_melvin_state(handlerInput);
@@ -68,9 +76,15 @@ const NavigateGeneTargetIntentHandler = {
             console.error("Error in NavigateGeneTargetIntent", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };

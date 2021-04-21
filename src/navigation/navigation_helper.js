@@ -64,7 +64,8 @@ const {
 function add_followup_text(handlerInput, speech) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     if (Object.keys(sessionAttributes["MELVIN.STATE"]).length <= FOLLOW_UP_TEXT_THRESHOLD) {
-        speech.prosody({ rate: "110%" }, "What would you like to know?");
+        //speech.prosody({ rate: "110%" }, "What would you like to know?");
+        speech.say("What would you like to know?");
     }
 }
 
@@ -95,7 +96,7 @@ const ack_attribute_change = function (handlerInput, state_change) {
         add_followup_text(handlerInput, speech);
     }
 
-    return { "speech_text": speech.ssml() };
+    return { "speech_text": speech.ssml(true) };
 };
 
 const build_compare_response = async function (handlerInput, melvin_state, compare_state, state_diff) {
@@ -142,7 +143,7 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
             throw melvin_error(
                 `[build_compare_response] not implemented | melvin_state: ${JSON.stringify(melvin_state)}`,
                 MelvinIntentErrors.NOT_IMPLEMENTED,
-                "This data type comparison analysis is not yet supported"
+                "This data type comparison analysis is not yet supported."
             );
         }
 
@@ -151,7 +152,7 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         throw melvin_error(
             `[build_compare_response] not implemented | melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.NOT_IMPLEMENTED,
-            "comparisons across data sources are not yet supported"
+            "comparisons across data sources are not yet supported."
         );
 
     } else {

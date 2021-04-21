@@ -84,7 +84,7 @@ const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_
         );
     }
     speech.sayWithSSML(nunjucks_res);
-    return speech.ssml();
+    return speech.ssml(true);
 };
 
 const call_directive_service = async function(handlerInput, speech) {

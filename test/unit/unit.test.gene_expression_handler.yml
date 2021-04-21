@@ -15,7 +15,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "The gene with the highest mean log2 normalized expression count in Ovarian serous cystadenocarcinoma is EEF1A1 at 18.8"
+  - response.outputSpeech.ssml: "The gene with the highest mean log2 normalized expression count in Ovarian serous cystadenocarcinoma is EEF1A1 at 18.8. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -26,7 +27,8 @@ configuration:
         data_type: "GENE_EXPRESSION"
         data_source: "TCGA"
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "The highest mean expression of TP53 is found in Acute Myeloid Leukemia with a log2 normalized count of 11.9."
+  - response.outputSpeech.ssml: "The highest mean expression of TP53 is found in Acute Myeloid Leukemia with a log2 normalized count of 11.9. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -42,7 +44,8 @@ configuration:
         gene_name: "TP53"
         data_type: "GENE_EXPRESSION"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "The mean log2 normalized expression count of TP53 in Breast invasive carcinoma is 11.3"
+  - response.outputSpeech.ssml: "The mean log2 normalized expression count of TP53 in Breast invasive carcinoma is 11.3. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -53,5 +56,6 @@ configuration:
         name: "query"
         value: "gene expression"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Ok, gene expression. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, gene expression. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, gene expression. What would you like to know?"
   - response.shouldEndSession: false

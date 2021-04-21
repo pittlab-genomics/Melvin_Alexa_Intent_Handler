@@ -16,8 +16,8 @@ configuration:
         name: "count"
         value: "3"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Ok, I'm emailing that to you now."
-  - response.reprompt.outputSpeech.ssml: "Please check your inbox in a while."
+  - response.outputSpeech.ssml: "Ok, I'm emailing that to you now. Please check your inbox in a while."
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -31,6 +31,6 @@ configuration:
         name: "duration"
         value: "PT4200S"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Ok, I'm emailing results during that period."
-  - response.reprompt.outputSpeech.ssml: "Please check your inbox in a while."
+  - response.outputSpeech.ssml: "Ok, I'm emailing results during that period. Please check your inbox in a while."
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false

@@ -35,22 +35,29 @@ const build_gene_definition_response = async function (handlerInput, params) {
         speech.sayWithSSML(`Sorry, I don't have the gene definition for ${gene_speech_text}.`);
     }
 
-    return { "speech_text": speech.ssml() };
+    return { "speech_text": speech.ssml(true) };
 };
 
 const build_gene_target_response = async function (handlerInput, params) {
     const speech = new Speech();
     const response = await get_gene_target(handlerInput, params);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    const sentence_sum = response.data.summary.match(/\S.*?\."?(?=\s|$)/g)[0];
+    let regex = new RegExp(/\S.*?\."?(?=\s|$)/g);
 
-    speech
-        .sayWithSSML(gene_speech_text)
-        .say("can be targeted.")
-        .pause("200ms")
-        .say(sentence_sum);
+    if(response.data.summary.match(regex))
+    {
+        const sentence_sum = response.data.summary.match(regex)[0];
+        speech
+            .sayWithSSML(gene_speech_text)
+            .say("can be targeted.")
+            .pause("200ms")
+            .say(sentence_sum);
+    } else {
+        speech
+            .sayWithSSML(`Sorry, I don't have more information about ${gene_speech_text}.`);
+    }
 
-    return { "speech_text": speech.ssml() };
+    return { "speech_text": speech.ssml(true) };
 };
 
 module.exports = {

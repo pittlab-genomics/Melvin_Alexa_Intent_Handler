@@ -8,7 +8,6 @@ const {
     parse, toSeconds 
 } = require("iso8601-duration");
 
-
 const NavigateEmailIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
@@ -60,14 +59,14 @@ const NavigateEmailIntentHandler = {
                 //     speechText = `Ok, I'm emailing last ${results_count} results to you now.`;
                 // }
             }
-            repromptText = "Please check your inbox in a while.";
+            speechText += " Please check your inbox in a while.";
 
             // publish IRS message to AWS SQS
             await publish_irs_message(JSON.stringify(msg_data), queue_url);
 
         } catch (error) {
             if (error.statusCode === 403) {
-                repromptText = speechText = "Please enable email permissions in the Amazon Alexa app.";
+                speechText = "Please enable email permissions in the Amazon Alexa app to do this.";
                 return handlerInput.responseBuilder
                     .speak(speechText)
                     .reprompt(repromptText)
@@ -75,13 +74,19 @@ const NavigateEmailIntentHandler = {
                     .getResponse();
             }
             else if (error["speech"]) {
-                repromptText = speechText = error["speech"];
+                speechText = error["speech"];
             } else {
-                repromptText = speechText = "Something went wrong while sending the results. Please try again later.";
+                speechText = "Something went wrong while sending the results. Please try again later.";
             }
             console.error("Error in NavigateEmailIntent", error);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)

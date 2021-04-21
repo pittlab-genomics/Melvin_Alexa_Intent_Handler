@@ -15,7 +15,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 mutated genes found in 70 percent and 22 percent of the patients respectively."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 mutated genes found in 70 percent and 22 percent of the patients respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -26,7 +27,8 @@ configuration:
         gene_name: "TP53"
         data_type: "MUTATIONS"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 mutations are found in 31 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent."
+  - response.outputSpeech.ssml: "TP53 mutations are found in 31 cancer types. It is most mutated in Ovarian serous cystadenocarcinoma at 70 percent followed by Lung squamous cell carcinoma at 68 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -42,7 +44,8 @@ configuration:
         gene_name: "TP53"
         data_type: "MUTATIONS"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated."
+  - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -57,7 +60,8 @@ configuration:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -73,7 +77,8 @@ configuration:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -89,7 +94,8 @@ configuration:
         gene_name: "TP53"
         study_abbreviation: "BRCA"
         data_type: "MUTATIONS"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -100,7 +106,8 @@ configuration:
         gene_name: "TP53"
         data_type: "INDELS"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 indels are found in 26 cancer types. It has most indels in Esophageal carcinoma at 12.1 percent followed by Ovarian serous cystadenocarcinoma at 11.7 percent."
+  - response.outputSpeech.ssml: "TP53 indels are found in 26 cancer types. It has most indels in Esophageal carcinoma at 12.1 percent followed by Ovarian serous cystadenocarcinoma at 11.7 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -115,7 +122,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -131,7 +139,8 @@ configuration:
         gene_name: "TP53"
         data_type: "INDELS"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 indels are found in 5.7 percent of Breast invasive carcinoma patients with 6 amino acid residues recurrently mutated."
+  - response.outputSpeech.ssml: "TP53 indels are found in 5.7 percent of Breast invasive carcinoma patients with 6 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -146,7 +155,8 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
         data_type: "INDELS"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -161,7 +171,8 @@ configuration:
       MELVIN.STATE:
         data_type: "INDELS"
         study_abbreviation: "OV"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -177,7 +188,8 @@ configuration:
         gene_name: "TP53"
         study_abbreviation: "BRCA"
         data_type: "INDELS"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and none are the most affected domains containing 75 percent and 17.9 percent of indels respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and none are the most affected domains containing 75 percent and 17.9 percent of indels respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -188,7 +200,8 @@ configuration:
         gene_name: "TP53"
         data_type: "SNV"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 SNVs are found in 31 cancer types. It has most SNVs in Uterine Carcinosarcoma at 61.4 percent followed by Ovarian serous cystadenocarcinoma at 58.7 percent."
+  - response.outputSpeech.ssml: "TP53 SNVs are found in 31 cancer types. It has most SNVs in Uterine Carcinosarcoma at 61.4 percent followed by Ovarian serous cystadenocarcinoma at 58.7 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -203,7 +216,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -219,7 +233,8 @@ configuration:
         gene_name: "TP53"
         data_type: "SNV"
         data_source: "TCGA"
-  - response.outputSpeech.ssml: "TP53 SNVs are found in 24.4 percent of Breast invasive carcinoma patients with 44 amino acid residues recurrently mutated."
+  - response.outputSpeech.ssml: "TP53 SNVs are found in 24.4 percent of Breast invasive carcinoma patients with 44 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -234,7 +249,8 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
         data_type: "SNV"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.1 percent and 5.1 percent of SNVs respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.1 percent and 5.1 percent of SNVs respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -249,7 +265,8 @@ configuration:
       MELVIN.STATE:
         data_type: "SNV"
         study_abbreviation: "OV"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -265,7 +282,8 @@ configuration:
         gene_name: "TP53"
         data_type: "SNV"
         study_abbreviation: "BRCA"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 91 percent and 4.9 percent of SNVs respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 91 percent and 4.9 percent of SNVs respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -276,7 +294,8 @@ configuration:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Ok, protein domains. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, protein domains. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, protein domains. What would you like to know?"
   - response.shouldEndSession: false
 
 ---
@@ -287,7 +306,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Ok, mutations. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, mutations. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, mutations. What would you like to know?"
   - response.shouldEndSession: false
 
 ---
@@ -298,7 +318,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Ok, indels. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, indels. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, indels. What would you like to know?"
   - response.shouldEndSession: false
 
 ---
@@ -309,5 +330,6 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Ok, single nucleotide variants. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, single nucleotide variants. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, single nucleotide variants. What would you like to know?"
   - response.shouldEndSession: false

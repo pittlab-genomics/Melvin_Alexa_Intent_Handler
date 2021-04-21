@@ -11,6 +11,7 @@ configuration:
         gene_name: "TP53"
   - response.card.title: "Welcome to Melvin test"
   - response.outputSpeech.ssml: "Welcome to Melvin test version."
+  - response.reprompt.outputSpeech.ssml: "You can say 'Tell me about' followed by the name of a gene, cancer type, or data type. What would you like to know?"
 
 ---
 - test: NavigateGoBackIntent 1
@@ -26,7 +27,8 @@ configuration:
           data_type: "MUTATIONS"
         intent: "NavigateMutationsIntent"
         event_type: "analysis_event"
-  - response.outputSpeech.ssml: "You have reached the end of analysis series. Please provide a new query."
+  - response.outputSpeech.ssml: "You have reached the end of analysis series. Please provide a new query. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateGoBackIntent 2
@@ -63,7 +65,8 @@ configuration:
           data_type: MUTATIONS
         intent: NavigateMutationsIntent
         event_type: analysis_event
-  - response.outputSpeech.ssml: "TP53 mutations are found in 26 percent of Liver hepatocellular carcinoma patients with 19 amino acid residues recurrently mutated."
+  - response.outputSpeech.ssml: "TP53 mutations are found in 26 percent of Liver hepatocellular carcinoma patients with 19 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateRestoreSessionIntent
@@ -71,8 +74,8 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "Ok. Your last session was restored."
-  - response.reprompt.outputSpeech.ssml: "You may continue from your last analysis now."
+  - response.outputSpeech.ssml: "Ok. Your last session was restored. You may continue from your last analysis now. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateRepeatIntent
@@ -88,7 +91,8 @@ configuration:
           data_type: "MUTATIONS"
         intent: "NavigateMutationsIntent"
         event_type: "analysis_event"
-  - response.outputSpeech.ssml: "<speak>Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody></speak>"
+  - response.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
 
 ---
 - test: NavigateCompareIntent_cna_G_vs_G
@@ -102,7 +106,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "TP53 has the greatest number of copy number alterations in Sarcoma at 37.6 percent while Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent"
+  - response.outputSpeech.ssml: "TP53 has the greatest number of copy number alterations in Sarcoma at 37.6 percent while Braca one has the greatest number of copy number alterations in Uterine Carcinosarcoma at 21.1 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_cna_GS_vs_G
@@ -117,7 +122,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less copy number alterations in TP53 at 5.7 percent while 11.9 percent of cases have alterations in Braca one."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less copy number alterations in TP53 at 5.7 percent while 11.9 percent of cases have alterations in Braca one. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_cna_S_vs_S
@@ -131,7 +137,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of copy number alterations at 28.6 percent while HCN2 has the greatest number of copy number alterations in Ovarian serous cystadenocarcinoma at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of copy number alterations at 28.6 percent while HCN2 has the greatest number of copy number alterations in Ovarian serous cystadenocarcinoma at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_cna_GS_vs_S
@@ -146,7 +153,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has more copy number alterations in Ovarian serous cystadenocarcinoma at 12.5 percent while 11.9 percent of Breast invasive carcinoma cases have alterations."
+  - response.outputSpeech.ssml: "Braca one has more copy number alterations in Ovarian serous cystadenocarcinoma at 12.5 percent while 11.9 percent of Breast invasive carcinoma cases have alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_G_vs_G
@@ -160,7 +168,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "TP53 is the most amplified gene in Ovarian serous cystadenocarcinoma at 9.4 percent while Braca one is the most amplified gene in Esophageal carcinoma at 10.8 percent"
+  - response.outputSpeech.ssml: "TP53 is the most amplified gene in Ovarian serous cystadenocarcinoma at 9.4 percent while Braca one is the most amplified gene in Esophageal carcinoma at 10.8 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_S_vs_S
@@ -174,7 +183,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of amplifications at 27.4 percent while MECOM has the greatest number of amplifications in Ovarian serous cystadenocarcinoma at 55.9 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, CCND1 has the greatest number of amplifications at 27.4 percent while MECOM has the greatest number of amplifications in Ovarian serous cystadenocarcinoma at 55.9 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_GS_vs_G
@@ -189,7 +199,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less amplifications of TP53 at 1.5 percent compared to 3.7 percent at Braca one."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less amplifications of TP53 at 1.5 percent compared to 3.7 percent at Braca one. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_GS_vs_S
@@ -204,7 +215,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has more amplifications in Ovarian serous cystadenocarcinoma at 4.5 percent compared to 3.7 percent of Breast invasive carcinoma cases."
+  - response.outputSpeech.ssml: "Braca one has more amplifications in Ovarian serous cystadenocarcinoma at 4.5 percent compared to 3.7 percent of Breast invasive carcinoma cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_loss_G_vs_G
@@ -218,7 +230,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "TP53 has the greatest number of deletions in Sarcoma at 34.1 percent while Braca one has the greatest number of deletions in Uterine Carcinosarcoma at 15.8 percent"
+  - response.outputSpeech.ssml: "TP53 has the greatest number of deletions in Sarcoma at 34.1 percent while Braca one has the greatest number of deletions in Uterine Carcinosarcoma at 15.8 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_loss_S_vs_S
@@ -232,7 +245,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, KAZN has the greatest number of deletions at 16.9 percent while TCF3 has the greatest number of deletions in Ovarian serous cystadenocarcinoma at 57.7 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, KAZN has the greatest number of deletions at 16.9 percent while TCF3 has the greatest number of deletions in Ovarian serous cystadenocarcinoma at 57.7 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_loss_GS_vs_G
@@ -247,7 +261,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less deletions of TP53 at 4.3 percent compared to 8.2 percent at Braca one."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have less deletions of TP53 at 4.3 percent compared to 8.2 percent at Braca one. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_loss_GS_vs_S
@@ -262,7 +277,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent compared to 8.2 percent of Breast invasive carcinoma cases."
+  - response.outputSpeech.ssml: "Braca one has less deletions in Ovarian serous cystadenocarcinoma at 8 percent compared to 8.2 percent of Breast invasive carcinoma cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_cna_G
@@ -276,7 +292,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 19.4 percent and has copy number of alterations in 5.7 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 19.4 percent and has copy number of alterations in 5.7 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_cna_S
@@ -290,7 +307,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 34.3 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 34.3 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_cna_GS
@@ -305,7 +323,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_cna_G
@@ -319,7 +338,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has copy number of alterations in 5.7 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has copy number of alterations in 5.7 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_cna_S
@@ -333,7 +353,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while POLRMT has the greatest number of copy number alterations at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_cna_GS
@@ -348,7 +369,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 12 percent have copy number alterations. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 12 percent have copy number alterations. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_cna_G
@@ -362,7 +384,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has copy number of alterations in 5.7 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has copy number of alterations in 5.7 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_cna_S
@@ -376,7 +399,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of copy number alterations at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of copy number alterations at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_cna_GS
@@ -391,7 +415,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 13 percent have copy number alterations. 1 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_gain_G
@@ -405,7 +430,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has gains in 1.3 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has gains in 1.3 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_gain_S
@@ -419,7 +445,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while MECOM has the greatest number of gains at 57.4 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while MECOM has the greatest number of gains at 57.4 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_gain_GS
@@ -434,7 +461,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has mutations in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_loss_G
@@ -448,7 +476,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has losses in 4.4 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has mutations in 27.7 percent and has losses in 4.4 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_loss_S
@@ -462,7 +491,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 is the top mutated gene at 51 percent while PWWP3A has the greatest number of losses at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_loss_GS
@@ -477,7 +507,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has mutations in 2 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has mutations in 2 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_gain_G
@@ -491,7 +522,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has gains in 1.3 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has gains in 1.3 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_gain_S
@@ -505,7 +537,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while MECOM has the greatest number of gains at 57.4 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while MECOM has the greatest number of gains at 57.4 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_gain_GS
@@ -520,7 +553,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 4 percent have gains. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 4 percent have gains. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_loss_G
@@ -534,7 +568,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has losses in 4.4 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has indels in 4.4 percent and has losses in 4.4 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_loss_S
@@ -548,7 +583,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of indels at 8.5 percent while PWWP3A has the greatest number of losses at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_loss_GS
@@ -563,7 +599,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has indels in 1 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_gain_G
@@ -577,7 +614,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has gains in 1.3 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has gains in 1.3 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_gain_S
@@ -591,7 +629,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while MECOM has the greatest number of gains at 57.4 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while MECOM has the greatest number of gains at 57.4 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_gain_GS
@@ -606,7 +645,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has SNVs in 3 percent of Breast invasive carcinoma patients while 5 percent have gains. 1 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_loss_G
@@ -620,7 +660,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has losses in 4.4 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has losses in 4.4 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_loss_S
@@ -634,7 +675,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of losses at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.8 percent while DAZAP1 has the greatest number of losses at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_loss_GS
@@ -649,7 +691,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has SNVs in percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has SNVs in percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_loss_G
@@ -663,7 +706,8 @@ configuration:
         name: "query"
         value: "amplifications"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has gains in 1.3 percent and has losses in 4.4 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has gains in 1.3 percent and has losses in 4.4 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_loss_S
@@ -677,7 +721,8 @@ configuration:
         name: "query"
         value: "amplifications"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, MECOM has the highest number of gains at 57.4 percent while PWWP3A has the greatest number of losses at 59.5 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, MECOM has the highest number of gains at 57.4 percent while PWWP3A has the greatest number of losses at 59.5 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_gain_loss_GS
@@ -692,7 +737,8 @@ configuration:
         name: "query"
         value: "amplifications"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has gains in 4 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has gains in 4 percent of Breast invasive carcinoma patients while 9 percent have losses. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_ind_G
@@ -706,7 +752,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has indels in 4.4 percent of all cases."
+  - response.outputSpeech.ssml: "Across all of TCGA, TP53 has SNVs in 23.6 percent and has indels in 4.4 percent of all cases. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_ind_S
@@ -720,7 +767,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.5 percent while TP53 has the greatest number of indels at 8.2 percent."
+  - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 has the greatest number of SNVs at 42.5 percent while TP53 has the greatest number of indels at 8.2 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_ind_GS
@@ -735,7 +783,8 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one has SNVs in 2 percent of Breast invasive carcinoma patients while 1 percent have indels. 0 percent of Breast invasive carcinoma patients harbor both alterations."
+  - response.outputSpeech.ssml: "Braca one has SNVs in 2 percent of Breast invasive carcinoma patients while 1 percent have indels. 0 percent of Breast invasive carcinoma patients harbor both alterations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 
 - test: NavigateJoinFilterIntent_BRCA
@@ -748,7 +797,8 @@ configuration:
         name: "query"
         value: "breast cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Ok, Breast invasive carcinoma."
+  - response.outputSpeech.ssml: "Ok, Breast invasive carcinoma. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 
 - test: NavigateJoinFilterIntent_TP53
@@ -761,8 +811,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Ok, TP53. <prosody rate='110%'>What would you like to know?</prosody>"
-
+  - response.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
 
 --- 
 - test: NavigateJoinFilterIntent_TP53_BRCA_OV
@@ -777,7 +827,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated."
+  - response.outputSpeech.ssml: "TP53 mutations are found in 70 percent of Ovarian serous cystadenocarcinoma patients with 65 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 
 - test: NavigateJoinFilterIntent_SV-MD_TP53_BRCA
@@ -793,7 +844,8 @@ configuration:
         name: "query"
         value: "most affected domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively."
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_cna_Error
@@ -806,14 +858,16 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "The data type is missing for comparison."
+  - response.outputSpeech.ssml: "The data type is missing for comparison. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 
 - test: NavigateJoinFilterIntent_Error
 - NavigateJoinFilterIntent:
   - request.session.attributes:
       MELVIN.STATE:
-  - response.outputSpeech.ssml: "Sorry, something went wrong while processing the request. Please try again later."
+  - response.outputSpeech.ssml: "Sorry, something went wrong while processing the request. Please try again later. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_G_vs_G
@@ -827,7 +881,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one and TP53 mutations are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.9 percent of all cases while TP53 is mutated in 70 percent"
+  - response.outputSpeech.ssml: "Braca one and TP53 mutations are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.9 percent of all cases while TP53 is mutated in 70 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_GS_vs_G
@@ -842,7 +897,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more mutations in TP53 at 30 percent while 1.9 percent of cases have Braca one mutations."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more mutations in TP53 at 30 percent while 1.9 percent of cases have Braca one mutations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_GS_vs_S
@@ -857,7 +913,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 3.2 percent while 1.9 percent of Breast invasive carcinoma cases have mutations."
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 3.2 percent while 1.9 percent of Breast invasive carcinoma cases have mutations. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_mut_S_vs_S
@@ -871,7 +928,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 33.1 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 70 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 33.1 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 70 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_G_vs_G
@@ -885,7 +943,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one and TP53 indels are found in 21.2 and 78.8 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 1.2 percent of all cases while TP53 is mutated in 12.1 percent"
+  - response.outputSpeech.ssml: "Braca one and TP53 indels are found in 21.2 and 78.8 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 1.2 percent of all cases while TP53 is mutated in 12.1 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_GS_vs_G
@@ -900,7 +959,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more indels in TP53 at 5.7 percent while 0.3 percent of cases have Braca one indels."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more indels in TP53 at 5.7 percent while 0.3 percent of cases have Braca one indels. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_GS_vs_S
@@ -915,7 +975,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 1.1 percent while 0.3 percent of Breast invasive carcinoma cases have indels."
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 1.1 percent while 0.3 percent of Breast invasive carcinoma cases have indels. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_ind_S_vs_S
@@ -929,7 +990,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, GATA3 is the top mutated gene at 8.3 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 11.7 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, GATA3 is the top mutated gene at 8.3 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 11.7 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_G_vs_G
@@ -943,7 +1005,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one and TP53 SNVs are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.4 percent of all cases while TP53 is mutated in 61.4 percent"
+  - response.outputSpeech.ssml: "Braca one and TP53 SNVs are found in 63.6 and 93.9 percent of cancer types respectively. Across all of TCGA, Braca one is mutated in 7.4 percent of all cases while TP53 is mutated in 61.4 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_GS_vs_G
@@ -958,7 +1021,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more SNVs in TP53 at 24.4 percent while 1.6 percent of cases have Braca one SNVs."
+  - response.outputSpeech.ssml: "Breast invasive carcinoma patients have more SNVs in TP53 at 24.4 percent while 1.6 percent of cases have Braca one SNVs. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_GS_vs_S
@@ -973,7 +1037,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 2.1 percent while 1.6 percent of Breast invasive carcinoma cases have SNVs."
+  - response.outputSpeech.ssml: "Braca one is mutated more frequently in Ovarian serous cystadenocarcinoma at 2.1 percent while 1.6 percent of Breast invasive carcinoma cases have SNVs. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_snv_S_vs_S
@@ -987,7 +1052,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 31.8 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 58.7 percent."
+  - response.outputSpeech.ssml: "Among Breast invasive carcinoma patients, Pik 3 CA is the top mutated gene at 31.8 while TP53 is most mutated in Ovarian serous cystadenocarcinoma at 58.7 percent. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_exp_G_vs_G
@@ -1001,7 +1067,8 @@ configuration:
         name: "query"
         value: "braca one"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "This compare operation is not supported."
+  - response.outputSpeech.ssml: "This compare operation is not supported. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_exp_GS_vs_G
@@ -1016,7 +1083,8 @@ configuration:
         name: "query"
         value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, Braca one is expressed lower than TP53 with mean FPKM of 9.1 and 11.3, respectively."
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, Braca one is expressed lower than TP53 with mean FPKM of 9.1 and 11.3, respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_exp_GS_vs_S
@@ -1031,7 +1099,8 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Braca one is expressed higher in Breast invasive carcinoma compared to Ovarian serous cystadenocarcinoma with mean FPKMs of 9.1 and 8.3, respectively."
+  - response.outputSpeech.ssml: "Braca one is expressed higher in Breast invasive carcinoma compared to Ovarian serous cystadenocarcinoma with mean FPKMs of 9.1 and 8.3, respectively. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_exp_S_vs_S
@@ -1045,4 +1114,5 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "This compare operation is not supported."
+  - response.outputSpeech.ssml: "This compare operation is not supported. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"

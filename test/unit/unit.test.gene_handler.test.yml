@@ -14,7 +14,7 @@ configuration:
         name: "query"
         value: "Hif one alpha"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>HIF1A is at 14q23.2 <break time='200ms'/> *"
+  - response.outputSpeech.ssml: "HIF1A is at 14q23.2 <break time='200ms'/> * What else?"
   - response.shouldEndSession: false
 
 ---
@@ -28,7 +28,7 @@ configuration:
         name: "query"
         value: "Rad fifty one b"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>Sorry, I don't have the gene definition for RAD51B.</speak>"
+  - response.outputSpeech.ssml: "Sorry, I don't have the gene definition for RAD51B. What else?"
   - response.shouldEndSession: false
 
 --- 
@@ -42,7 +42,7 @@ configuration:
         name: "query"
         value: "Hif one alpha"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "<speak>HIF1A can be targeted. <break time='200ms'/> *"
+  - response.outputSpeech.ssml: "HIF1A can be targeted. <break time='200ms'/> * What else?"
   - response.shouldEndSession: false
 
 --- 

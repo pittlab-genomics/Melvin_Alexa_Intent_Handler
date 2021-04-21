@@ -62,17 +62,18 @@ const HelpIntentHandler = {
         const speechText = "Melvin is a voice-based tool that allows you to interrogate cancer genomics data. " +
             "To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
             "I am able to remember our conversation, so you can ask me to build compound queries one step at a time. " +
-            "For example, if you say, 'Tell me about TP53' followed by 'Show me breast cancer' I will provide an analytical summary of TP53 in breast cancer. " +
-            "If you subsequently ask 'Show me mutations' I will provided a detailed breakdown of TP53 mutations in breast cancer. " +
+            "For example, if you say, 'Tell me about TP53', followed by 'Show me breast cancer', I will provide an analytical summary of TP53 in breast cancer. " +
+            "If you subsequently ask 'Show me mutations', I will provided a detailed breakdown of TP53 mutations in breast cancer. " +
             "You can swap any of these variables by providing another gene, cancer type, or data type. " +
-            "If you ever feel stuck, just say 'Alexa, reset' and I will reset the state to start from scratch. " +
-            "For more example conversations, please visit https://pittgenomics.gitlab.io/melvin_docs. " +
-            "Now, How can I help you?";
-
+            "If you ever feel stuck, just say 'Reset' and I will reset the state to start from scratch. " +
+            "If you are new to the skill, check out our videos and sample conversation on the webpage provided in the skill description. " +
+            "Now back to the skill, What would you like to know?";
+        const repromptText = "To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
+            "What would you like to know?";
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
@@ -133,11 +134,12 @@ const ErrorHandler = {
     },
     handle(handlerInput, error) {
         console.log(`~~~~ Error handled: ${error.message}`, error);
-        const speechText = "Sorry, I'm unable to process that request for the moment. Please try again later.";
+        const speechText = "Sorry, I'm unable to process that request for the moment. Please try again later. What else?";
+        const repromptText = "What else?";
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };

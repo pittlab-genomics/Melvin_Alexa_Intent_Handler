@@ -23,6 +23,7 @@ const NavigateSplitbyIntentHandler = {
     },
     async handle(handlerInput) {
         let speechText = "";
+        let repromptText = "";
         try {
             // validate melvin_state for required attributes
             const melvin_state = get_melvin_state(handlerInput);
@@ -67,9 +68,15 @@ const NavigateSplitbyIntentHandler = {
             clean_melvin_aux_state(handlerInput);
         }
 
+        if(!speechText.trim().endsWith("?")) {
+            speechText += " What else?";
+            repromptText = "What else?";
+        } else {
+            repromptText = speechText;
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(speechText)
+            .reprompt(repromptText)
             .getResponse();
     }
 };
