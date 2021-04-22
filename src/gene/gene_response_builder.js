@@ -25,7 +25,7 @@ const build_gene_definition_response = async function (handlerInput, params) {
         if(location != "N/A") {
             speech
                 .sayWithSSML(gene_speech_text)
-                .say(`is at ${location}`)
+                .say(`is at ${location}.`)
                 .pause("200ms")
                 .say(sentence_sum);
         } else {

@@ -15,7 +15,7 @@ const {
 } = require("../common.js");
 
 const {
-    get_melvin_state, match_compare_dtype 
+    get_melvin_state, match_compare_dtype, get_prev_melvin_state
 } = require("../utils/navigation_utils.js");
 
 const {
@@ -198,6 +198,7 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
 const build_navigation_response = async function (handlerInput, state_change) {
     const melvin_state = get_melvin_state(handlerInput);
+    const prev_state = get_prev_melvin_state(handlerInput);
     const attr_count = Object.keys(melvin_state).length;
     console.log(`[build_navigation_response] state_change: ${JSON.stringify(state_change)}, ` +
         `attr_count: ${attr_count}`);
@@ -219,13 +220,20 @@ const build_navigation_response = async function (handlerInput, state_change) {
             response = await build_mutations_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
-            const prev_dtype = state_change["prev_state"]["data_type"];
+            const prev_dtype = prev_state["data_type"];
+            console.log(`[build_navigation_response] prev_state: ${JSON.stringify(prev_state)}, ` +
+                `prev_dtype: ${prev_dtype}`);
             if(prev_dtype === DataTypes.INDELS) {
                 response = await build_indels_domain_response(handlerInput, melvin_state);
             } else if(prev_dtype === DataTypes.SNV) {
                 response = await build_snv_domains_response(handlerInput, melvin_state);
-            } else {
+            } else if(prev_dtype === DataTypes.MUTATIONS){
                 response = await build_mutations_domain_response(handlerInput, melvin_state);
+            } else {
+                throw melvin_error(
+                    `[build_navigation_response] not supported | melvin_state: ${JSON.stringify(melvin_state)}`,
+                    MelvinIntentErrors.INVALID_DATA_TYPE,
+                    "Domains are supported only when the data type is mutations, SNVs, or indels.");
             }
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {

@@ -57,7 +57,7 @@ const get_prev_melvin_state = function (handlerInput) {
     const melvin_history = get_melvin_history(handlerInput);
     let prev_melvin_state = {};
     if (melvin_history.length > 0) {
-        prev_melvin_state = melvin_history.melvin_state;
+        prev_melvin_state = melvin_history[0].melvin_state;
     }
     return prev_melvin_state;
 };

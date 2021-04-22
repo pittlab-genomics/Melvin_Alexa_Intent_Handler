@@ -55,12 +55,20 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
         data_source: "TCGA"
+        data_type: "GAIN"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          data_type: "GAIN"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - request.request.intent.slots:
       query:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 85.8 percent and 5.5 percent of mutations respectively. What else?"
+  - response.outputSpeech.ssml: "Domains are supported only when the data type is mutations, SNVs, or indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -72,6 +80,13 @@ configuration:
         gene_name: "TP53"
         data_type: "MUTATIONS"
         data_source: "TCGA"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          data_type: "MUTATIONS"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - request.request.intent.slots:
       query:
         name: "query"
@@ -94,6 +109,14 @@ configuration:
         gene_name: "TP53"
         study_abbreviation: "BRCA"
         data_type: "MUTATIONS"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          study_abbreviation: "BRCA"
+          data_type: "MUTATIONS"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
@@ -155,6 +178,13 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
         data_type: "INDELS"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          data_type: "INDELS"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 65.8 percent and 8.1 percent of indels respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
@@ -171,6 +201,13 @@ configuration:
       MELVIN.STATE:
         data_type: "INDELS"
         study_abbreviation: "OV"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          data_source: "TCGA"
+          study_abbreviation: "OV"
+          data_type: "INDELS"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and NF1 are the top 2 genes with indels found in 11.7 percent and 1.8 percent of the patients respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
@@ -188,7 +225,15 @@ configuration:
         gene_name: "TP53"
         study_abbreviation: "BRCA"
         data_type: "INDELS"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and none are the most affected domains containing 75 percent and 17.9 percent of indels respectively. What else?"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          study_abbreviation: "BRCA"
+          data_type: "INDELS"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
+  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 75 percent and 7.1 percent of indels respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -249,6 +294,13 @@ configuration:
       MELVIN.STATE:
         gene_name: "TP53"
         data_type: "SNV"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          data_type: "SNV"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 89.1 percent and 5.1 percent of SNVs respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
@@ -265,6 +317,13 @@ configuration:
       MELVIN.STATE:
         data_type: "SNV"
         study_abbreviation: "OV"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          data_source: "TCGA"
+          study_abbreviation: "OV"
+          data_type: "SNV"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "Among Ovarian serous cystadenocarcinoma patients, TP53 and TTN are the top 2 genes with SNVs found in 58.7 percent and 21.3 percent of the patients respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
@@ -282,6 +341,14 @@ configuration:
         gene_name: "TP53"
         data_type: "SNV"
         study_abbreviation: "BRCA"
+      MELVIN.HISTORY:
+      - melvin_state: 
+          gene_name: "TP53"
+          data_source: "TCGA"
+          study_abbreviation: "BRCA"
+          data_type: "SNV"
+        intent: "NavigateJoinFilterIntent"
+        event_type: "analysis_event"
   - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 91 percent and 4.9 percent of SNVs respectively. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false

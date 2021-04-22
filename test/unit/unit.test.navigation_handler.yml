@@ -83,6 +83,9 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
+        data_source: "TCGA"
+        study_abbreviation: "BRCA"
+        data_type: "MUTATIONS"
       MELVIN.HISTORY: 
       - melvin_state: 
           gene_name: "TP53"
@@ -91,8 +94,8 @@ configuration:
           data_type: "MUTATIONS"
         intent: "NavigateMutationsIntent"
         event_type: "analysis_event"
-  - response.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
-  - response.reprompt.outputSpeech.ssml: "Ok, TP53. What would you like to know?"
+  - response.outputSpeech.ssml: "TP53 mutations are found in 30 percent of Breast invasive carcinoma patients with 53 amino acid residues recurrently mutated. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---
 - test: NavigateCompareIntent_cna_G_vs_G
@@ -844,7 +847,7 @@ configuration:
         name: "query"
         value: "most affected domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "P53 DNA-binding domain and P53 tetramerisation motif are the most affected domains containing 88 percent and 5.3 percent of mutations respectively. What else?"
+  - response.outputSpeech.ssml: "Domains are supported only when the data type is mutations, SNVs, or indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---

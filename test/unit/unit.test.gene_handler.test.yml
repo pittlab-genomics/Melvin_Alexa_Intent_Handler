@@ -14,7 +14,7 @@ configuration:
         name: "query"
         value: "Hif one alpha"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "HIF1A is at 14q23.2 <break time='200ms'/> * What else?"
+  - response.outputSpeech.ssml: "HIF1A is at 14q23.2. <break time='200ms'/> * What else?"
   - response.shouldEndSession: false
 
 ---
