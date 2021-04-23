@@ -55,9 +55,14 @@ const get_melvin_aux_state = function (handlerInput) {
 
 const get_prev_melvin_state = function (handlerInput) {
     const melvin_history = get_melvin_history(handlerInput);
+    const melvin_state = get_melvin_state(handlerInput);
     let prev_melvin_state = {};
-    if (melvin_history.length > 0) {
-        prev_melvin_state = melvin_history[0].melvin_state;
+    for (let item in melvin_history) {
+        const prev_item = melvin_history[item];
+        if(!_.isEqual(prev_item["melvin_state"], melvin_state)) {
+            prev_melvin_state = prev_item["melvin_state"];
+            break;
+        }
     }
     return prev_melvin_state;
 };

@@ -12,10 +12,11 @@ const {
     get_study_name_text,
     get_dtype_name_text,
     MELVIN_APP_NAME,
+    MELVIN_WELCOME_GREETING
 } = require("../common.js");
 
 const {
-    get_melvin_state, match_compare_dtype, get_prev_melvin_state
+    get_melvin_state, match_compare_dtype
 } = require("../utils/navigation_utils.js");
 
 const {
@@ -85,15 +86,20 @@ const ack_attribute_change = function (handlerInput, state_change) {
         speech.say(`Ok, ${study_name}.`);
         add_followup_text(handlerInput, speech);
 
-    } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE) {
-        const dsource = state_diff["entity_value"];
-        speech.say(`Ok, switching to ${dsource}.`);
+        // } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE) {
+        //     const dsource = state_diff["entity_value"];
+        //     speech.say(`Ok, switching to ${dsource}.`);
 
     } else if (state_diff["entity_type"] === MelvinAttributes.DTYPE) {
         const dtype = state_diff["entity_value"];
         const dtype_name = get_dtype_name_text(dtype);
         speech.say(`Ok, ${dtype_name}.`);
         add_followup_text(handlerInput, speech);
+    } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE || _.isEmpty(state_diff)) {
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}` +
+            " To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
+            " Now, What would you like to know? ";
+        speech.say(speechText);
     }
 
     return { "speech_text": speech.ssml(true) };
@@ -198,7 +204,7 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
 const build_navigation_response = async function (handlerInput, state_change) {
     const melvin_state = get_melvin_state(handlerInput);
-    const prev_state = get_prev_melvin_state(handlerInput);
+    const prev_state = state_change["prev_state"];
     const attr_count = Object.keys(melvin_state).length;
     console.log(`[build_navigation_response] state_change: ${JSON.stringify(state_change)}, ` +
         `attr_count: ${attr_count}`);
