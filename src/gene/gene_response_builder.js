@@ -5,6 +5,7 @@ const {
     get_gene_by_name,
     get_gene_target
 } = require("../http_clients/melvin_explorer_client.js");
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 
 const {
     MelvinAttributes,
@@ -35,6 +36,7 @@ const build_gene_definition_response = async function (handlerInput, params) {
         speech.sayWithSSML(`Sorry, I don't have the gene definition for ${gene_speech_text}.`);
     }
 
+    add_to_APL_text_pager(handlerInput, speech.ssml(true));
     return { "speech_text": speech.ssml(true) };
 };
 

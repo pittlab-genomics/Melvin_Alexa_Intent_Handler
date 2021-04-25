@@ -60,6 +60,7 @@ const {
     build_snv_domains_response,
     build_snvs_compare_response
 } = require("../mutations/snvs_response_builder.js");
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 
 
 function add_followup_text(handlerInput, speech) {
@@ -216,7 +217,7 @@ const build_navigation_response = async function (handlerInput, state_change) {
         for (let key in melvin_state) {
             card_text_list.push(`${key}: ${melvin_state[key]}`);
         }
-        handlerInput.responseBuilder.withSimpleCard(MELVIN_APP_NAME, card_text_list.join("\n"));
+        add_to_APL_text_pager(handlerInput, card_text_list.join("\n"));
 
     } else {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {

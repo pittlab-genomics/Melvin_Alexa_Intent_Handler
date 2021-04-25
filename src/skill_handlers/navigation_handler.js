@@ -23,6 +23,7 @@ const {
 const { get_state_change_diff } = require("../utils/response_builder_utils.js");
 const sessions_doc = require("../dao/sessions.js");
 const utterances_doc = require("../dao/utterances.js");
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 
 
 const NavigateJoinFilterIntentHandler = {
@@ -115,10 +116,11 @@ const NavigateResetIntentHandler = {
         clean_melvin_state(handlerInput);
         clean_melvin_aux_state(handlerInput);
 
+        const response_text = `Welcome to ${MELVIN_APP_NAME}. You can start with a gene or cancer type.`;
+        add_to_APL_text_pager(handlerInput, response_text);
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)
-            .withStandardCard(`Welcome to ${MELVIN_APP_NAME}`, "You can start with a gene or cancer type.")
             .getResponse();
     }
 };

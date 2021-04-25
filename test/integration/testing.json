@@ -2,7 +2,7 @@
     "locale": "en-US",
     "trace": false,
     "jest": {
-        "silent": true,
+        "silent": false,
         "collectCoverage": false
     },
     "userId": "testUserId",

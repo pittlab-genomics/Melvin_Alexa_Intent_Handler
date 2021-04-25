@@ -45,6 +45,7 @@ const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handl
 // const { NavigateExpressionIntentHandler } = require("./skill_handlers/gene_expression_handler.js");
 
 const { NavigateEmailIntentHandler } = require("./skill_handlers/email_handler.js");
+const { add_to_APL_text_pager } = require("./utils/APL_utils.js");
 
 // const {
 //     ClinicalTrialsNearbyIntentHandler,
@@ -66,11 +67,12 @@ const HelpIntentHandler = {
             "If you subsequently ask 'Show me mutations', I will provided a detailed breakdown of TP53 mutations in breast cancer. " +
             "You can swap any of these variables by providing another gene, cancer type, or data type. " +
             "If you ever feel stuck, just say 'Reset' and I will reset the state to start from scratch. " +
-            "If you are new to the skill, check out our videos and sample conversation on the webpage provided in the skill description. " +
+            "If you are new to the skill, check out our videos and sample conversations on the webpage provided in the skill description. " +
             "Now back to the skill, What would you like to know?";
         const repromptText = "To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
             "What would you like to know?";
 
+        add_to_APL_text_pager(handlerInput, "Check out our videos and sample conversations at https://pittgenomics.gitlab.io/melvin_docs");
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)
@@ -88,6 +90,7 @@ const CancelAndStopIntentHandler = {
         const speechText = "Goodbye!";
         return handlerInput.responseBuilder
             .speak(speechText)
+            .withShouldEndSession(true)
             .getResponse();
     }
 };
@@ -98,7 +101,9 @@ const SessionEndedRequestHandler = {
     },
     handle(handlerInput) {
         // Any cleanup logic goes here.
-        return handlerInput.responseBuilder.getResponse();
+        return handlerInput.responseBuilder
+            .withShouldEndSession(true)
+            .getResponse();
     }
 };
 

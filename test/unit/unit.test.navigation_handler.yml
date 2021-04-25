@@ -9,7 +9,7 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.card.title: "Welcome to Melvin test"
+  - response.card.title: "Melvin test"
   - response.outputSpeech.ssml: "Welcome to Melvin test version."
   - response.reprompt.outputSpeech.ssml: "You can say 'Tell me about' followed by the name of a gene, cancer type, or data type. What would you like to know?"
 

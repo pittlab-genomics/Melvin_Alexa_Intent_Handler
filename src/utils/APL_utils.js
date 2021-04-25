@@ -1,11 +1,18 @@
 const _ = require("lodash");
-const { MelvinAttributes } = require("../common.js");
+const {
+    MelvinAttributes,
+    MELVIN_APP_NAME
+} = require("../common.js");
 
-const APLDocs = { image_pager: require("../../resources/APL/image_pager.json") };
+const APLDocs = {
+    image_pager: require("../../resources/APL/image_pager.json"),
+    text_pager:  require("../../resources/APL/text_pager.json")
+};
 const {
     get_melvin_state,
     get_melvin_aux_state
 } = require("../utils/navigation_utils.js");
+const ssml_regex = /(<([^>]+)>)/ig;
 
 const MelvinAttributesLabels = {
     [MelvinAttributes.GENE_NAME]:   "Gene",
@@ -136,9 +143,36 @@ function add_context_to_urls(handlerInput, url_list) {
     });
 }
 
+const add_to_APL_text_pager = function (handlerInput, text) {
+    let response_text = "";
+    if(!_.isEmpty(text)) response_text = text.replace(ssml_regex, "");
+    if(supportsAPL(handlerInput)) {
+        const text_pager_doc = APLDocs.text_pager;
+        handlerInput.responseBuilder.addDirective({
+            type:        "Alexa.Presentation.APL.RenderDocument",
+            token:       "pagerToken",
+            version:     "1.0",
+            document:    text_pager_doc,
+            datasources: { "pagerTemplateData": {
+                "type":        "object",
+                "footer_text": build_APL_footer_text(handlerInput),
+                "body_text":   response_text,
+                "header_text": MELVIN_APP_NAME
+            }},
+        });
+
+    } else {
+        response_text = response_text + "\n \n \n \n \n" + build_APL_footer_text(handlerInput);
+        handlerInput.responseBuilder.withSimpleCard(
+            MELVIN_APP_NAME,
+            response_text
+        );
+    }
+};
+
 const add_to_APL_image_pager = function (handlerInput, url_list) {
     if (!Array.isArray(url_list) || url_list.length == 0) {
-        console.log("[WARNING] add_to_APL_image_pager called with invalid url_list");
+        add_to_APL_text_pager(handlerInput, "");
         return;
     }
 
@@ -212,5 +246,6 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
 
 module.exports = {
     supportsAPL,
-    add_to_APL_image_pager
+    add_to_APL_image_pager,
+    add_to_APL_text_pager
 };
