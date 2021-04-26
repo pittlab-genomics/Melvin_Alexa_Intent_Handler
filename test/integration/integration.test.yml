@@ -17,7 +17,7 @@ configuration:
 ---
 - test: Test 2
 - develop melvin : Welcome to Melvin
-- show me CNAs: Ok, copy number alterations. What would you like to know?
+- show me CNAs: I need to know a gene name first. What gene are you interested in?
 - show me glioblastoma: CDKN2A and CDKN2B have the greatest number of copy number alterations in Glioblastoma multiforme at 62.6 and 62.3 percent, respectively. What else?
 - compare to sarcoma: Among Glioblastoma multiforme patients, CDKN2A has the greatest number of copy number alterations at 62.6 percent while ATP1B2 has the greatest number of copy number alterations in Sarcoma at 37.6 percent. What else?
 - goodbye: Goodbye!
@@ -63,7 +63,7 @@ configuration:
 ---
 - test: Test 7
 - develop melvin: Welcome to Melvin
-- tell me about RNA expression: Ok, gene expression. What would you like to know?
+- tell me about RNA expression: I need to know a gene name first. What gene are you interested in?
 - show me BRCA1: The highest mean expression of Braca one is found in Acute Myeloid Leukemia with a log2 normalized count of 11.3. What else?
 - compare to BRCA2: This compare operation is not supported. What else?
 - goodbye: Goodbye!
