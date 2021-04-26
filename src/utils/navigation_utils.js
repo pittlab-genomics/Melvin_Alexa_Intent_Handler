@@ -20,7 +20,8 @@ const {
     DataTypes,
     DataSources,
     melvin_error,
-    get_oov_mappings_response
+    get_oov_mappings_response,
+    RequiredDatatypes
 } = require("../common.js");
 
 const { get_event_type } = require("./handler_configuration.js");
@@ -267,9 +268,28 @@ function validate_required_attributes(melvin_state) {
     }
 }
 
+const validate_required_datatypes = function(melvin_state, prev_state) {
+    console.log(`[validate_required_datatypes] melvin_state: ${JSON.stringify(melvin_state)}, 
+        prev_state: ${prev_state}`);
+
+    const data_type_val = melvin_state[MelvinAttributes.DTYPE];
+    if(data_type_val in RequiredDatatypes) {
+        const prev_dtype = prev_state["data_type"];
+        if(!(RequiredDatatypes[data_type_val].includes(prev_dtype))) {
+            throw melvin_error(
+                "[validate_required_attributes] error while validating required datatype | " +
+                    `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
+                MelvinIntentErrors.INVALID_DATA_TYPE,
+                "Domains are supported only when the data type is mutations, SNVs, or indels."
+            );
+        }
+    }
+};
+
 const validate_navigation_intent_state = function (handlerInput, state_change) {
     console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const prev_state = state_change["prev_state"];
 
     // Merge the previous state and new state. Overwrite with the latest.
     const melvin_state = {
@@ -279,6 +299,7 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
     sessionAttributes["MELVIN.STATE"] = melvin_state;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     validate_required_attributes(melvin_state);
+    validate_required_datatypes(melvin_state, prev_state);
     return melvin_state;
 };
 

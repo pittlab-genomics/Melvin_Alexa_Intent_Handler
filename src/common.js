@@ -171,6 +171,9 @@ const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
+const RequiredDatatypes = {};
+RequiredDatatypes[DataTypes.PROTEIN_DOMAINS] = [DataTypes.MUTATIONS, DataTypes.INDELS, DataTypes.SNV];
+
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
     " Please try again later.";
 const DEFAULT_INVALID_STATE_RESPONSE = "Sorry, I got lost during the conversation. Please start over.";
@@ -243,6 +246,7 @@ module.exports = {
     MelvinExplorerErrors,
     RequiredAttributesTCGA,
     RequiredAttributesClinvar,
+    RequiredDatatypes,
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
     MAX_EMAIL_RESULT_COUNT,

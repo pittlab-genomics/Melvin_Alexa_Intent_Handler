@@ -17,7 +17,8 @@ const {
     get_melvin_history,
     get_prev_melvin_state,
     clean_melvin_state,
-    clean_melvin_aux_state
+    clean_melvin_aux_state,
+    validate_navigation_intent_state
 } = require("../utils/navigation_utils.js",);
 
 const { get_state_change_diff } = require("../utils/response_builder_utils.js");
@@ -36,6 +37,7 @@ const NavigateJoinFilterIntentHandler = {
         let repromptText = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
+            validate_navigation_intent_state(handlerInput, state_change);
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
 
