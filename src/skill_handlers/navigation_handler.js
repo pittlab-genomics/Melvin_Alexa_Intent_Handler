@@ -19,7 +19,7 @@ const {
     clean_melvin_state,
     clean_melvin_aux_state,
     validate_required_datatypes
-} = require("../utils/navigation_utils.js",);
+} = require("../utils/navigation_utils.js");
 
 const { get_state_change_diff } = require("../utils/response_builder_utils.js");
 const sessions_doc = require("../dao/sessions.js");
@@ -37,7 +37,7 @@ const NavigateJoinFilterIntentHandler = {
         let repromptText = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
-            validate_required_datatypes(handlerInput, state_change);
+            validate_required_datatypes(state_change);
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
 
@@ -47,6 +47,7 @@ const NavigateJoinFilterIntentHandler = {
             } else {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
+            add_to_APL_text_pager(handlerInput, "");
             console.error("[NavigateJoinFilterIntentHandler] Error! except: ", error);
         }
 

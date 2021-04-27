@@ -10,7 +10,6 @@ const {
     DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
     DEFAULT_INVALID_STATE_RESPONSE,
     SUPPORTED_SPLITBY_DTYPES,
-    SUPPORTED_COMPARE_DTYPES,
     MelvinAttributes,
     MelvinEventTypes,
     MelvinIntentErrors,
@@ -20,12 +19,10 @@ const {
     DataTypes,
     DataSources,
     melvin_error,
-    get_oov_mappings_response,
-    RequiredDatatypes
+    get_oov_mappings_response
 } = require("../common.js");
 
 const { get_event_type } = require("./handler_configuration.js");
-const { add_to_APL_text_pager } = require("./APL_utils.js");
 
 const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml");
 
@@ -212,7 +209,7 @@ const update_melvin_history = async function (handlerInput) {
     await utterances_doc.addUserUtterance(new_utterance_rec);
 };
 
-function validate_required_attributes(melvin_state) {
+const validate_required_attributes = function (melvin_state) {
     console.log(`[validate_required_attributes] melvin_state: ${JSON.stringify(melvin_state)}`);
     if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
         return;
@@ -275,16 +272,15 @@ function validate_required_attributes(melvin_state) {
             "I need to know a cancer type first. What cancer type are you interested in?"
         );
     }
-}
+};
 
-const validate_required_datatypes = function(handlerInput, state_change) {
+const validate_required_datatypes = function(state_change) {
     const melvin_state = state_change["updated_state"];
     console.log(`[validate_required_datatypes] melvin_state: ${JSON.stringify(melvin_state)}`);
 
     const data_type_val = melvin_state[MelvinAttributes.DTYPE];
 
     if(data_type_val === DataTypes.PROTEIN_DOMAINS) {
-        add_to_APL_text_pager(handlerInput, "");
         throw melvin_error(
             "[validate_required_attributes] error while validating required datatype | " +
                     `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,

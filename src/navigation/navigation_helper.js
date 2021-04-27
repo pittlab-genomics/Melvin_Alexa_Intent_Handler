@@ -11,7 +11,6 @@ const {
     get_gene_speech_text,
     get_study_name_text,
     get_dtype_name_text,
-    MELVIN_APP_NAME,
     MELVIN_WELCOME_GREETING
 } = require("../common.js");
 
