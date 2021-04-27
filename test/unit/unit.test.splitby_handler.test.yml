@@ -146,7 +146,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 GAIN. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 copy number gains. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -167,7 +167,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -208,7 +208,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 MUTATIONS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 mutations. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -229,7 +229,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 INDELS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -250,7 +250,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 SNV. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 single nucleotide variants. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -271,7 +271,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 MUTATIONS and CDH1 CNA. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 mutations and CDH1 copy number alterations. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -292,7 +292,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 LOSS and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 copy number losses and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -313,7 +313,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 GAIN and CDH1 GAIN. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 copy number gains and CDH1 copy number gains. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -334,7 +334,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 GAIN and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 copy number gains and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -355,7 +355,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 CNA and CDH1 CNA. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 copy number alterations and CDH1 copy number alterations. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -376,7 +376,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 CNA. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 copy number gains and TP53 copy number alterations. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -397,7 +397,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 CNA and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 copy number alterations and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -418,7 +418,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 INDELS and CDH1 INDELS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 indels and CDH1 indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -439,7 +439,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 CNA and TP53 INDELS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 copy number alterations and TP53 indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -460,7 +460,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 INDELS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 copy number gains and TP53 indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -481,7 +481,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 INDELS and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 indels and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -502,7 +502,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 SNV. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 single nucleotide variants and CDH1 single nucleotide variants. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -523,7 +523,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 INDELS and TP53 SNV. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 indels and TP53 single nucleotide variants. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -544,7 +544,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 CNA. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 single nucleotide variants and CDH1 copy number alterations. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -565,7 +565,7 @@ configuration:
         value: "TP53"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 GAIN and TP53 SNV. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between CDH1 copy number gains and TP53 single nucleotide variants. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -586,6 +586,6 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 SNV and CDH1 LOSS. What else?"
+  - response.outputSpeech.ssml: "Across Breast invasive carcinoma, there is no observed association between TP53 single nucleotide variants and CDH1 copy number losses. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
