@@ -5,7 +5,9 @@ const DATA_TYPES = {
     "LOSS":                "copy number losses",
     "GENE_EXPRESSION":     "gene expression",
     "STRUCTURAL_VARIANTS": "structural variants",
-    "PROTEIN_DOMAINS":     "protein domains",
+    "MUT_DOMAINS":     "mutation domains",
+    "IND_DOMAINS":     "indel domains",
+    "SNV_DOMAINS":     "snv domains",
     "INDELS":              "indels",
     "SNV":                 "single nucleotide variants"
 };

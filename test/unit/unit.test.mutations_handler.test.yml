@@ -68,7 +68,7 @@ configuration:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Domains are supported only when the data type is mutations, SNVs, or indels. What else?"
+  - response.outputSpeech.ssml: "Domains are supported only when the previous data type is mutations, SNVs, or indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -361,8 +361,8 @@ configuration:
         name: "query"
         value: "domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.reprompt.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.outputSpeech.ssml: "Domains are supported only when the previous data type is mutations, SNVs, or indels. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
 ---
@@ -373,8 +373,8 @@ configuration:
         name: "query"
         value: "mutations"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.reprompt.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.outputSpeech.ssml: "Ok, mutations. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, mutations. What would you like to know?"
   - response.shouldEndSession: false
 
 ---
@@ -385,8 +385,8 @@ configuration:
         name: "query"
         value: "indels"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.reprompt.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.outputSpeech.ssml: "Ok, indels. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, indels. What would you like to know?"
   - response.shouldEndSession: false
 
 ---
@@ -397,6 +397,6 @@ configuration:
         name: "query"
         value: "SNVs"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
-  - response.reprompt.outputSpeech.ssml: "I need to know a gene name first. What gene are you interested in?"
+  - response.outputSpeech.ssml: "Ok, single nucleotide variants. What would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Ok, single nucleotide variants. What would you like to know?"
   - response.shouldEndSession: false

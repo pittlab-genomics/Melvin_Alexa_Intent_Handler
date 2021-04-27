@@ -19,7 +19,7 @@
 - melvin genomics : 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_2/Test2.1.mp3: 
-  - caption: I need to know a gene name first. What gene are you interested in?
+  - caption: Ok, copy number alterations. What would you like to know?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_2/Test2.2.mp3: 
   - caption: CDKN2A and CDKN2B have the greatest number of copy number alterations in Glioblastoma multiforme at 62.6 and 62.3 percent, respectively. What else?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_2/Test2.3.mp3: 
@@ -86,7 +86,7 @@
 - melvin genomics: 
   - caption: Welcome to Melvin
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_7/Test7.1.mp3: 
-  - caption: I need to know a gene name first. What gene are you interested in?
+  - caption: Ok, gene expression. What would you like to know?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_7/Test7.2.mp3: 
   - caption: The highest mean expression of Braca one is found in Acute Myeloid Leukemia with a log2 normalized count of 11.3. What else?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Shwetha/Test_7/Test7.3.mp3: 

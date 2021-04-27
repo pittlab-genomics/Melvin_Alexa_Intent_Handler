@@ -847,7 +847,7 @@ configuration:
         name: "query"
         value: "most affected domains"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "Domains are supported only when the data type is mutations, SNVs, or indels. What else?"
+  - response.outputSpeech.ssml: "Domains are supported only when the previous data type is mutations, SNVs, or indels. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
 
 ---

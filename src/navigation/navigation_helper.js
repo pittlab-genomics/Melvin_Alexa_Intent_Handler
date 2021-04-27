@@ -166,9 +166,6 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
             response = await build_mutations_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
-            response = await build_mutations_domain_response(handlerInput, melvin_state);
-
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GAIN) {
             response = await build_gain_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
@@ -205,7 +202,6 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
 
 const build_navigation_response = async function (handlerInput, state_change) {
     const melvin_state = get_melvin_state(handlerInput);
-    const prev_state = state_change["prev_state"];
     const attr_count = Object.keys(melvin_state).length;
     console.log(`[build_navigation_response] state_change: ${JSON.stringify(state_change)}, ` +
         `attr_count: ${attr_count}`);
@@ -226,22 +222,14 @@ const build_navigation_response = async function (handlerInput, state_change) {
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
             response = await build_mutations_response(handlerInput, melvin_state);
 
-        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.PROTEIN_DOMAINS) {
-            const prev_dtype = prev_state["data_type"];
-            console.log(`[build_navigation_response] prev_state: ${JSON.stringify(prev_state)}, ` +
-                `prev_dtype: ${prev_dtype}`);
-            if(prev_dtype === DataTypes.INDELS) {
-                response = await build_indels_domain_response(handlerInput, melvin_state);
-            } else if(prev_dtype === DataTypes.SNV) {
-                response = await build_snv_domains_response(handlerInput, melvin_state);
-            } else if(prev_dtype === DataTypes.MUTATIONS){
-                response = await build_mutations_domain_response(handlerInput, melvin_state);
-            } else {
-                throw melvin_error(
-                    `[build_navigation_response] not supported | melvin_state: ${JSON.stringify(melvin_state)}`,
-                    MelvinIntentErrors.INVALID_DATA_TYPE,
-                    "Domains are supported only when the data type is mutations, SNVs, or indels.");
-            }
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.IND_DOMAINS) {
+            response = await build_indels_domain_response(handlerInput, melvin_state);
+
+        } else if(melvin_state[MelvinAttributes.DTYPE] === DataTypes.SNV_DOMAINS) {
+            response = await build_snv_domains_response(handlerInput, melvin_state);
+
+        } else if(melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUT_DOMAINS){
+            response = await build_mutations_domain_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {
             response = await build_indels_response(handlerInput, melvin_state);

@@ -63,6 +63,9 @@ const DataTypes = {
     GENE_DEFINITION:     "GENE_DEFINITION",
     MUTATIONS:           "MUTATIONS",
     PROTEIN_DOMAINS:     "PROTEIN_DOMAINS",
+    MUT_DOMAINS:         "MUT_DOMAINS",
+    IND_DOMAINS:         "IND_DOMAINS",
+    SNV_DOMAINS:         "SNV_DOMAINS",
     GENE_EXPRESSION:     "GENE_EXPRESSION",
     CNA:                 "CNA",
     GAIN:                "GAIN",
@@ -160,6 +163,9 @@ const RequiredAttributesTCGA = {};
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.PROTEIN_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributesTCGA[DataTypes.MUT_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributesTCGA[DataTypes.IND_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
+RequiredAttributesTCGA[DataTypes.SNV_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.INDELS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.SNV] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.CNA] = [3, 1, 2]; // ['GC', 'C', 'G'];
@@ -170,9 +176,6 @@ RequiredAttributesTCGA[DataTypes.GENE_EXPRESSION] = [2, 3, 1]; // ['G', 'GC', 'C
 const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
-
-const RequiredDatatypes = {};
-RequiredDatatypes[DataTypes.PROTEIN_DOMAINS] = [DataTypes.MUTATIONS, DataTypes.INDELS, DataTypes.SNV];
 
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
     " Please try again later.";
@@ -246,7 +249,6 @@ module.exports = {
     MelvinExplorerErrors,
     RequiredAttributesTCGA,
     RequiredAttributesClinvar,
-    RequiredDatatypes,
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
     MAX_EMAIL_RESULT_COUNT,

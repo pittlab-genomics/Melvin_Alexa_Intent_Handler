@@ -25,6 +25,7 @@ const {
 } = require("../common.js");
 
 const { get_event_type } = require("./handler_configuration.js");
+const { add_to_APL_text_pager } = require("./APL_utils.js");
 
 const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml");
 
@@ -130,7 +131,15 @@ const update_melvin_state = async function (
         } else if (query_response.data.type === OOVEntityTypes.STUDY) {
             oov_entity[MelvinAttributes.STUDY_ABBRV] = _.get(query_response, "data.val");
         } else if (query_response.data.type === OOVEntityTypes.DTYPE) {
-            oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.val");
+            const curr_datatype = _.get(query_response, "data.val");
+            if(curr_datatype === DataTypes.PROTEIN_DOMAINS) {
+                const prev_datatype = prev_state[MelvinAttributes.DTYPE];
+                if(prev_datatype === DataTypes.MUTATIONS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.MUT_DOMAINS;
+                else if(prev_datatype === DataTypes.INDELS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.IND_DOMAINS;
+                else if(prev_datatype === DataTypes.SNV) oov_entity[MelvinAttributes.DTYPE] = DataTypes.SNV_DOMAINS;
+                else oov_entity[MelvinAttributes.DTYPE] = DataTypes.PROTEIN_DOMAINS;
+            }
+            else oov_entity[MelvinAttributes.DTYPE] = curr_datatype;
         } else if (query_response.data.type === OOVEntityTypes.DSOURCE) {
             oov_entity[MelvinAttributes.DSOURCE] = _.get(query_response, "data.val");
         }
@@ -268,28 +277,26 @@ function validate_required_attributes(melvin_state) {
     }
 }
 
-const validate_required_datatypes = function(melvin_state, prev_state) {
-    console.log(`[validate_required_datatypes] melvin_state: ${JSON.stringify(melvin_state)}, 
-        prev_state: ${prev_state}`);
+const validate_required_datatypes = function(handlerInput, state_change) {
+    const melvin_state = state_change["updated_state"];
+    console.log(`[validate_required_datatypes] melvin_state: ${JSON.stringify(melvin_state)}`);
 
     const data_type_val = melvin_state[MelvinAttributes.DTYPE];
-    if(data_type_val in RequiredDatatypes) {
-        const prev_dtype = prev_state["data_type"];
-        if(!(RequiredDatatypes[data_type_val].includes(prev_dtype))) {
-            throw melvin_error(
-                "[validate_required_attributes] error while validating required datatype | " +
+
+    if(data_type_val === DataTypes.PROTEIN_DOMAINS) {
+        add_to_APL_text_pager(handlerInput, "");
+        throw melvin_error(
+            "[validate_required_attributes] error while validating required datatype | " +
                     `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
-                MelvinIntentErrors.INVALID_DATA_TYPE,
-                "Domains are supported only when the data type is mutations, SNVs, or indels."
-            );
-        }
+            MelvinIntentErrors.INVALID_DATA_TYPE,
+            "Domains are supported only when the previous data type is mutations, SNVs, or indels."
+        );
     }
 };
 
 const validate_navigation_intent_state = function (handlerInput, state_change) {
     console.log(`[validate_navigation_intent_state] | state_change: ${JSON.stringify(state_change)}`);
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const prev_state = state_change["prev_state"];
 
     // Merge the previous state and new state. Overwrite with the latest.
     const melvin_state = {
@@ -299,7 +306,6 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
     sessionAttributes["MELVIN.STATE"] = melvin_state;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     validate_required_attributes(melvin_state);
-    validate_required_datatypes(melvin_state, prev_state);
     return melvin_state;
 };
 
@@ -464,6 +470,7 @@ module.exports = {
     update_melvin_history,
     resolve_oov_entity,
     validate_navigation_intent_state,
+    validate_required_datatypes,
     validate_action_intent_state,
     clean_melvin_state,
     clean_melvin_aux_state,
