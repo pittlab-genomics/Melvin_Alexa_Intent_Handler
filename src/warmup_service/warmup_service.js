@@ -218,14 +218,12 @@ const plots_ep_path_dict = {
     ]
 };
 
-const oov_mapper_ep_path_dict = {
-    "mapper_model": [
-        "?query=press%20cancell",
-        "?query=barack%20obama",
-        "?query=domin",
-        "?query=Rad%20fifty%20one%20b"
-    ]
-};
+const oov_mapper_ep_path_dict = { "mapper_model": [
+    "?query=press%20cancell",
+    "?query=barack%20obama",
+    "?query=domin",
+    "?query=Rad%20fifty%20one%20b"
+]};
 
 const request_async = function(url, timeout) {
     const controller = new AbortController();
@@ -288,7 +286,14 @@ function get_melvin_splitby_stats_urls() {
         splitby_url.searchParams.set("splitby_state", 
             JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
 
+        let splitby_url1 = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
+        splitby_url1.searchParams.set("melvin_state",
+            JSON.stringify(get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
+        splitby_url1.searchParams.set("splitby_state",
+            JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0])));
+
         splitby_urls.push(splitby_url);
+        splitby_urls.push(splitby_url1);
     }
 
     return splitby_urls;
