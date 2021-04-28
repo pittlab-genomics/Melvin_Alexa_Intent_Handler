@@ -38,7 +38,7 @@ const send_request_async = function(url, signal) {
         } else if(_.has(response, "error")) {
             if(response["error"] === MelvinExplorerErrors.DATA_IS_ZERO) {
                 let description = response["description"];
-                if(!description.trim().endsWith("?")) description += ".";
+                if(!description.trim().endsWith(".")) description += ".";
                 throw melvin_error(`[send_request_async] Data is zero error: ${JSON.stringify(response)}`,
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
@@ -53,7 +53,7 @@ const send_request_async = function(url, signal) {
     }).catch((err) => {
         throw melvin_error(
             `[send_request_async] Melvin Explorer error: ${JSON.stringify(err)}`,
-            MelvinExplorerErrors[err.type],
+            MelvinIntentErrors.INVALID_API_RESPONSE,
             err.speech
         );
     });

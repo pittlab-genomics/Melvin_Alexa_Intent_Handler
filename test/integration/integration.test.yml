@@ -93,5 +93,5 @@ configuration:
 - show me mutations: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively. What else?
 - show me KRAS: mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated. What else?
 - split by amplifications: Which gene would you like to split by?
-- MYC: Across Colon adenocarcinoma, * MUTATIONS and MYC GAIN are observed to show mutual exclusivity with a Fisher's Exact P-value of 0.02. What else?
+- MYC: Across Colon adenocarcinoma, * mutations and MYC copy number gains are observed to show mutual exclusivity with a Fisher's Exact P-value of 0.02. What else?
 - goodbye: Goodbye!

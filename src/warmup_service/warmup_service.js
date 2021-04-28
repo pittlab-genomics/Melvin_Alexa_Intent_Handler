@@ -276,24 +276,79 @@ function generate_urls_from_paths(endpoint, endpoint_paths) {
     return service_urls;
 }
 
+function get_splitby_stats_url(dtypes) {
+    let splitby_url = "";
+    switch(dtypes[0] + ":" + dtypes[1]) {
+    case "GAIN:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
+        break;
+    case "GAIN:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
+        break;
+    case "LOSS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
+        break;
+    case "CNA:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
+        break;
+    case "CNA:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
+        break;
+    case "CNA:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
+        break;
+    case "INDELS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
+        break;
+    case "INDELS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
+        break;
+    case "INDELS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
+        break;
+    case "INDELS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
+        break;
+    case "SNV:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
+        break;
+    case "SNV:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
+        break;
+    case "SNV:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
+        break;
+    case "SNV:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
+        break;
+    case "SNV:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
+        break;
+    case "MUTATIONS:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "MUTATIONS:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "MUTATIONS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "MUTATIONS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "MUTATIONS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "MUTATIONS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        break;
+    case "GENE_EXPRESSION:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    case "GENE_EXPRESSION:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    case "GENE_EXPRESSION:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    case "GENE_EXPRESSION:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    case "GENE_EXPRESSION:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    case "GENE_EXPRESSION:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        break;
+    }
+
+    return splitby_url;
+}
+
 function get_melvin_splitby_stats_urls() {
     const splitby_urls = [];
 
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
-        let splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
+        let splitby_url = get_splitby_stats_url(SUPPORTED_SPLITBY_DTYPES[index]);
         splitby_url.searchParams.set("melvin_state", 
             JSON.stringify(get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0])));
         splitby_url.searchParams.set("splitby_state", 
             JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
 
-        let splitby_url1 = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/stats`);
-        splitby_url1.searchParams.set("melvin_state",
-            JSON.stringify(get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
-        splitby_url1.searchParams.set("splitby_state",
-            JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0])));
-
         splitby_urls.push(splitby_url);
-        splitby_urls.push(splitby_url1);
     }
 
     return splitby_urls;
