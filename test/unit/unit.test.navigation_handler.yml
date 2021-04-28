@@ -834,6 +834,21 @@ configuration:
   - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 
+- test: NavigateJoinFilterIntent_CDH1_OV
+- NavigateJoinFilterIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "CDH1"
+        data_type: "INDELS"
+  - request.request.intent.slots:
+      query:
+        name: "query"
+        value: "ovarian cancer"
+        confirmationStatus: "NONE"
+  - response.outputSpeech.ssml: "No indels in database for CDH1 in OV. What else?"
+  - response.reprompt.outputSpeech.ssml: "What else?"
+
+--- 
 - test: NavigateJoinFilterIntent_SV-MD_TP53_BRCA
 - NavigateJoinFilterIntent:
   - request.session.attributes:

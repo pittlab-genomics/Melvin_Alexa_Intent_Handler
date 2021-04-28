@@ -1,5 +1,6 @@
 "use strict";
 
+const _ = require("lodash");
 const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
@@ -11,7 +12,8 @@ const {
     melvin_error,
     DEFAULT_AE_ACCESS_ERROR_RESPONSE,
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
-    MELVIN_EXPLORER_ENDPOINT
+    MELVIN_EXPLORER_ENDPOINT,
+    MelvinExplorerErrors
 } = require("../common.js");
 
 const {
@@ -29,9 +31,18 @@ const send_request_async = function(url, signal) {
     console.info(`[send_request_async] AE url: ${url.href}`);
     return fetch(url, {
         signal, agent 
-    }).then((response) => {
-        if (response.ok) {
-            return response.json();
+    }).then((response) => response.json()
+    ).then((response) => {
+        if(_.has(response, "data")) {
+            return response;
+        } else if(_.has(response, "error")) {
+            if(response["error"] === MelvinExplorerErrors.DATA_IS_ZERO) {
+                let description = response["description"];
+                if(!description.trim().endsWith("?")) description += ".";
+                throw melvin_error(`[send_request_async] Data is zero error: ${JSON.stringify(response)}`,
+                    MelvinExplorerErrors.DATA_IS_ZERO,
+                    description);
+            }
         } else {
             throw melvin_error(
                 `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
@@ -41,9 +52,9 @@ const send_request_async = function(url, signal) {
         }
     }).catch((err) => {
         throw melvin_error(
-            `[send_request_async] AE connect error: ${JSON.stringify(err)}`,
-            MelvinIntentErrors.INVALID_API_RESPONSE,
-            DEFAULT_AE_CONNECT_ERROR_RESPONSE
+            `[send_request_async] Melvin Explorer error: ${JSON.stringify(err)}`,
+            MelvinExplorerErrors[err.type],
+            err.speech
         );
     });
 };

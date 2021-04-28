@@ -552,6 +552,10 @@ const MelvinExplorerInterceptor = {
                         patient_percentage:  5.7201,
                         recurrent_positions: 6
                     }}); break;
+                    case "CDH1-OV": jsonResult = { 
+                        error:       "DATA_IS_ZERO",
+                        description: "No indels in database for CDH1 in OV"
+                    }; break;
                     case "BRCA1-BRCA": jsonResult = Object.assign(jsonResult, { data: {
                         patient_percentage:  0.3064,
                         recurrent_positions: 0
