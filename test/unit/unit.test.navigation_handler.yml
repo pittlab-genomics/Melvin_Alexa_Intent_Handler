@@ -845,7 +845,7 @@ configuration:
         name: "query"
         value: "ovarian cancer"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "No indels in database for CDH1 in OV. What else?"
+  - response.outputSpeech.ssml: "There are no indels in the TCGA database for CDH1 in Ovarian serous cystadenocarcinoma. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
 
 --- 

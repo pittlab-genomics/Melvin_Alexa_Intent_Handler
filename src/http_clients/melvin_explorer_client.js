@@ -17,7 +17,7 @@ const {
 } = require("../common.js");
 
 const {
-    add_query_params, add_query_list_params, call_directive_service
+    add_query_params, add_query_list_params, call_directive_service, build_ssml_response_from_nunjucks
 } = require("../utils/response_builder_utils.js");
 
 const agent = new https.Agent({ maxSockets: 100 });
@@ -42,6 +42,12 @@ const send_request_async = function(url, signal) {
                 throw melvin_error(`[send_request_async] Data is zero error: ${JSON.stringify(response)}`,
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
+            } else {
+                throw melvin_error(
+                    `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
+                    MelvinIntentErrors.INVALID_API_RESPONSE,
+                    DEFAULT_AE_ACCESS_ERROR_RESPONSE
+                );
             }
         } else {
             throw melvin_error(
@@ -53,8 +59,8 @@ const send_request_async = function(url, signal) {
     }).catch((err) => {
         throw melvin_error(
             `[send_request_async] Melvin Explorer error: ${JSON.stringify(err)}`,
-            MelvinIntentErrors.INVALID_API_RESPONSE,
-            err.speech
+            (err.type)? err.type : MelvinIntentErrors.INVALID_API_RESPONSE,
+            (err.speech)? err.speech : DEFAULT_AE_CONNECT_ERROR_RESPONSE
         );
     });
 };
@@ -117,46 +123,133 @@ const get_mutations_tcga_top_genes = async function (handlerInput, params) {
 const get_mutations_tcga_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
     add_query_params(mutations_url, params);
-    const result = await process_repeat_requests(handlerInput, mutations_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, mutations_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mutations_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
     add_query_params(mutations_url, params);
     mutations_url.searchParams.set("style", "domain");
-    const result = await process_repeat_requests(handlerInput, mutations_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, mutations_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params,
+                subtype:      "domain",
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mutations_tcga_domain_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_indels_tcga_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
     add_query_params(indels_url, params);
-    const result = await process_repeat_requests(handlerInput, indels_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, indels_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_indels_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_indels_tcga_domain_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
     add_query_params(indels_url, params);
     indels_url.searchParams.set("style", "domain");
-    const result = await process_repeat_requests(handlerInput, indels_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, indels_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params,
+                subtype:      "domain",
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_indels_tcga_domain_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snvs_tcga_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
-    const result = await process_repeat_requests(handlerInput, snvs_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, snvs_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snvs_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
     snvs_url.searchParams.set("style", "domain");
-    const result = await process_repeat_requests(handlerInput, snvs_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, snvs_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params,
+                subtype:      "domain"
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snvs_tcga_domain_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_clinical_trials = async function (handlerInput, params) {
@@ -177,22 +270,61 @@ const get_cna_clinvar_stats = async function (handlerInput, params) {
 const get_cna_tcga_stats = async function (handlerInput, params) {
     const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
     add_query_params(cna_url, params);
-    const result = await process_repeat_requests(handlerInput, cna_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, cna_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_cna_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_gain_tcga_stats = async function (handlerInput, params) {
     const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
     add_query_params(gain_stats_url, params);
-    const result = await process_repeat_requests(handlerInput, gain_stats_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, gain_stats_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gain_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_loss_tcga_stats = async function (handlerInput, params) {
     const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
     add_query_params(loss_stats_url, params);
-    const result = await process_repeat_requests(handlerInput, loss_stats_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, loss_stats_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_loss_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_gene_by_name = async function (handlerInput, params) {
@@ -217,8 +349,21 @@ const get_gene_expression_clinvar_stats = async function (handlerInput, params) 
 const get_gene_expression_tcga_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/tcga/stats`);
     add_query_params(gene_expression_url, params);
-    const result = await process_repeat_requests(handlerInput, gene_expression_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, gene_expression_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gene_expression_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_mutations_clinvar_stats = async function (handlerInput, params) {

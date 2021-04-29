@@ -83,7 +83,7 @@ configuration:
 - show me CTNNB1: Ok, Catenin Beta 1. What else?
 - show me mutations: Catenin Beta 1 mutations are found in 25.4 percent of Liver hepatocellular carcinoma patients with 10 amino acid residues recurrently mutated. What else?
 - split by expression: Which gene would you like to split by?
-- CCND1: In Liver hepatocellular carcinoma, Catenin Beta 1 is differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0. What else?
+- CCND1: In Liver hepatocellular carcinoma, CCND1 is differentially expressed between Catenin Beta 1 mutant and wild type samples with a Mann Whitney P value of 0. What else?
 - goodbye: Goodbye!
 
 ---
