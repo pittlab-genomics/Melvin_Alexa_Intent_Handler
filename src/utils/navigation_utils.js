@@ -188,7 +188,7 @@ const update_melvin_history = async function (handlerInput) {
     };
     melvin_history.unshift(history_event);
     if (melvin_history.length > MELVIN_MAX_HISTORY_ITEMS) {
-        melvin_history = melvin_history.pop();
+        melvin_history = new Array(melvin_history.pop());
     }
     sessionAttributes["MELVIN.HISTORY"] = melvin_history;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
