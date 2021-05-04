@@ -24,7 +24,7 @@ const {
 const stats_ep_timeout = 2500;
 const plot_ep_timeout = 5000;
 const mapper_ep_timeout = 5000;
-const warmup_session_timeout = 600; // disable warmup rule if there is no new user sessions after X mins
+const warmup_session_timeout = 900; // disable warmup rule if there is no new user sessions after X mins
 
 /*
     make sure to include at least N number of entries for each unique path 
@@ -516,7 +516,7 @@ async function disable_warmup_cloudwatch_rule() {
             const cloudwatchevent_params = {
                 Name:               warmup_rule_name,
                 Description:        description,
-                ScheduleExpression: "rate(5 minutes)",
+                ScheduleExpression: "rate(10 minutes)",
                 State:              "DISABLED",
                 Tags:               [
                     {

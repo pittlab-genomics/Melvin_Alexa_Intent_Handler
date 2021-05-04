@@ -13,7 +13,7 @@ provider:
     lambda: true
     apiGateway: true
   environment: ${self:custom.config.environment}
-  timeout: 60
+  timeout: 150
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -86,7 +86,7 @@ functions:
     events:
       - schedule:
           description: 'warmup service scheduled event rule'
-          rate: rate(5 minutes)
+          rate: rate(10 minutes)
           enabled: false
           input:
             stage: ${self:custom.stage}

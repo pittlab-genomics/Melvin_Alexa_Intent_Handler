@@ -50,7 +50,16 @@ const NavigateSplitbyIntentHandler = {
             };
 
             // check whether requested split-by analysis is supported
-            validate_splitby_aux_state(melvin_state, splitby_state);
+            validate_splitby_aux_state(handlerInput, melvin_state, splitby_state);
+
+            if(_.isEqual(melvin_state, splitby_state)) {
+                return handlerInput.responseBuilder
+                    .speak("Please tell me a different gene from the preliminary analysis. " +
+                        "Which gene would you like to split by?")
+                    .reprompt("Which gene would you like to split by?")
+                    .addElicitSlotDirective("gene_query")
+                    .getResponse();
+            }
 
             // generate the response for the requested split-by analysis
             let response = await build_splitby_response(handlerInput, melvin_state, splitby_state);

@@ -174,7 +174,7 @@ const update_melvin_history = async function (handlerInput) {
     }
 
     const timestamp = moment().valueOf();
-    const utterance_id = `${timestamp}_${handlerInput.requestEnvelope.session.sessionId}`;
+    const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
     const melvin_state = get_melvin_state(handlerInput);
 
     // store utterance as a session attribute for faster navigation
@@ -368,25 +368,17 @@ const resolve_splitby_query = async function(handlerInput) {
 };
 
 const validate_splitby_melvin_state = function(melvin_state) {
-    if (_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
+    if (_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV]) ||
+        _.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) ||
+            _.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
         throw melvin_error(
-            `[validate_splitby_melvin_state] missing cancer type | melvin_state: ${JSON.stringify(melvin_state)}`,
+            "[validate_splitby_melvin_state] empty/incomplete melvin state " +
+                `| melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.MISSING_STUDY,
-            "I need to know a cancer type first. What cancer type are you interested in?"
-        );
-
-    } else if (_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])) {
-        throw melvin_error(
-            `[validate_splitby_melvin_state] missing gene | melvin_state: ${JSON.stringify(melvin_state)}`,
-            MelvinIntentErrors.MISSING_GENE,
-            "I need to know a gene first. What gene are you interested in?"
-        );
-
-    } else if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
-        throw melvin_error(
-            `[validate_splitby_melvin_state] missing data type | melvin_state: ${JSON.stringify(melvin_state)}`,
-            MelvinIntentErrors.MISSING_DTYPE,
-            "I need to know a data type first. What data type are you interested in?"
+            "Sorry, this split-by operation is not supported. " +
+                "You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. " +
+                "Only then you can splitby another gene or datatype within the same cancer type. " +
+                "Now, what would you like to know?"
         );
     }
 };
@@ -432,17 +424,16 @@ const is_splitby_supported = function (query_dtypes) {
     return false;
 };
 
-const validate_splitby_aux_state = function (melvin_state, splitby_state) {
+const validate_splitby_aux_state = function (handlerInput, melvin_state, splitby_state) {
     const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], splitby_state[MelvinAttributes.DTYPE]];
 
     if (!is_splitby_supported(query_dtypes)) {
-        throw melvin_error(
-            "Error while validating required attributes "
-            + `in melvin_state: ${JSON.stringify(melvin_state,)}, `
-            + `splitby_state: ${JSON.stringify(splitby_state,)}`,
-            MelvinIntentErrors.INVALID_STATE,
-            "Sorry, this split-by operation is not supported."
-        );
+        return handlerInput.responseBuilder
+            .speak("Sorry, this split-by operation is not supported. " +
+                "Please provide a different datatype. Which data type would you like to split by?")
+            .reprompt("Which data type would you like to split by?")
+            .addElicitSlotDirective("dtype_query")
+            .getResponse();
     }
 };
 

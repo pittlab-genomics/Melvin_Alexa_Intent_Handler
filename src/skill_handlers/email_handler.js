@@ -66,7 +66,10 @@ const NavigateEmailIntentHandler = {
 
         } catch (error) {
             if (error.statusCode === 403) {
-                speechText = "Please enable email permissions in the Amazon Alexa app to do this.";
+                speechText = "In order to email, Melvin will need access to your email address. " +
+                    "Go to the home screen in your Alexa app and grant me permissions.";
+                speechText += " What else?";
+                repromptText = "What else?";
                 return handlerInput.responseBuilder
                     .speak(speechText)
                     .reprompt(repromptText)
