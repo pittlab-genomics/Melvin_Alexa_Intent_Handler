@@ -187,8 +187,8 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "I need to know a cancer type first. What cancer type are you interested in?"
-  - response.reprompt.outputSpeech.ssml: "I need to know a cancer type first. What cancer type are you interested in?"
+  - response.outputSpeech.ssml: "Sorry, this split-by operation is not supported. You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. Only then you can splitby another gene or datatype within the same cancer type. Now, what would you like to know?"
+  - response.reprompt.outputSpeech.ssml: "Sorry, this split-by operation is not supported. You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. Only then you can splitby another gene or datatype within the same cancer type. Now, what would you like to know?"
   - response.shouldEndSession: false
 
 --- 

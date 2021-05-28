@@ -38,4 +38,4 @@ configuration:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
-  - response.outputSpeech.ssml: "Please enable email permissions in the Amazon Alexa app to do this."
+  - response.outputSpeech.ssml: "In order to email, Melvin will need access to your email address. Go to the home screen in your Alexa app and grant me permissions. What else?"
