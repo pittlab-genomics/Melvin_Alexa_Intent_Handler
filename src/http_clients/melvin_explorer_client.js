@@ -377,136 +377,392 @@ const get_gain_gain_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gain_gain_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_gain_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gain_loss_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
+    
 };
 
 const get_loss_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_loss_loss_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_cna_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_cna_cna_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_cna_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_cna_gain_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_cna_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_cna_loss_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_ind_ind_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_ind_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_ind_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_cna_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_ind_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_gain_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_ind_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_loss_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snv_snv_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_snv_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snv_ind_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_ind_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snv_cna_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_cna_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snv_gain_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_gain_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_loss_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_mut_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mut_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, splitby_state) {
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const result = await process_repeat_requests(handlerInput, splitby_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, splitby_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: melvin_state, splitby_state: splitby_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/splitby_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_exp_splitby_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_sv_clinvar_stats = async function (handlerInput, params) {
@@ -516,81 +772,247 @@ const get_sv_clinvar_stats = async function (handlerInput, params) {
     return result;
 };
 
-const get_mut_cna_compare_tcga_stats = async function (handlerInput, params) {
+const get_mut_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvCNA_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        console.log(JSON.stringify(params));
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mut_cna_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_mut_gain_compare_tcga_stats = async function (handlerInput, params) {
+const get_mut_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvGAIN_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mut_gain_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    } 
 };
 
-const get_mut_loss_compare_tcga_stats = async function (handlerInput, params) {
+const get_mut_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvLOSS_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mut_loss_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_gain_loss_compare_tcga_stats = async function (handlerInput, params) {
+const get_gain_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/GAINvLOSS_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gain_loss_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_ind_cna_compare_tcga_stats = async function (handlerInput, params) {
+const get_ind_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvCNA_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_cna_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_snv_cna_compare_tcga_stats = async function (handlerInput, params) {
+const get_snv_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvCNA_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_cna_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_snv_ind_compare_tcga_stats = async function (handlerInput, params) {
+const get_snv_ind_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvIND_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_ind_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_ind_gain_compare_tcga_stats = async function (handlerInput, params) {
+const get_ind_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvGAIN_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_gain_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_ind_loss_compare_tcga_stats = async function (handlerInput, params) {
+const get_ind_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvLOSS_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_ind_loss_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_snv_gain_compare_tcga_stats = async function (handlerInput, params) {
+const get_snv_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvGAIN_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_snv_gain_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
-const get_snv_loss_compare_tcga_stats = async function (handlerInput, params) {
+const get_snv_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvLOSS_stats`);
     add_query_params(compare_url, params);
-    const result = await process_repeat_requests(handlerInput, compare_url);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, compare_url);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = {
+                melvin_state: params, compare_state: compare_state 
+            };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/compare_data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_mut_gain_compare_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 module.exports = {

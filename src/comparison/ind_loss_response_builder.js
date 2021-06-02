@@ -14,9 +14,9 @@ const {
 const { get_ind_loss_compare_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
-async function build_ind_loss_compare_tcga_response(handlerInput, melvin_state, state_diff) {
+async function build_ind_loss_compare_tcga_response(handlerInput, melvin_state, compare_state, state_diff) {
     const image_list = [];
-    const response = await get_ind_loss_compare_tcga_stats(handlerInput, melvin_state);
+    const response = await get_ind_loss_compare_tcga_stats(handlerInput, melvin_state, compare_state,);
     const nunjucks_context = {
         melvin_state: melvin_state,
         state_diff:   state_diff,
@@ -29,11 +29,11 @@ async function build_ind_loss_compare_tcga_response(handlerInput, melvin_state, 
     return { "speech_text": speech_ssml };
 }
 
-async function build_ind_loss_compare_response(handlerInput, params, state_diff) {
+async function build_ind_loss_compare_response(handlerInput, params, compare_state, state_diff) {
     console.info(`[build_ind_loss_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_ind_loss_compare_tcga_response(handlerInput, params, state_diff);
+        response = await build_ind_loss_compare_tcga_response(handlerInput, params, compare_state, state_diff);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
