@@ -2,6 +2,7 @@
 
 const _ = require("lodash");
 const AWS = require("aws-sdk");
+const sigv4_utils = require("../utils/sigv4_utils");
 const fetch = require("node-fetch");
 const AbortController = require("abort-controller");
 const https = require("https");
@@ -13,6 +14,8 @@ const {
     DEFAULT_AE_ACCESS_ERROR_RESPONSE,
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
     MELVIN_EXPLORER_ENDPOINT,
+    MELVIN_EXPLORER_ROLE,
+    MELVIN_EXPLORER_REGION,
     MelvinExplorerErrors
 } = require("../common.js");
 
@@ -27,10 +30,10 @@ const ae_timeout_1 = 1800;
 const ae_timeout_2 = 7000;
 
 
-const send_request_async = function(url, signal) {
-    console.info(`[send_request_async] AE url: ${url.href}`);
+const send_request_async = function(url, headers, signal) {
+    console.info(`[send_request_async] AE url: ${url}`);
     return fetch(url, {
-        signal, agent 
+        headers, signal, agent
     }).then((response) => response.json()
     ).then((response) => {
         if(_.has(response, "data")) {
@@ -65,7 +68,8 @@ const send_request_async = function(url, signal) {
     });
 };
 
-const process_repeat_requests = async function(handlerInput, url, timeout1=ae_timeout_1, timeout2=ae_timeout_2) {
+const process_repeat_requests = async function(handlerInput, url, headers, timeout1=ae_timeout_1, 
+    timeout2=ae_timeout_2) {
     const controller_short = new AbortController();
     const signal_short = controller_short.signal;
     setTimeout(() => { 
@@ -74,7 +78,7 @@ const process_repeat_requests = async function(handlerInput, url, timeout1=ae_ti
 
     const t1 = performance.now();
     try {        
-        const result = await send_request_async(url, signal_short);
+        const result = await send_request_async(url, headers, signal_short);
         const t2 = performance.now();
         console.log("[process_repeat_requests] first AE request took " + (t2 - t1) + " ms");
         return result;
@@ -101,7 +105,7 @@ const process_repeat_requests = async function(handlerInput, url, timeout1=ae_ti
     
     const t4 = performance.now();
     try {        
-        const result = await send_request_async(url, signal_long);
+        const result = await send_request_async(url, headers, signal_long);
         const t5 = performance.now();
         console.log("[process_repeat_requests] second AE request took " + (t5 - t4) + " ms");
         return result;
@@ -120,11 +124,43 @@ const get_mutations_tcga_top_genes = async function (handlerInput, params) {
     return result;
 };
 
+async function assumeRole() {
+    var sts = new AWS.STS();
+    try {
+        const data = await sts.assumeRole({
+            RoleArn:         MELVIN_EXPLORER_ROLE,
+            RoleSessionName: "melvin_explorer_invoke"
+        }).promise();
+        console.log("[assumeRole] Assumed role success.");
+        return data;
+    } catch (err) {
+        console.log("[assumeRole] Cannot assume role.");
+        console.log(err, err.stack);
+    }
+}
+
+async function signUrl(path, queryParams = {}, method="GET", headers={}) {
+    const data = await assumeRole();
+    const signedRequest = sigv4_utils.sigV4Client.newClient({
+        accessKey:    data.Credentials.AccessKeyId,
+        secretKey:    data.Credentials.SecretAccessKey,
+        sessionToken: data.Credentials.SessionToken,
+        region:       MELVIN_EXPLORER_REGION,
+        endpoint:     MELVIN_EXPLORER_ENDPOINT
+    }).signRequest({
+        method, path, headers, queryParams
+    });
+    return signedRequest;
+
+}
+
 const get_mutations_tcga_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
-    add_query_params(mutations_url, params);
+    const path = "/analysis/mutations/tcga/MUT_stats";
+    var qparams = add_query_params(mutations_url, params);
+    var signedRequest = await signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, mutations_url);
+        const result = await process_repeat_requests(handlerInput, signedRequest.url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -142,10 +178,13 @@ const get_mutations_tcga_stats = async function (handlerInput, params) {
 
 const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
-    add_query_params(mutations_url, params);
+    const path = "/analysis/mutations/tcga/MUT_stats";
+    var qparams = add_query_params(mutations_url, params);
     mutations_url.searchParams.set("style", "domain");
+    qparams.style = "domain";
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, mutations_url);
+        const result = await process_repeat_requests(handlerInput, mutations_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -166,9 +205,11 @@ const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
 
 const get_indels_tcga_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
-    add_query_params(indels_url, params);
+    const path = "/analysis/mutations/tcga/IND_stats";
+    var qparams = add_query_params(indels_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, indels_url);
+        const result = await process_repeat_requests(handlerInput, indels_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -186,10 +227,13 @@ const get_indels_tcga_stats = async function (handlerInput, params) {
 
 const get_indels_tcga_domain_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
-    add_query_params(indels_url, params);
+    const path = "/analysis/mutations/tcga/IND_stats";
+    var qparams = add_query_params(indels_url, params);
     indels_url.searchParams.set("style", "domain");
+    qparams.style = "domain";
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, indels_url);
+        const result = await process_repeat_requests(handlerInput, indels_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -210,9 +254,11 @@ const get_indels_tcga_domain_stats = async function (handlerInput, params) {
 
 const get_snvs_tcga_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
-    add_query_params(snvs_url, params);
+    const path = "/analysis/mutations/tcga/SNV_stats";
+    var qparams = add_query_params(snvs_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, snvs_url);
+        const result = await process_repeat_requests(handlerInput, snvs_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -230,10 +276,13 @@ const get_snvs_tcga_stats = async function (handlerInput, params) {
 
 const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
-    add_query_params(snvs_url, params);
+    const path = "/analysis/mutations/tcga/SNV_stats";
+    var qparams = add_query_params(snvs_url, params);
     snvs_url.searchParams.set("style", "domain");
+    qparams.style = "domain";
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, snvs_url);
+        const result = await process_repeat_requests(handlerInput, snvs_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -269,9 +318,11 @@ const get_cna_clinvar_stats = async function (handlerInput, params) {
 
 const get_cna_tcga_stats = async function (handlerInput, params) {
     const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
-    add_query_params(cna_url, params);
+    const path = "/analysis/mutations/tcga/cna_stats";
+    var qparams = add_query_params(cna_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, cna_url);
+        const result = await process_repeat_requests(handlerInput, cna_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -289,9 +340,11 @@ const get_cna_tcga_stats = async function (handlerInput, params) {
 
 const get_gain_tcga_stats = async function (handlerInput, params) {
     const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
-    add_query_params(gain_stats_url, params);
+    const path = "/analysis/mutations/tcga/gain_stats";
+    var qparams = add_query_params(gain_stats_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, gain_stats_url);
+        const result = await process_repeat_requests(handlerInput, gain_stats_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -309,9 +362,11 @@ const get_gain_tcga_stats = async function (handlerInput, params) {
 
 const get_loss_tcga_stats = async function (handlerInput, params) {
     const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
-    add_query_params(loss_stats_url, params);
+    const path = "/analysis/mutations/tcga/loss_stats";
+    var qparams = add_query_params(loss_stats_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, loss_stats_url);
+        const result = await process_repeat_requests(handlerInput, loss_stats_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -329,13 +384,17 @@ const get_loss_tcga_stats = async function (handlerInput, params) {
 
 const get_gene_by_name = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
-    const result = await process_repeat_requests(handlerInput, gene_url);
+    const path = `/genes/${params.gene_name}`;
+    var signedRequest = signUrl(path);
+    const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
     return result;
 };
 
 const get_gene_target = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
-    const result = await process_repeat_requests(handlerInput, gene_url);
+    const path = `/genes/${params.gene_name}`;
+    var signedRequest = signUrl(path);
+    const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
     return result;
 };
 
@@ -348,9 +407,11 @@ const get_gene_expression_clinvar_stats = async function (handlerInput, params) 
 
 const get_gene_expression_tcga_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/tcga/stats`);
-    add_query_params(gene_expression_url, params);
+    const path = "/analysis/gene_expression/tcga/stats";
+    var qparams = add_query_params(gene_expression_url, params);
+    var signedRequest = signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, gene_expression_url);
+        const result = await process_repeat_requests(handlerInput, gene_expression_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -377,8 +438,10 @@ const get_gain_gain_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -400,8 +463,10 @@ const get_gain_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -424,8 +489,10 @@ const get_loss_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -447,8 +514,10 @@ const get_cna_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -470,8 +539,10 @@ const get_cna_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -493,8 +564,10 @@ const get_cna_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -516,8 +589,10 @@ const get_ind_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -539,8 +614,10 @@ const get_ind_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -562,8 +639,10 @@ const get_ind_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -585,8 +664,10 @@ const get_ind_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -608,8 +689,10 @@ const get_snv_snv_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -631,8 +714,10 @@ const get_snv_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -654,8 +739,10 @@ const get_snv_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -677,8 +764,10 @@ const get_snv_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -700,8 +789,10 @@ const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -723,8 +814,10 @@ const get_mut_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -746,8 +839,10 @@ const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
+    var signedRequest = await signUrl(path);
     try {
-        const result = await process_repeat_requests(handlerInput, splitby_url);
+        const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -774,10 +869,11 @@ const get_sv_clinvar_stats = async function (handlerInput, params) {
 
 const get_mut_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvCNA_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/MUTvCNA_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        console.log(JSON.stringify(params));
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = await signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -797,9 +893,11 @@ const get_mut_cna_compare_tcga_stats = async function (handlerInput, params, com
 
 const get_mut_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvGAIN_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/MUTvGAIN_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -814,14 +912,17 @@ const get_mut_gain_compare_tcga_stats = async function (handlerInput, params, co
             );
         }
         throw err;
-    } 
+    }
 };
 
 const get_mut_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvLOSS_stats`);
+    const path = "/analysis/comparison/tcga/MUTvLOSS_stats";
+    var qparams = add_query_params(compare_url, params);
     add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -841,9 +942,11 @@ const get_mut_loss_compare_tcga_stats = async function (handlerInput, params, co
 
 const get_gain_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/GAINvLOSS_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/GAINvLOSS_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -863,9 +966,11 @@ const get_gain_loss_compare_tcga_stats = async function (handlerInput, params, c
 
 const get_ind_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvCNA_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/INDvCNA_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -885,9 +990,11 @@ const get_ind_cna_compare_tcga_stats = async function (handlerInput, params, com
 
 const get_snv_cna_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvCNA_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/SNVvCNA_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -907,9 +1014,12 @@ const get_snv_cna_compare_tcga_stats = async function (handlerInput, params, com
 
 const get_snv_ind_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvIND_stats`);
+    const path = "/analysis/comparison/tcga/SNVvIND_stats";
+    var qparams = add_query_params(compare_url, params);
     add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -929,9 +1039,11 @@ const get_snv_ind_compare_tcga_stats = async function (handlerInput, params, com
 
 const get_ind_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvGAIN_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/INDvGAIN_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -951,9 +1063,11 @@ const get_ind_gain_compare_tcga_stats = async function (handlerInput, params, co
 
 const get_ind_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvLOSS_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/INDvLOSS_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -973,9 +1087,11 @@ const get_ind_loss_compare_tcga_stats = async function (handlerInput, params, co
 
 const get_snv_gain_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvGAIN_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/SNVvGAIN_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -995,9 +1111,11 @@ const get_snv_gain_compare_tcga_stats = async function (handlerInput, params, co
 
 const get_snv_loss_compare_tcga_stats = async function (handlerInput, params, compare_state) {
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvLOSS_stats`);
-    add_query_params(compare_url, params);
+    const path = "/analysis/comparison/tcga/SNVvLOSS_stats";
+    var qparams = add_query_params(compare_url, params);
     try {
-        const result = await process_repeat_requests(handlerInput, compare_url);
+        var signedRequest = signUrl(path, qparams);
+        const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {

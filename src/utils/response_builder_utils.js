@@ -20,13 +20,17 @@ const add_query_list_params = function (url, params, list) {
 };
 
 const add_query_params = function (url, params) {
+    let result = {};
     if (params[MelvinAttributes.GENE_NAME]) {
         url.searchParams.set("gene", params[MelvinAttributes.GENE_NAME]);
+        result.gene = params[MelvinAttributes.GENE_NAME];
     }
 
     if (params[MelvinAttributes.STUDY_ABBRV]) {
         url.searchParams.set("study", params[MelvinAttributes.STUDY_ABBRV]);
+        result.study = params[MelvinAttributes.STUDY_ABBRV];
     }
+    return result;
 
 };
 

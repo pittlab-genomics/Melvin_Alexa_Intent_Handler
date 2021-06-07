@@ -30,7 +30,7 @@ configuration:
 - how about amplifications: SFTA3 has the greatest number of amplifications in Lung adenocarcinoma at 22.3 percent. What else?
 - show me MYC: In Lung adenocarcinoma patients, MYC is amplified at 17.2 percent. What else?
 - split by expression: Which gene would you like to split by?
-- M.Y.C: In Lung adenocarcinoma, MYC is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01. What else?
+- MYC: In Lung adenocarcinoma, MYC is differentially expressed between MYC mutant and wild type samples with a Mann Whitney P value of 0.01. What else?
 - goodbye: Goodbye!
 
 ---
@@ -93,5 +93,5 @@ configuration:
 - show me mutations: Among Colon adenocarcinoma patients, APC and TP53 are the top 2 mutated genes found in 70.4 percent and 46.6 percent of the patients respectively. What else?
 - show me KRAS: mutations are found in 38.1 percent of Colon adenocarcinoma patients with 5 amino acid residues recurrently mutated. What else?
 - split by amplifications: Which gene would you like to split by?
-- M.Y.C: Across Colon adenocarcinoma, * mutations and MYC copy number gains are observed to show mutual exclusivity with a Fisher's Exact P-value of 0.02. What else?
+- MYC: Across Colon adenocarcinoma, * mutations and MYC copy number gains are observed to show mutual exclusivity with a Fisher's Exact P-value of 0.02. What else?
 - goodbye: Goodbye!

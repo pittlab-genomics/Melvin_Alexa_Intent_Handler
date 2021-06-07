@@ -13,6 +13,7 @@
     "abort-controller": "^3.0.0",
     "ask-sdk-core": "^2.7.0",
     "ask-sdk-model": "^1.18.0",
+    "crypto-js": "^4.0.0",
     "iso8601-duration": "^1.2.0",
     "js-yaml": "3.13.1",
     "lodash": "^4.17.15",

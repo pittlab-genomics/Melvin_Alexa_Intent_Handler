@@ -4,6 +4,7 @@ const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const allSettled = require("promise.allsettled");
 const AbortController = require("abort-controller");
+const sigv4_utils = require("../utils/sigv4_utils");
 const https = require("https");
 const moment = require("moment");
 const _ = require("lodash");
@@ -18,7 +19,11 @@ const {
     SUPPORTED_SPLITBY_DTYPES,
     MELVIN_EXPLORER_ENDPOINT,
     OOV_MAPPER_ENDPOINT,
-    STAGE
+    STAGE,
+    OOV_MAPPER_ROLE,
+    OOV_MAPPER_REGION,
+    MELVIN_EXPLORER_REGION,
+    MELVIN_EXPLORER_ROLE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
@@ -225,15 +230,17 @@ const oov_mapper_ep_path_dict = { "mapper_model": [
     "?query=Rad%20fifty%20one%20b"
 ]};
 
-const request_async = function(url, timeout) {
+const request_async = function(data, timeout) {
+    const url = data.url;
+    let headers = data.headers;
     const controller = new AbortController();
     const signal = controller.signal;
     setTimeout(() => { 
         controller.abort();
     }, timeout);
 
-    return fetch(url, {
-        signal, agent 
+    return fetch(data.url, {
+        signal, agent, headers
     }).then((response) => {
         if (response.ok) {
             return {
@@ -251,6 +258,34 @@ const request_async = function(url, timeout) {
     });
 };
 
+async function assumeRole(role) {
+    var sts = new AWS.STS();
+    try {
+        const data = await sts.assumeRole({
+            RoleArn:         role,
+            RoleSessionName: "oov_mapper_invoke"
+        }).promise();
+        return data;
+    } catch (err) {
+        console.log(err, err.stack);
+    }
+}
+
+async function signUrl(path, role, region, endpoint, queryParams = {}, method="GET", headers={}) {
+    const data = await assumeRole(role);
+    const signedRequest = sigv4_utils.sigV4Client.newClient({
+        accessKey:    data.Credentials.AccessKeyId,
+        secretKey:    data.Credentials.SecretAccessKey,
+        sessionToken: data.Credentials.SessionToken,
+        region:       region,
+        endpoint:     endpoint
+    }).signRequest({
+        method, path, headers, queryParams
+    });
+    return signedRequest;
+
+}
+
 function get_melvin_state_with_dtype(dtype) {
     return {
         [MelvinAttributes.GENE_NAME]:   "TP53",
@@ -267,166 +302,291 @@ function get_splitby_state_with_dtype(dtype) {
     };
 }
 
-function generate_urls_from_paths(endpoint, endpoint_paths) {
+function generate_urls_from_paths(endpoint, endpoint_paths, role, region) {
     const service_urls = [];
     for (const ep_path of endpoint_paths) {
         let ep_url = endpoint + ep_path;
-        service_urls.push(ep_url);
+        let signedRequest = signUrl(ep_path, role, region, endpoint);
+        service_urls.push({
+            "url":    ep_url,
+            "header": signedRequest.headers
+        });
     }
     return service_urls;
 }
 
 function get_splitby_stats_url(dtypes) {
     let splitby_url = "";
+    let path = "";
     switch(dtypes[0] + ":" + dtypes[1]) {
-    case "GAIN:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
+    case "GAIN:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
+        path = "/analysis/splitby/tcga/GAINsGAIN_stats";
         break;
-    case "GAIN:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
+    case "GAIN:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
+        path = "/analysis/splitby/tcga/GAINsLOSS_stats";
         break;
-    case "LOSS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
+    case "LOSS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
+        path = "/analysis/splitby/tcga/LOSSsLOSS_stats";
         break;
-    case "CNA:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
+    case "CNA:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
+        path = "/analysis/splitby/tcga/CNAsCNA_stats";
         break;
-    case "CNA:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
+    case "CNA:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
+        path = "/analysis/splitby/tcga/CNAsGAIN_stats";
         break;
-    case "CNA:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
+    case "CNA:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
+        path = "/analysis/splitby/tcga/CNAsLOSS_stats";
         break;
-    case "INDELS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
+    case "INDELS:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
+        path = "/analysis/splitby/tcga/INDsIND_stats";
         break;
-    case "INDELS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
+    case "INDELS:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
+        path = "/analysis/splitby/tcga/INDsCNA_stats";
         break;
-    case "INDELS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
+    case "INDELS:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
+        path = "/analysis/splitby/tcga/INDsGAIN_stats";
         break;
-    case "INDELS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
+    case "INDELS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
+        path = "/analysis/splitby/tcga/INDsLOSS_stats";
         break;
-    case "SNV:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
+    case "SNV:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
+        path = "/analysis/splitby/tcga/SNVsSNV_stats";
         break;
-    case "SNV:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
+    case "SNV:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
+        path = "/analysis/splitby/tcga/SNVsIND_stats";
         break;
-    case "SNV:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
+    case "SNV:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
+        path = "/analysis/splitby/tcga/SNVsCNA_stats";
         break;
-    case "SNV:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
+    case "SNV:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
+        path = "/analysis/splitby/tcga/SNVsGAIN_stats";
         break;
-    case "SNV:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
+    case "SNV:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
+        path = "/analysis/splitby/tcga/SNVsLOSS_stats";
         break;
-    case "MUTATIONS:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:MUTATIONS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "MUTATIONS:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "MUTATIONS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "MUTATIONS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "MUTATIONS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "MUTATIONS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+    case "MUTATIONS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
+        path = "/analysis/splitby/tcga/MUT_stats";
         break;
-    case "GENE_EXPRESSION:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:MUTATIONS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
-    case "GENE_EXPRESSION:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
-    case "GENE_EXPRESSION:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
-    case "GENE_EXPRESSION:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
-    case "GENE_EXPRESSION:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
-    case "GENE_EXPRESSION:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+    case "GENE_EXPRESSION:LOSS":
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
+        path = "/analysis/splitby/tcga/EXP_stats";
         break;
     }
 
-    return splitby_url;
+    return [splitby_url, path];
 }
 
 function get_splitby_plots_url(dtypes) {
     let splitby_url = "";
+    let path = "";
     switch(dtypes[0] + ":" + dtypes[1]) {
-    case "GAIN:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_plot`);
+    case "GAIN:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_plot`);
+        path = "/analysis/splitby/tcga/GAINsGAIN_plot";
         break;
-    case "GAIN:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_plot`);
+    case "GAIN:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_plot`);
+        path = "/analysis/splitby/tcga/GAINsLOSS_plot";
         break;
-    case "LOSS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_plot`);
+    case "LOSS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_plot`);
+        path = "/analysis/splitby/tcga/LOSSsLOSS_plot";
         break;
-    case "CNA:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_plot`);
+    case "CNA:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_plot`);
+        path = "/analysis/splitby/tcga/CNAsCNA_plot";
         break;
-    case "CNA:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_plot`);
+    case "CNA:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_plot`);
+        path = "/analysis/splitby/tcga/CNAsGAIN_plot";
         break;
-    case "CNA:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_plot`);
+    case "CNA:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_plot`);
+        path = "/analysis/splitby/tcga/CNAsLOSS_plot";
         break;
-    case "INDELS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_plot`);
+    case "INDELS:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_plot`);
+        path = "/analysis/splitby/tcga/INDsIND_plot";
         break;
-    case "INDELS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_plot`);
+    case "INDELS:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_plot`);
+        path = "/analysis/splitby/tcga/INDsCNA_plot";
         break;
-    case "INDELS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_plot`);
+    case "INDELS:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_plot`);
+        path = "/analysis/splitby/tcga/INDsGAIN_plot";
         break;
-    case "INDELS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_plot`);
+    case "INDELS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_plot`);
+        path = "/analysis/splitby/tcga/INDsLOSS_plot";
         break;
-    case "SNV:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_plot`);
+    case "SNV:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_plot`);
+        path = "/analysis/splitby/tcga/SNVsSNV_plot";
         break;
-    case "SNV:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_plot`);
+    case "SNV:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_plot`);
+        path = "/analysis/splitby/tcga/SNVsIND_plot";
         break;
-    case "SNV:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_plot`);
+    case "SNV:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_plot`);
+        path = "/analysis/splitby/tcga/SNVsCNA_plot";
         break;
-    case "SNV:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_plot`);
+    case "SNV:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_plot`);
+        path = "/analysis/splitby/tcga/SNVsGAIN_plot";
         break;
-    case "SNV:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_plot`);
+    case "SNV:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_plot`);
+        path = "/analysis/splitby/tcga/SNVsLOSS_plot";
         break;
-    case "MUTATIONS:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:MUTATIONS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "MUTATIONS:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "MUTATIONS:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "MUTATIONS:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "MUTATIONS:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "MUTATIONS:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+    case "MUTATIONS:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_plot`);
+        path = "/analysis/splitby/tcga/MUT_plot";
         break;
-    case "GENE_EXPRESSION:MUTATIONS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:MUTATIONS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
-    case "GENE_EXPRESSION:SNV": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:SNV": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
-    case "GENE_EXPRESSION:INDELS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:INDELS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
-    case "GENE_EXPRESSION:CNA": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:CNA": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
-    case "GENE_EXPRESSION:GAIN": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:GAIN": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
-    case "GENE_EXPRESSION:LOSS": splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+    case "GENE_EXPRESSION:LOSS": 
+        splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_plot`);
+        path = "/analysis/splitby/tcga/EXP_plot";
         break;
     }
 
-    return splitby_url;
+    return [splitby_url, path];
 }
 
-function get_melvin_splitby_stats_urls() {
+function get_melvin_splitby_stats_urls(endpoint, region, role) {
     const splitby_urls = [];
 
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
-        let splitby_url = get_splitby_stats_url(SUPPORTED_SPLITBY_DTYPES[index]);
+        let result = get_splitby_stats_url(SUPPORTED_SPLITBY_DTYPES[index]);
+        let splitby_url = result[0];
         splitby_url.searchParams.set("melvin_state", 
             JSON.stringify(get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0])));
         splitby_url.searchParams.set("splitby_state", 
             JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
-
-        splitby_urls.push(splitby_url);
+        let path = result[1] + splitby_url.search;
+        let signedRequest = signUrl(path, role, region, endpoint);
+        splitby_urls.push({
+            "url":     splitby_url,
+            "headers": signedRequest.headers
+        });
     }
 
     return splitby_urls;
 }
 
-function get_melvin_splitby_plot_urls() {
+function get_melvin_splitby_plot_urls(endpoint, region, role) {
     const splitby_urls = [];
 
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
-        let splitby_url = get_splitby_plots_url(SUPPORTED_SPLITBY_DTYPES[index]);
+        let result = get_splitby_plots_url(SUPPORTED_SPLITBY_DTYPES[index]);
+        let splitby_url = result[0];
         splitby_url.searchParams.set("melvin_state", 
             JSON.stringify(get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0])));
         splitby_url.searchParams.set("splitby_state", 
             JSON.stringify(get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1])));
 
-        splitby_urls.push(splitby_url);
+        let path = result[1] + splitby_url.search;
+        let signedRequest = signUrl(path, role, region, endpoint);
+        splitby_urls.push({
+            "url":     splitby_url,
+            "headers": signedRequest.headers
+        });
     }
 
     return splitby_urls;
@@ -444,21 +604,25 @@ const send_parallel_requests = async function() {
         const results = {};
 
         for (let cat_item in oov_mapper_ep_path_dict) {
-            let cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]);
+            let cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]
+                , OOV_MAPPER_ROLE, OOV_MAPPER_REGION);
             results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, mapper_ep_timeout)));
         }
 
         for (let cat_item in stats_ep_path_dict) {
-            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]);
+            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]
+                , MELVIN_EXPLORER_ROLE, MELVIN_EXPLORER_REGION);
             results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, stats_ep_timeout)));
         }
 
         for (let cat_item in plots_ep_path_dict) {
-            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]);
+            let cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]
+                , MELVIN_EXPLORER_ROLE, MELVIN_EXPLORER_REGION);
             results[cat_item] = await allSettled(cat_url_list.map((data) => request_async(data, plot_ep_timeout)));
         }
 
-        const splitby_stat_urls = get_melvin_splitby_stats_urls();
+        const splitby_stat_urls = get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT, MELVIN_EXPLORER_REGION
+            , MELVIN_EXPLORER_ROLE);
         for (const [index, url_item] of splitby_stat_urls.entries()) {
             let repeat_url_items = Array(parallel_request_count).fill(url_item);
             let results_key = "splitby_stats_" + index;
@@ -467,7 +631,8 @@ const send_parallel_requests = async function() {
         }
         
 
-        const splitby_plot_urls = get_melvin_splitby_plot_urls();
+        const splitby_plot_urls = get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT, MELVIN_EXPLORER_REGION
+            , MELVIN_EXPLORER_ROLE);
         for (const [index, url_item] of splitby_plot_urls.entries()) {
             let repeat_url_items = Array(parallel_request_count).fill(url_item);
             let results_key = "splitby_plot_" + index;

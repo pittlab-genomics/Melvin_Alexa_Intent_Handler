@@ -68,6 +68,11 @@ provider:
         - ec2:DeleteNetworkInterface
       Resource: "*"
 
+    - Effect: Allow
+      Action:
+        - sts:AssumeRole
+      Resource: "arn:aws:iam::073302257160:role/*"
+
 functions:
   alexa-skill:
     handler: src/alexa-skill.handler

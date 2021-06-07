@@ -221,7 +221,11 @@ module.exports = {
     // Welcome greeting specific to the deployment environment helps to identify which skill is being used
     MELVIN_WELCOME_GREETING:  process.env.MELVIN_WELCOME_GREETING,
     MELVIN_EXPLORER_ENDPOINT: process.env.MELVIN_EXPLORER_ENDPOINT,
+    MELVIN_EXPLORER_REGION:   process.env.MELVIN_EXPLORER_REGION,
+    MELVIN_EXPLORER_ROLE:     process.env.MELVIN_EXPLORER_INVOKE_ROLE,
     OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
+    OOV_MAPPER_REGION:        process.env.OOV_MAPPER_REGION,
+    OOV_MAPPER_ROLE:          process.env.OOV_MAPPER_INVOKE_ROLE,
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
     STAGE:                    process.env.STAGE,
     MelvinAttributes,

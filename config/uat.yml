@@ -8,7 +8,11 @@ environment:
   SQS_IRS: 073302257160:melvin-sqs-irs-${self:provider.stage}
   SQS_WARMUP: 073302257160:melvin-sqs-warmup-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.uat.melvin.pittlabgenomics.com/v0.1"
+  MELVIN_EXPLORER_INVOKE_ROLE: "arn:aws:iam::073302257160:role/melvin-explorer-uat-api-invoke"
+  MELVIN_EXPLORER_REGION: "ap-southeast-1"
   OOV_MAPPER_ENDPOINT: "https://api.uat.oovm.pittlabgenomics.com/v0.1/oov-ml-mapper-uat"
+  OOV_MAPPER_INVOKE_ROLE: "arn:aws:iam::073302257160:role/oov-mapper-uat-api-invoke"
+  OOV_MAPPER_REGION: "ap-southeast-1"
 
 alexa:
   appId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d

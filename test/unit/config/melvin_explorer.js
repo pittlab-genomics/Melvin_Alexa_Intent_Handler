@@ -1,4 +1,3 @@
-const { isEqual } = require("lodash");
 const _ = require("lodash");
 const nock = require("nock");
 const url = require("url");
