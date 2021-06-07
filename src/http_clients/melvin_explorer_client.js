@@ -46,6 +46,7 @@ const send_request_async = function(url, headers, signal) {
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
             } else {
+                console.log(`${JSON.stringify(response)}`);
                 throw melvin_error(
                     `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPONSE,
@@ -53,6 +54,7 @@ const send_request_async = function(url, headers, signal) {
                 );
             }
         } else {
+            console.log(`${JSON.stringify(response)}`);
             throw melvin_error(
                 `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
                 MelvinIntentErrors.INVALID_API_RESPONSE,
@@ -160,7 +162,7 @@ const get_mutations_tcga_stats = async function (handlerInput, params) {
     var qparams = add_query_params(mutations_url, params);
     var signedRequest = await signUrl(path, qparams);
     try {
-        const result = await process_repeat_requests(handlerInput, signedRequest.url, signedRequest.headers);
+        const result = await process_repeat_requests(handlerInput, mutations_url, signedRequest.headers);
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -182,7 +184,7 @@ const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
     var qparams = add_query_params(mutations_url, params);
     mutations_url.searchParams.set("style", "domain");
     qparams.style = "domain";
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, mutations_url, signedRequest.headers);
         return result;
@@ -207,7 +209,7 @@ const get_indels_tcga_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
     const path = "/analysis/mutations/tcga/IND_stats";
     var qparams = add_query_params(indels_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, indels_url, signedRequest.headers);
         return result;
@@ -231,7 +233,7 @@ const get_indels_tcga_domain_stats = async function (handlerInput, params) {
     var qparams = add_query_params(indels_url, params);
     indels_url.searchParams.set("style", "domain");
     qparams.style = "domain";
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, indels_url, signedRequest.headers);
         return result;
@@ -256,7 +258,7 @@ const get_snvs_tcga_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     const path = "/analysis/mutations/tcga/SNV_stats";
     var qparams = add_query_params(snvs_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, snvs_url, signedRequest.headers);
         return result;
@@ -280,7 +282,7 @@ const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
     var qparams = add_query_params(snvs_url, params);
     snvs_url.searchParams.set("style", "domain");
     qparams.style = "domain";
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, snvs_url, signedRequest.headers);
         return result;
@@ -318,9 +320,9 @@ const get_cna_clinvar_stats = async function (handlerInput, params) {
 
 const get_cna_tcga_stats = async function (handlerInput, params) {
     const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
-    const path = "/analysis/mutations/tcga/cna_stats";
+    const path = "/analysis/cna/tcga/cna_stats";
     var qparams = add_query_params(cna_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, cna_url, signedRequest.headers);
         return result;
@@ -340,9 +342,9 @@ const get_cna_tcga_stats = async function (handlerInput, params) {
 
 const get_gain_tcga_stats = async function (handlerInput, params) {
     const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
-    const path = "/analysis/mutations/tcga/gain_stats";
+    const path = "/analysis/cna/tcga/gain_stats";
     var qparams = add_query_params(gain_stats_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, gain_stats_url, signedRequest.headers);
         return result;
@@ -362,9 +364,9 @@ const get_gain_tcga_stats = async function (handlerInput, params) {
 
 const get_loss_tcga_stats = async function (handlerInput, params) {
     const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
-    const path = "/analysis/mutations/tcga/loss_stats";
+    const path = "/analysis/cna/tcga/loss_stats";
     var qparams = add_query_params(loss_stats_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, loss_stats_url, signedRequest.headers);
         return result;
@@ -385,7 +387,7 @@ const get_loss_tcga_stats = async function (handlerInput, params) {
 const get_gene_by_name = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
     const path = `/genes/${params.gene_name}`;
-    var signedRequest = signUrl(path);
+    var signedRequest = await signUrl(path);
     const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
     return result;
 };
@@ -393,7 +395,7 @@ const get_gene_by_name = async function (handlerInput, params) {
 const get_gene_target = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
     const path = `/genes/${params.gene_name}`;
-    var signedRequest = signUrl(path);
+    var signedRequest = await signUrl(path);
     const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
     return result;
 };
@@ -409,7 +411,7 @@ const get_gene_expression_tcga_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/tcga/stats`);
     const path = "/analysis/gene_expression/tcga/stats";
     var qparams = add_query_params(gene_expression_url, params);
-    var signedRequest = signUrl(path, qparams);
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, gene_expression_url, signedRequest.headers);
         return result;
@@ -438,8 +440,12 @@ const get_gain_gain_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/GAINsGAIN_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -463,8 +469,12 @@ const get_gain_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/GAINsLOSS_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -489,8 +499,12 @@ const get_loss_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/LOSSsLOSS_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -514,8 +528,12 @@ const get_cna_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/CNAsCNA_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -539,8 +557,12 @@ const get_cna_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/CNAsGAIN_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -564,8 +586,12 @@ const get_cna_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/CNAsLOSS_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -589,8 +615,12 @@ const get_ind_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/INDsIND_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -614,8 +644,12 @@ const get_ind_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/INDsCNA_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -639,8 +673,12 @@ const get_ind_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/INDsGAIN_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -664,8 +702,12 @@ const get_ind_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/INDsLOSS_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -689,8 +731,12 @@ const get_snv_snv_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/SNVsSNV_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -714,8 +760,12 @@ const get_snv_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/SNVsIND_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -739,8 +789,12 @@ const get_snv_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/SNVsCNA_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -764,8 +818,12 @@ const get_snv_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/SNVsGAIN_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -789,8 +847,12 @@ const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/SNVsLOSS_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -814,8 +876,12 @@ const get_mut_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/MUT_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -839,8 +905,12 @@ const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const path = "/analysis/splitby/tcga/GAINsGAIN_stats" + splitby_url.search;
-    var signedRequest = await signUrl(path);
+    const path = "/analysis/splitby/tcga/EXP_stats";
+    let qparams = {
+        melvin_state:  JSON.stringify(melvin_state),
+        splitby_state: JSON.stringify(splitby_state)
+    };
+    var signedRequest = await signUrl(path, qparams);
     try {
         const result = await process_repeat_requests(handlerInput, splitby_url, signedRequest.headers);
         return result;
@@ -896,7 +966,7 @@ const get_mut_gain_compare_tcga_stats = async function (handlerInput, params, co
     const path = "/analysis/comparison/tcga/MUTvGAIN_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -921,7 +991,7 @@ const get_mut_loss_compare_tcga_stats = async function (handlerInput, params, co
     var qparams = add_query_params(compare_url, params);
     add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -945,7 +1015,7 @@ const get_gain_loss_compare_tcga_stats = async function (handlerInput, params, c
     const path = "/analysis/comparison/tcga/GAINvLOSS_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -969,7 +1039,7 @@ const get_ind_cna_compare_tcga_stats = async function (handlerInput, params, com
     const path = "/analysis/comparison/tcga/INDvCNA_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -993,7 +1063,7 @@ const get_snv_cna_compare_tcga_stats = async function (handlerInput, params, com
     const path = "/analysis/comparison/tcga/SNVvCNA_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -1018,7 +1088,7 @@ const get_snv_ind_compare_tcga_stats = async function (handlerInput, params, com
     var qparams = add_query_params(compare_url, params);
     add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -1042,7 +1112,7 @@ const get_ind_gain_compare_tcga_stats = async function (handlerInput, params, co
     const path = "/analysis/comparison/tcga/INDvGAIN_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -1066,7 +1136,7 @@ const get_ind_loss_compare_tcga_stats = async function (handlerInput, params, co
     const path = "/analysis/comparison/tcga/INDvLOSS_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -1090,7 +1160,7 @@ const get_snv_gain_compare_tcga_stats = async function (handlerInput, params, co
     const path = "/analysis/comparison/tcga/SNVvGAIN_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
@@ -1114,7 +1184,7 @@ const get_snv_loss_compare_tcga_stats = async function (handlerInput, params, co
     const path = "/analysis/comparison/tcga/SNVvLOSS_stats";
     var qparams = add_query_params(compare_url, params);
     try {
-        var signedRequest = signUrl(path, qparams);
+        var signedRequest = await signUrl(path, qparams);
         const result = await process_repeat_requests(handlerInput, compare_url, signedRequest.headers);
         return result;
     } catch(err) {
