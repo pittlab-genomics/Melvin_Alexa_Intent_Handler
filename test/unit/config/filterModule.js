@@ -50,11 +50,19 @@ module.exports = {
                 Key: "label", Value: "melvin-alexa-intent-handlers-test-warmup_service"
             }]});
         });
+
+        AWS.mock("STS", "assumeRole", function(params, callback) {
+            callback(null, { Credentials: {
+                SecretAccessKey: "",
+                AccessKeyId:     ""
+            }});
+        });
     },
     onTestSuiteEnd: (testResults) => {
         nock.cleanAll();
         AWS.restore("DynamoDB.DocumentClient");
         AWS.restore("SQS");
         AWS.restore("CloudWatchEvents");
+        AWS.restore("STS");
     } 
 };
