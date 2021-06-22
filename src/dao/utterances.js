@@ -63,7 +63,7 @@ utterances_doc.prototype.get_events_in_period_with_count = async function (user_
     console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, s_time: ${s_time}, count: ${count}`);
     var query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "utterance_id, melvin_state, melvin_response, event_type",
+        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type",
         KeyConditionExpression:   "#user_id = :uid",
         FilterExpression:         "#event_type = :event_type AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives)) AND #time > :s_time",
         ExpressionAttributeNames: {
@@ -79,12 +79,14 @@ utterances_doc.prototype.get_events_in_period_with_count = async function (user_
             ":event_type": event_type,
             ":s_time":     s_time
         },
-        ScanIndexForward: false,
-        Limit:            count
+        Limit: count
     };
 
     utterance_list = await queryEntireTable(docClient, query_params);
     console.info(`[utterances_doc] [get_events_in_period_with_count] utterance_list.len: ${utterance_list.length}`);
+    utterance_list.sort(function(a, b) {
+        return new Date(b["createdAt"]) - new Date(a["createdAt"]);
+    });
     return utterance_list;
 };
 
