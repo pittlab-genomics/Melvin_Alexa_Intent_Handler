@@ -25,13 +25,11 @@ const EnableUserPreferenceIntentHandler = {
             const preferenceName = get_user_preference_name(_.get(handlerInput, 
                 "requestEnvelope.request.intent.slots.preference.value"));
             const userInfo = await getUserInfo(accessToken);
-            let {
-                email, name, user_id 
-            } = userInfo;
+            let { user_id } = userInfo;
 
             const attributesManager = handlerInput.attributesManager;
             let attributes = {
-                [preferenceName]: true, "email": email, "name": name, "user_id": user_id 
+                [preferenceName]: true, "user_id": user_id
             };
 
             attributesManager.setPersistentAttributes(attributes);
@@ -71,13 +69,11 @@ const DisableUserPreferenceIntentHandler = {
             const preferenceName = get_user_preference_name(_.get(handlerInput, 
                 "requestEnvelope.request.intent.slots.preference.value"));
             const userInfo = await getUserInfo(accessToken);
-            let {
-                email, name, user_id 
-            } = userInfo;
+            let { user_id } = userInfo;
 
             const attributesManager = handlerInput.attributesManager;
             let attributes = {
-                [preferenceName]: false, "email": email, "name": name, "user_id": user_id 
+                [preferenceName]: false, "user_id": user_id
             };
 
             attributesManager.setPersistentAttributes(attributes);
