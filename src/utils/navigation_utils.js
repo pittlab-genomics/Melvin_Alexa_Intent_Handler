@@ -4,6 +4,7 @@ const moment = require("moment");
 const { performance } = require("perf_hooks");
 
 const utterances_doc = require("../dao/utterances.js");
+const voicerecords_doc = require("../dao/voicerecords.js");
 const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js");
 const {
     MELVIN_MAX_HISTORY_ITEMS,
@@ -77,6 +78,18 @@ const get_melvin_history = function (handlerInput) {
 
 
 const resolve_oov_entity = async function(handlerInput, query) {
+    const attributesManager = handlerInput.attributesManager;
+    const attributes = await attributesManager.getPersistentAttributes() || {};
+
+    const mapping_preference = _.has(attributes, "CUSTOM_MAPPINGS")? attributes["CUSTOM_MAPPINGS"] : false;
+    if(mapping_preference) {
+        console.log(`Check custom mappings ${attributes}, mapping setting: ${mapping_preference}`);
+        let result = await voicerecords_doc.getOOVMappingForQuery(query);
+        if(result!=null) {
+            console.log(`response - ${JSON.stringify(result[0]["entity_data"])}`);
+            return { "data": result[0]["entity_data"] };
+        }
+    }
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
     const response = get_oov_mappings_response(query);

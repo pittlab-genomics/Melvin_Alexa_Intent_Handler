@@ -229,9 +229,46 @@
               "email results within {duration}",
               "send results within {duration}"
             ]
+          },
+          {
+            "name": "EnableUserPreferenceIntent",
+            "slots": [
+              {
+                "name": "preference",
+                "type": "USER_PREFERENCE"
+              }
+            ],
+            "samples": [
+              "enable {preference}",
+              "turn on {preference}"
+            ]
+          },
+          {
+            "name": "DisableUserPreferenceIntent",
+            "slots": [
+              {
+                "name": "preference",
+                "type": "USER_PREFERENCE"
+              }
+            ],
+            "samples": [
+              "disable {preference}",
+              "turn off {preference}"
+            ]
           }
         ],
         "types": [
+          {
+            "name": "USER_PREFERENCE",
+            "values": [
+              {
+                "id": "CUSTOM_MAPPINGS",
+                "name": {
+                  "value": "custom mappings"
+                }
+              }
+            ]
+          },
           {
             "name": "GENE",
             "values": [

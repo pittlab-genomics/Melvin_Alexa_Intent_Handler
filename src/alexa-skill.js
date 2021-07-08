@@ -1,5 +1,7 @@
 "use strict";
 const Alexa = require("ask-sdk-core");
+const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
+var AWS = require("aws-sdk");
 
 const { MelvinEventTypes } = require("./common.js");
 const { add_event_configuration } = require("./utils/handler_configuration.js");
@@ -26,6 +28,9 @@ const {
 
 const { LaunchRequestHandler } = require("./skill_handlers/launch_handler.js");
 const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handler.js");
+const {
+    EnableUserPreferenceIntentHandler, DisableUserPreferenceIntentHandler 
+} = require("./skill_handlers/user_preference_handler.js");
 
 // const {
 //     NavigateCNAIntentHandler,
@@ -191,6 +196,10 @@ add_event_configuration("NavigateRepeatIntent", MelvinEventTypes.NAVIGATION_EVEN
 
 
 add_event_configuration("NavigateEmailIntent", MelvinEventTypes.IRS_EVENT, NavigateEmailIntentHandler);
+add_event_configuration("EnableUserPreferenceIntent", MelvinEventTypes.ENABLE_PREFERENCE_EVENT, 
+    EnableUserPreferenceIntentHandler);
+add_event_configuration("DisableUserPreferenceIntent", MelvinEventTypes.DISABLE_PREFERENCE_EVENT, 
+    DisableUserPreferenceIntentHandler);
 
 
 
@@ -206,6 +215,8 @@ exports.handler = Alexa.SkillBuilders.custom()
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
+        EnableUserPreferenceIntentHandler,
+        DisableUserPreferenceIntentHandler,
 
         // Navigation handlers - system
         NavigateResetIntentHandler,
@@ -239,4 +250,13 @@ exports.handler = Alexa.SkillBuilders.custom()
         IntentReflectorHandler)
     .addErrorHandlers(ErrorHandler)
     .withApiClient(new Alexa.DefaultApiClient())
+    .withPersistenceAdapter(
+        new ddbAdapter.DynamoDbPersistenceAdapter({
+            tableName:      process.env.DYNAMODB_TABLE_USER_PREFERENCE,
+            createTable:    false,
+            dynamoDBClient: new AWS.DynamoDB({
+                apiVersion: "latest", region: "eu-west-1"
+            })
+        })
+    )
     .lambda();

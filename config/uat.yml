@@ -5,6 +5,8 @@ environment:
   MELVIN_APP_NAME: "Melvin"
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}
   DYNAMODB_TABLE_USER_SESSION: melvin-user-session-${self:provider.stage}
+  DYNAMODB_TABLE_USER_PREFERENCE: melvin-user-preference-${self:provider.stage}
+  DYNAMODB_TABLE_VOICE_RECORDER: melvin-voice-recorder
   SQS_IRS: 073302257160:melvin-sqs-irs-${self:provider.stage}
   SQS_WARMUP: 073302257160:melvin-sqs-warmup-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.uat.melvin.pittlabgenomics.com/v0.1"

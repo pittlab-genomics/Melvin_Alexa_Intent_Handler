@@ -20,7 +20,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.16. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.16. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -41,7 +41,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.12. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.12. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -62,7 +62,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.27. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.27. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -83,7 +83,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.36. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.36. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -104,7 +104,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.26. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.26. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 
@@ -125,7 +125,7 @@ configuration:
         value: "CDH1"
         confirmationStatus: "NONE"
   - request.request.dialogState: "COMPLETED"
-  - response.outputSpeech.ssml: "In Breast invasive carcinoma, CDH1 is not differentially expressed between TP53 mutant and wild type samples with a Mann Whitney P value of 0.23. What else?"
+  - response.outputSpeech.ssml: "In Breast invasive carcinoma, TP53 is not differentially expressed between CDH1 mutant and wild type samples with a Mann Whitney P value of 0.23. What else?"
   - response.reprompt.outputSpeech.ssml: "What else?"
   - response.shouldEndSession: false
 

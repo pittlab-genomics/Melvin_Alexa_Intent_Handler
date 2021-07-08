@@ -13,17 +13,20 @@ const FOLLOW_UP_TEXT_THRESHOLD = 2;
 const MAX_EMAIL_RESULT_COUNT = 1000;
 const MAX_EMAIL_DURATION = 604800; //1 week
 
+const UserPreferences = { "custom mappings": "CUSTOM_MAPPINGS" };
 const MelvinEventTypes = {
-    ANALYSIS_EVENT:          "analysis_event",
-    NAVIGATION_REVERT_EVENT: "navigation_revert_event",
-    NAVIGATION_START_EVENT:  "navigation_start_event",
-    NAVIGATION_RESET_EVENT:  "navigation_reset_event",
-    NAVIGATION_EVENT:        "navigation_event",
-    LAUNCH_EVENT:            "launch_event",
-    SESSION_ENDED_EVENT:     "session_ended",
-    IRS_EVENT:               "irs_event",
-    UNMAPPED_EVENT:          "unmapped_event",
-    UNKNOWN_EVENT:           "unknown_event"
+    ANALYSIS_EVENT:           "analysis_event",
+    NAVIGATION_REVERT_EVENT:  "navigation_revert_event",
+    NAVIGATION_START_EVENT:   "navigation_start_event",
+    NAVIGATION_RESET_EVENT:   "navigation_reset_event",
+    NAVIGATION_EVENT:         "navigation_event",
+    LAUNCH_EVENT:             "launch_event",
+    SESSION_ENDED_EVENT:      "session_ended",
+    IRS_EVENT:                "irs_event",
+    ENABLE_PREFERENCE_EVENT:  "enable_preference_event",
+    DISABLE_PREFERENCE_EVENT: "disable_preference_event",
+    UNMAPPED_EVENT:           "unmapped_event",
+    UNKNOWN_EVENT:            "unknown_event"
 };
 
 const MelvinAttributes = {
@@ -137,6 +140,10 @@ const get_oov_mappings_response = function (query) {
     return response;
 };
 
+const get_user_preference_name = function (pref) {
+    return (_.has(UserPreferences, pref) ? UserPreferences[pref] : "");
+};
+
 const get_study_name_text = function (study_abbrv) {
     return (_.has(CANCER_TYPES, study_abbrv) ? CANCER_TYPES[study_abbrv] : study_abbrv);
 };
@@ -230,6 +237,7 @@ module.exports = {
     STAGE:                    process.env.STAGE,
     MelvinAttributes,
     MelvinEventTypes,
+    get_user_preference_name,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,

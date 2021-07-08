@@ -26,8 +26,8 @@ const {
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
-const ae_timeout_1 = 1800;
-const ae_timeout_2 = 7000;
+const ae_timeout_1 = 2000;
+const ae_timeout_2 = 10000;
 
 
 const send_request_async = function(url, headers, signal) {
