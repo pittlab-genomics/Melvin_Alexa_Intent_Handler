@@ -23,7 +23,8 @@ const {
     OOV_MAPPER_ROLE,
     OOV_MAPPER_REGION,
     MELVIN_EXPLORER_REGION,
-    MELVIN_EXPLORER_ROLE
+    MELVIN_EXPLORER_ROLE,
+    DISABLE_WARMUP_SERVICE_CW_RULE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
@@ -704,17 +705,20 @@ const handler = async function (event, context, callback) {
     console.info(`[warmup_handler] event: ${JSON.stringify(event)}, context: ${JSON.stringify(context)}`);
     const result = await send_parallel_requests();
 
-    try {
-        let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
-        if (recent_sessions.length == 0) {
-            console.error("[warmup_handler] Recent user sessions do not exist. Disabling warmup cloudwatch rules...");
-            await disable_warmup_cloudwatch_rule();
-        } else {
-            console.error("[warmup_handler] Recent user sessions exist, " + 
-                `no changes will be made to cloudwatch rules | ${JSON.stringify(recent_sessions)}`);
+    if(DISABLE_WARMUP_SERVICE_CW_RULE) {
+        try {
+            let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
+            if (recent_sessions.length == 0) {
+                console.error("[warmup_handler] Recent user sessions do not exist. " + 
+                    "Disabling warmup cloudwatch rules...");
+                await disable_warmup_cloudwatch_rule();
+            } else {
+                console.error("[warmup_handler] Recent user sessions exist, " + 
+                    `no changes will be made to cloudwatch rules | ${JSON.stringify(recent_sessions)}`);
+            }
+        } catch (err) {
+            console.error(`[warmup_handler] Failed to perform idle check | ${JSON.stringify(err)}`);
         }
-    } catch (err) {
-        console.error(`[warmup_handler] Failed to perform idle check | ${JSON.stringify(err)}`);
     }
 
     const response = {
