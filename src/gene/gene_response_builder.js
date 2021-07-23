@@ -47,12 +47,15 @@ const build_gene_target_response = async function (handlerInput, params) {
 
     if(_.size(response.data)!=0)
     {
-        const sentence_sum = parse(response.data);
+        const grouped = _.groupBy(response.data, drug => drug.Biomarker);
+        const count = Object.keys(grouped).length;
+        const bm_sentence = (count > 1) ? "bio markers": "biomarker";
+        const drugs_sentence = parse(grouped);
         speech
             .sayWithSSML(gene_speech_text)
-            .say("can be targeted.")
+            .say(`has ${count} ${bm_sentence}.`)
             .pause("200ms")
-            .say(sentence_sum);
+            .say(drugs_sentence);
     } else {
         speech
             .sayWithSSML(`Sorry, I don't have more information about ${gene_speech_text}.`);
@@ -62,14 +65,13 @@ const build_gene_target_response = async function (handlerInput, params) {
 };
 
 
-const parse = function(drugs) {
+const parse = function(grouped) {
     let result = "", key;
-    const grouped = _.groupBy(drugs, drug => drug.Biomarker);
 
     for (key in grouped) {
         if (grouped.hasOwnProperty(key)) {
             let targets = grouped[key];
-            result += key + " is treated with ";
+            result += " " + key + " is treated with ";
             for (let i = 0; i < targets.length; i++) {
                 if(i == targets.length -2) result += targets[i].Drug + " and ";
                 else if(i == targets.length -1) result += targets[i].Drug + ".";
