@@ -24,7 +24,7 @@ const {
     OOV_MAPPER_REGION,
     MELVIN_EXPLORER_REGION,
     MELVIN_EXPLORER_ROLE,
-    DISABLE_WARMUP_SERVICE_CW_RULE
+    WARMUP_SERVICE_CW_RULE
 } = require("../common.js");
 
 const stats_ep_timeout = 2500;
@@ -705,7 +705,8 @@ const handler = async function (event, context, callback) {
     console.info(`[warmup_handler] event: ${JSON.stringify(event)}, context: ${JSON.stringify(context)}`);
     const result = await send_parallel_requests();
 
-    if(DISABLE_WARMUP_SERVICE_CW_RULE) {
+    console.log(WARMUP_SERVICE_CW_RULE);
+    if(!(WARMUP_SERVICE_CW_RULE === "enabled")) {
         try {
             let recent_sessions = await sessions_doc.getRecentSessions(warmup_session_timeout);
             if (recent_sessions.length == 0) {

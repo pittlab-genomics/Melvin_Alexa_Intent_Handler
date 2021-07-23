@@ -65,6 +65,7 @@ const OOVEntityTypes = {
 
 const DataTypes = {
     GENE_DEFINITION:     "GENE_DEFINITION",
+    GENE_TARGETS:        "GENE_TARGETS",
     MUTATIONS:           "MUTATIONS",
     PROTEIN_DOMAINS:     "PROTEIN_DOMAINS",
     MUT_DOMAINS:         "MUT_DOMAINS",
@@ -169,6 +170,7 @@ const total_cancer_types = 33;
 */
 const RequiredAttributesTCGA = {};
 RequiredAttributesTCGA[DataTypes.GENE_DEFINITION] = [2]; // ['G'];
+RequiredAttributesTCGA[DataTypes.GENE_TARGETS] = [2]; // ['G'];
 RequiredAttributesTCGA[DataTypes.MUTATIONS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.PROTEIN_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
 RequiredAttributesTCGA[DataTypes.MUT_DOMAINS] = [3, 2, 1]; // ['GC', 'G', 'C'];
@@ -226,16 +228,16 @@ nunjucks_env.addGlobal("filter_domains", filter_domains);
 
 module.exports = {
     // Welcome greeting specific to the deployment environment helps to identify which skill is being used
-    MELVIN_WELCOME_GREETING:        process.env.MELVIN_WELCOME_GREETING,
-    MELVIN_EXPLORER_ENDPOINT:       process.env.MELVIN_EXPLORER_ENDPOINT,
-    MELVIN_EXPLORER_REGION:         process.env.MELVIN_EXPLORER_REGION,
-    MELVIN_EXPLORER_ROLE:           process.env.MELVIN_EXPLORER_INVOKE_ROLE,
-    OOV_MAPPER_ENDPOINT:            process.env.OOV_MAPPER_ENDPOINT,
-    OOV_MAPPER_REGION:              process.env.OOV_MAPPER_REGION,
-    OOV_MAPPER_ROLE:                process.env.OOV_MAPPER_INVOKE_ROLE,
-    MELVIN_APP_NAME:                process.env.MELVIN_APP_NAME,
-    STAGE:                          process.env.STAGE,
-    DISABLE_WARMUP_SERVICE_CW_RULE: process.env.DISABLE_WARMUP_SERVICE_CW_RULE,
+    MELVIN_WELCOME_GREETING:  process.env.MELVIN_WELCOME_GREETING,
+    MELVIN_EXPLORER_ENDPOINT: process.env.MELVIN_EXPLORER_ENDPOINT,
+    MELVIN_EXPLORER_REGION:   process.env.MELVIN_EXPLORER_REGION,
+    MELVIN_EXPLORER_ROLE:     process.env.MELVIN_EXPLORER_INVOKE_ROLE,
+    OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
+    OOV_MAPPER_REGION:        process.env.OOV_MAPPER_REGION,
+    OOV_MAPPER_ROLE:          process.env.OOV_MAPPER_INVOKE_ROLE,
+    MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
+    STAGE:                    process.env.STAGE,
+    WARMUP_SERVICE_CW_RULE:   process.env.WARMUP_SERVICE_CW_RULE,
     MelvinAttributes,
     MelvinEventTypes,
     get_user_preference_name,

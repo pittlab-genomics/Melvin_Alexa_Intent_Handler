@@ -28,7 +28,7 @@ const {
     build_loss_response, build_loss_compare_response
 } = require("../cna/loss_response_builder.js");
 
-const { build_gene_definition_response } = require("../gene/gene_response_builder.js");
+const { build_gene_definition_response, build_gene_target_response } = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
 const {
     build_gene_expression_response, build_gene_expression_compare_response 
@@ -217,6 +217,9 @@ const build_navigation_response = async function (handlerInput, state_change) {
     } else {
         if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_DEFINITION) {
             response = await build_gene_definition_response(handlerInput, melvin_state);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_TARGETS) {
+            response = await build_gene_target_response(handlerInput, melvin_state);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUTATIONS) {
             response = await build_mutations_response(handlerInput, melvin_state);

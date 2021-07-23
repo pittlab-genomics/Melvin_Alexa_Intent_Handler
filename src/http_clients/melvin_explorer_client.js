@@ -39,12 +39,16 @@ const send_request_async = function(url, headers, signal) {
         if(_.has(response, "data")) {
             return response;
         } else if(_.has(response, "error")) {
+            console.log(`${JSON.stringify(response)}`);
             if(response["error"] === MelvinExplorerErrors.DATA_IS_ZERO) {
-                let description = response["description"];
-                if(!description.trim().endsWith(".")) description += ".";
+                let description = "There is no data in the database.";
+                if(response.description != null) {
+                    description = response["description"];
+                    if(!description.trim().endsWith(".")) description += ".";
+                }
                 throw melvin_error(`[send_request_async] Data is zero error: ${JSON.stringify(response)}`,
                     MelvinExplorerErrors.DATA_IS_ZERO,
-                    description);
+                    description);   
             } else {
                 console.log(`${JSON.stringify(response)}`);
                 throw melvin_error(
@@ -393,11 +397,24 @@ const get_gene_by_name = async function (handlerInput, params) {
 };
 
 const get_gene_target = async function (handlerInput, params) {
-    const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
-    const path = `/genes/${params.gene_name}`;
+    const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/gene_targets/${params.gene_name}`);
+    const path = `/gene_targets/${params.gene_name}`;
     var signedRequest = await signUrl(path);
-    const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
-    return result;
+    try {
+        const result = await process_repeat_requests(handlerInput, gene_url, signedRequest.headers);
+        return result;
+    } catch(err) {
+        if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
+            const nunjucks_context = { melvin_state: params, };
+            const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
+            throw melvin_error(
+                `[get_gene_target] Melvin Explorer error: ${JSON.stringify(err)}`,
+                err.type,
+                speech_ssml
+            );
+        }
+        throw err;
+    }
 };
 
 const get_gene_expression_clinvar_stats = async function (handlerInput, params) {

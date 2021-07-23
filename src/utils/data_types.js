@@ -10,7 +10,9 @@ const DATA_TYPES = {
     "MUT_DOMAINS":         "mutation domains",
     "IND_DOMAINS":         "indel domains",
     "SNV_DOMAINS":         "snv domains",
-    "PROTEIN_DOMAINS":     "protein domains"
+    "PROTEIN_DOMAINS":     "protein domains",
+    "GENE_DEFINITIONS":    "gene definitions",
+    "GENE_TARGETS":        "gene targets"
 };
 
 module.exports = { DATA_TYPES };

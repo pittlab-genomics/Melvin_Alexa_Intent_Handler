@@ -44,11 +44,10 @@ const build_gene_target_response = async function (handlerInput, params) {
     const speech = new Speech();
     const response = await get_gene_target(handlerInput, params);
     const gene_speech_text = get_gene_speech_text(params[MelvinAttributes.GENE_NAME]);
-    let regex = new RegExp(/\S.*?\."?(?=\s|$)/g);
 
-    if(response.data.summary.match(regex))
+    if(_.size(response.data)!=0)
     {
-        const sentence_sum = response.data.summary.match(regex)[0];
+        const sentence_sum = parse(response.data);
         speech
             .sayWithSSML(gene_speech_text)
             .say("can be targeted.")
@@ -60,6 +59,25 @@ const build_gene_target_response = async function (handlerInput, params) {
     }
 
     return { "speech_text": speech.ssml(true) };
+};
+
+
+const parse = function(drugs) {
+    let result = "", key;
+    const grouped = _.groupBy(drugs, drug => drug.Biomarker);
+
+    for (key in grouped) {
+        if (grouped.hasOwnProperty(key)) {
+            let targets = grouped[key];
+            result += key + " is treated with ";
+            for (let i = 0; i < targets.length; i++) {
+                if(i == targets.length -2) result += targets[i].Drug + " and ";
+                else if(i == targets.length -1) result += targets[i].Drug + ".";
+                else result += targets[i].Drug + ", ";
+            }
+        }
+    }
+    return result;
 };
 
 module.exports = {

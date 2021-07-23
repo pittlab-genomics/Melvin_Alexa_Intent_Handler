@@ -62,7 +62,7 @@ const NavigateGeneTargetIntentHandler = {
 
         try {
             const state_change = await update_melvin_state(handlerInput);
-            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_DEFINITION);
+            const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_TARGETS);
             const params = { ...melvin_state };
             const target_response = await build_gene_target_response(handlerInput, params);
             speechText = target_response["speech_text"];
