@@ -405,7 +405,7 @@ const get_gene_target = async function (handlerInput, params) {
         return result;
     } catch(err) {
         if(err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
-            const nunjucks_context = { melvin_state: params, };
+            const nunjucks_context = { melvin_state: params };
             const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
             throw melvin_error(
                 `[get_gene_target] Melvin Explorer error: ${JSON.stringify(err)}`,
