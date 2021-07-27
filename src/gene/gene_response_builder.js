@@ -53,7 +53,7 @@ const build_gene_target_response = async function (handlerInput, params) {
         const drugs_sentence = parse(grouped);
         speech
             .sayWithSSML(gene_speech_text)
-            .say(`has ${count} ${bm_sentence}.`)
+            .say(`has ${count} therapeutic ${bm_sentence} relevant to oncology.`)
             .pause("200ms")
             .say(drugs_sentence);
     } else {
