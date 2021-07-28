@@ -52,13 +52,14 @@ const build_gene_target_response = async function (handlerInput, params) {
         const bm_sentence = (count > 1) ? "bio markers": "biomarker";
         const drugs_sentence = parse(grouped);
         speech
+            .say("According to the US FDA,")
             .sayWithSSML(gene_speech_text)
             .say(`has ${count} therapeutic ${bm_sentence} relevant to oncology.`)
             .pause("200ms")
             .say(drugs_sentence);
     } else {
         speech
-            .sayWithSSML(`Sorry, I don't have more information about ${gene_speech_text}.`);
+            .sayWithSSML(`Sorry, I don't have any drug information about ${gene_speech_text}.`);
     }
 
     add_to_APL_text_pager(handlerInput, speech.ssml(true));
