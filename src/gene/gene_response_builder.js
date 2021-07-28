@@ -47,10 +47,14 @@ const build_gene_target_response = async function (handlerInput, params) {
 
     if(_.size(response.data)!=0)
     {
-        const grouped = _.groupBy(response.data, drug => drug.Biomarker);
-        const count = Object.keys(grouped).length;
-        const bm_sentence = (count > 1) ? "bio markers": "biomarker";
-        const drugs_sentence = parse(grouped);
+        const groups = _(response.data).groupBy("Biomarker")
+            .map((v, biomarker) => ({
+                biomarker,
+                drugs: _.map(v, "Drug")
+            }));
+        const count = Object.keys(_.groupBy(response.data, drug => drug.Biomarker)).length;
+        const bm_sentence = (count > 1) ? "biomarkers": "biomarker";
+        const drugs_sentence = parse(groups);
         speech
             .say("According to the US FDA,")
             .sayWithSSML(gene_speech_text)
@@ -67,20 +71,19 @@ const build_gene_target_response = async function (handlerInput, params) {
 };
 
 
-const parse = function(grouped) {
-    let result = "", key;
+const parse = function(groups) {
+    let result = "";
 
-    for (key in grouped) {
-        if (grouped.hasOwnProperty(key)) {
-            let targets = grouped[key];
-            result += " " + key + " is treated with ";
-            for (let i = 0; i < targets.length; i++) {
-                if(i == targets.length -2) result += targets[i].Drug + " and ";
-                else if(i == targets.length -1) result += targets[i].Drug + ".";
-                else result += targets[i].Drug + ", ";
-            }
+    groups.forEach((group) => {
+        let bm = group["biomarker"];
+        let drugs = group["drugs"];
+        let last = drugs.pop();
+        if(drugs.length > 1) {
+            result += " " + bm + " is treated with " + drugs.join(", ") + " and " + last + ".";
+        } else {
+            result += " " + bm + " is treated with " + last + ".";
         }
-    }
+    });
     return result;
 };
 
