@@ -1,0 +1,22 @@
+---
+configuration: 
+  locale: en-US
+  dynamo: mock
+
+--- 
+- test: EnableUserPreferenceIntent
+- EnableUserPreferenceIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "You must authenticate with your Amazon Account to use this feature. Go to the home screen in your Alexa app and follow the instructions. What else?"
+  - response.shouldEndSession: false
+
+--- 
+- test: DisableUserPreferenceIntent 
+- DisableUserPreferenceIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - response.outputSpeech.ssml: "You must authenticate with your Amazon Account to use this feature. Go to the home screen in your Alexa app and follow the instructions. What else?"
+  - response.shouldEndSession: false

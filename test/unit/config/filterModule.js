@@ -11,6 +11,7 @@ module.exports = {
         MelvinExplorerInterceptor.gain_tcga_stats();
         MelvinExplorerInterceptor.loss_tcga_stats();
         MelvinExplorerInterceptor.gene_by_name();
+        MelvinExplorerInterceptor.get_gene_target();
         MelvinExplorerInterceptor.gene_expression_tcga_stats();
         MelvinExplorerInterceptor.indels_tcga_stats();
         MelvinExplorerInterceptor.snv_tcga_stats();

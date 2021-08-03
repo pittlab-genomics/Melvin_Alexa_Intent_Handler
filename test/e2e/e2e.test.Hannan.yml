@@ -116,7 +116,7 @@
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Hannan/Test_9/Test9.4.mp3: 
   - caption: Which gene would you like to split by?
 - https://melvin-e2e-test.s3-ap-southeast-1.amazonaws.com/Hannan/Test_9/Test9.5.mp3: 
-  - caption: In Liver hepatocellular carcinoma, CCND1 is differentially expressed between Catenin Beta 1 mutant and wild type samples with a Mann Whitney P value of 0. What else?
+  - caption: In Liver hepatocellular carcinoma, Catenin Beta 1 is differentially expressed between CCND1 mutant and wild type samples with a Mann Whitney P value of 0. What else?
 
 ---
 - test: Hannan Test 10

@@ -40,9 +40,9 @@ configuration:
   - request.request.intent.slots:
       query:
         name: "query"
-        value: "Hif one alpha"
+        value: "TP53"
         confirmationStatus: "NONE"
-  - response.outputSpeech.ssml: "HIF1A can be targeted. <break time='200ms'/> * What else?"
+  - response.outputSpeech.ssml: "According to the US FDA, TP53 has 1 therapeutic biomarker relevant to oncology. <break time='200ms'/>  TP53 is treated with Venetoclax. What else?"
   - response.shouldEndSession: false
 
 --- 

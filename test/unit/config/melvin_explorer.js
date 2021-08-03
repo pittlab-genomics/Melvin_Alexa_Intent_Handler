@@ -1486,6 +1486,18 @@ const MelvinExplorerInterceptor = {
                 }
                 return [ 200, jsonResult];
             }).persist();
+    }, get_gene_target() {
+        nock("https://api.test.melvin.pittlabgenomics.com")
+            .get("/v0.1/gene_targets/TP53")
+            .query(true)
+            .reply(200, { data: [{
+                Name:      "TP53",
+                Drug:      "Venetoclax",
+                Area:      "Oncology",
+                Biomarker: "TP53",
+                Id:        234,
+                Labeling:  "Clinical Studies"
+            }]}).persist();
     }
 };
 
