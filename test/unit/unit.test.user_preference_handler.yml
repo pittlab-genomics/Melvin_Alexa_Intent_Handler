@@ -4,7 +4,7 @@ configuration:
   dynamo: mock
 
 --- 
-- test: EnableUserPreferenceIntent
+- test: EnableUserPreferenceIntent_notoken
 - EnableUserPreferenceIntent:
   - request.session.attributes:
       MELVIN.STATE:
@@ -13,10 +13,34 @@ configuration:
   - response.shouldEndSession: false
 
 --- 
-- test: DisableUserPreferenceIntent 
+- test: DisableUserPreferenceIntent_notoken
 - DisableUserPreferenceIntent:
   - request.session.attributes:
       MELVIN.STATE:
         gene_name: "TP53"
   - response.outputSpeech.ssml: "You must authenticate with your Amazon Account to use this feature. Go to the home screen in your Alexa app and follow the instructions. What else?"
+  - response.shouldEndSession: false
+
+---
+- test: EnableUserPreferenceIntent
+- EnableUserPreferenceIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.context.System.user:
+      userId: 'xxx'
+      accessToken: 'yyy'
+  - response.outputSpeech.ssml: "Your preference was updated. What else?"
+  - response.shouldEndSession: false
+
+---
+- test: DisableUserPreferenceIntent
+- DisableUserPreferenceIntent:
+  - request.session.attributes:
+      MELVIN.STATE:
+        gene_name: "TP53"
+  - request.context.System.user:
+      userId: 'xxx'
+      accessToken: 'yyy'
+  - response.outputSpeech.ssml: "Your preference was updated. What else?"
   - response.shouldEndSession: false
