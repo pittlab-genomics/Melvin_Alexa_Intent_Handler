@@ -1,0 +1,43 @@
+image: node
+
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - unit_test
+  - dev_deploy
+  - integration_test
+  - uat_deploy
+
+unit-test:
+  stage: unit_test
+  script:
+    - npm install
+    - npm unit-tests
+
+dev-deploy:
+  stage: dev_deploy
+  script:
+    - npm install
+    - serverless deploy -s dev
+  environment:
+    name: dev
+  only:
+    - master
+
+integration-test:
+  stage: integration_test
+  script:
+    - npm install
+    - npm smapi-tests
+
+uat-deploy:
+  stage: uat_deploy
+  script:
+    - npm install
+    - serverless deploy -s uat
+  environment:
+    name: uat
+  only:
+    - master
