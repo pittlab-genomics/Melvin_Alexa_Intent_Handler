@@ -14,7 +14,7 @@ unit-test:
   stage: unit_test
   script:
     - npm install
-    - npm unit-tests
+    - npm run unit-tests
 
 dev-deploy:
   stage: dev_deploy
@@ -30,7 +30,7 @@ integration-test:
   stage: integration_test
   script:
     - npm install
-    - npm smapi-tests
+    - npm run smapi-tests
 
 uat-deploy:
   stage: uat_deploy
