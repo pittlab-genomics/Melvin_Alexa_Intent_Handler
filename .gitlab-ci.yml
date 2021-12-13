@@ -1,25 +1,38 @@
-image: node:10
+image: node:14
+
+before_script:
+  - npm install
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
 
 cache:
   paths:
   - node_modules/
 
 stages:
+  - build
   - unit_test
   - dev_deploy
   - integration_test
   - uat_deploy
 
+build:
+  stage: build
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
+
 unit-test:
   stage: unit_test
   script:
-    - npm install
     - npm run unit-tests
 
 dev-deploy:
   stage: dev_deploy
   script:
-    - npm install
     - serverless deploy -s dev
   environment:
     name: dev
@@ -29,13 +42,11 @@ dev-deploy:
 integration-test:
   stage: integration_test
   script:
-    - npm install
     - npm run smapi-tests
 
 uat-deploy:
   stage: uat_deploy
   script:
-    - npm install
     - serverless deploy -s uat
   environment:
     name: uat
