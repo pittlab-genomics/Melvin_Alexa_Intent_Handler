@@ -119,7 +119,6 @@ functions:
             label: "melvin-alexa-intent-handlers-${self:provider.stage}-warmup_service"
 
 plugins:
-  - serverless-plugin-aws-alerts
   - serverless-plugin-include-dependencies
   - serverless-prune-plugin
   - serverless-pseudo-parameters
