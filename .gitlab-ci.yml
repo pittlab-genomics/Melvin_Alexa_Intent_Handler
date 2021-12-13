@@ -11,6 +11,8 @@ stages:
   - build
   - unit_test
   - dev_deploy
+  - integration_test
+  - uat_deploy
 
 build:
   stage: build
@@ -24,6 +26,8 @@ unit-test:
   stage: unit_test
   script:
     - npm run unit-tests
+  only:
+    - master
 
 dev-deploy:
   stage: dev_deploy
@@ -33,5 +37,23 @@ dev-deploy:
     - npm run dev-deploy
   environment:
     name: dev
+  only:
+    - master
+
+integration-test:
+  stage: integration_test
+  script:
+    - npm run smapi-tests
+  only:
+    - master
+
+uat-deploy:
+  stage: uat_deploy
+  before_script:
+    - npm install serverless@1.83.3
+  script:
+    - npm run uat-deploy
+  environment:
+    name: uat
   only:
     - master
