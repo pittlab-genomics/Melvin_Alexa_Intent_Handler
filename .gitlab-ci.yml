@@ -1,8 +1,5 @@
 image: node:14
 
-before_script:
-  - npm install
-
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -14,8 +11,6 @@ stages:
   - build
   - unit_test
   - dev_deploy
-  - integration_test
-  - uat_deploy
 
 build:
   stage: build
@@ -32,23 +27,12 @@ unit-test:
 
 dev-deploy:
   stage: dev_deploy
+  before_script:
+    - npm config set prefix /usr/local
+    - npm install -g serverless
   script:
     - serverless deploy -s dev
   environment:
     name: dev
-  only:
-    - master
-
-integration-test:
-  stage: integration_test
-  script:
-    - npm run smapi-tests
-
-uat-deploy:
-  stage: uat_deploy
-  script:
-    - serverless deploy -s uat
-  environment:
-    name: uat
   only:
     - master
