@@ -31,7 +31,7 @@ dev-deploy:
     - npm config set prefix /usr/local
     - npm install -g serverless@1.83.3
   script:
-    - serverless deploy -s dev
+    - npm run dev-deploy
   environment:
     name: dev
   only:

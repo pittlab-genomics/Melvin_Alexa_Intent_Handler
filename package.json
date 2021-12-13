@@ -7,7 +7,8 @@
   "scripts": {
     "unit-tests": "bst test --config test/unit/testing.json /unit.test",
     "smapi-tests": "bst test --config test/integration/testing.json /integration.test",
-    "e2e-tests": "bst test --config test/e2e/testing.json /e2e.test"
+    "e2e-tests": "bst test --config test/e2e/testing.json /e2e.test",
+    "dev-deploy": "serverless deploy -s dev"
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
