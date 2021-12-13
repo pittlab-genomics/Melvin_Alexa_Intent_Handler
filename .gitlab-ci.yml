@@ -28,8 +28,7 @@ unit-test:
 dev-deploy:
   stage: dev_deploy
   before_script:
-    - npm config set prefix /usr/local
-    - npm install -g serverless@1.83.3
+    - npm install serverless@1.83.3
   script:
     - npm run dev-deploy
   environment:
