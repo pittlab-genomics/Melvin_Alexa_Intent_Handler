@@ -26,6 +26,7 @@ unit-test:
   stage: unit_test
   script:
     - npm run unit-tests
+    - codecov -f test_output/coverage/*.json
   only:
     - master
 
