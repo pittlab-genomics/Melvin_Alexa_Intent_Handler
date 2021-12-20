@@ -1,0 +1,15 @@
+{
+    "profiles": {
+      "default": {
+        "aws_profile": "default",
+        "token": {
+          "access_token": "ASK_ACCESS_TOKEN",
+          "refresh_token": "ASK_REFRESH_TOKEN",
+          "token_type": "bearer",
+          "expires_in": 3600,
+          "expires_at": "2021-12-20T06:50:57.008Z"
+        },
+        "vendor_id": "M17DFFBQK3HK2"
+      }
+    }
+  }

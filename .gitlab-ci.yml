@@ -28,11 +28,6 @@ unit-test:
     - npm run unit-tests
   only:
     - master
-  artifacts:
-    paths:
-      - test/test_output/coverage/lcov-report/index.html
-    reports:
-      junit: test/test_output/coverage/lcov-report/index.html
 
 dev-deploy:
   stage: dev_deploy
@@ -50,17 +45,18 @@ integration-test:
   before_script:
     - npm install -g ask-cli
   script:
+    - ./deploy.sh
     - npm run smapi-tests
   only:
     - master
 
-# uat-deploy:
-#   stage: uat_deploy
-#   before_script:
-#     - npm install serverless@1.83.3
-#   script:
-#     - npm run uat-deploy
-#   environment:
-#     name: uat
-#   only:
-#     - master
+uat-deploy:
+  stage: uat_deploy
+  before_script:
+    - npm install serverless@1.83.3
+  script:
+    - npm run uat-deploy
+  environment:
+    name: uat
+  only:
+    - master
