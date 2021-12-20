@@ -9,8 +9,8 @@ cache:
 
 stages:
   - build
-  # - unit_test
-  # - dev_deploy
+  - unit_test
+  - dev_deploy
   - integration_test
   - uat_deploy
 
@@ -22,23 +22,23 @@ build:
     paths:
       - node_modules/
 
-# unit-test:
-#   stage: unit_test
-#   script:
-#     - npm run unit-tests
-#   only:
-#     - master
+unit-test:
+  stage: unit_test
+  script:
+    - npm run unit-tests
+  only:
+    - master
 
-# dev-deploy:
-#   stage: dev_deploy
-#   before_script:
-#     - npm install serverless@1.83.3
-#   script:
-#     - npm run dev-deploy
-#   environment:
-#     name: dev
-#   only:
-#     - master
+dev-deploy:
+  stage: dev_deploy
+  before_script:
+    - npm install serverless@1.83.3
+  script:
+    - npm run dev-deploy
+  environment:
+    name: dev
+  only:
+    - master
 
 integration-test:
   stage: integration_test
