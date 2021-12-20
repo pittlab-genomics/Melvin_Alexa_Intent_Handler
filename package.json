@@ -10,7 +10,6 @@
     "e2e-tests": "bst test --config test/e2e/testing.json /e2e.test",
     "dev-deploy": "serverless deploy -s dev",
     "uat-deploy": "serverless deploy -s uat",
-    "codecoverage": "codecov"
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
@@ -31,7 +30,6 @@
   "devDependencies": {
     "aws-sdk-mock": "^5.1.0",
     "bespoken-tools": "^2.4.88",
-    "codecov": "^3.8.3",
     "eslint": "^7.8.1",
     "nock": "^13.0.5",
     "serverless": "^1.82.0",
