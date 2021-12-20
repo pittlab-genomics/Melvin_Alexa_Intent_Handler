@@ -9,7 +9,8 @@
     "smapi-tests": "bst test --config test/integration/testing.json /integration.test",
     "e2e-tests": "bst test --config test/e2e/testing.json /e2e.test",
     "dev-deploy": "serverless deploy -s dev",
-    "uat-deploy": "serverless deploy -s uat"
+    "uat-deploy": "serverless deploy -s uat",
+    "codecov": "codecov -f test_output/coverage/*.json"
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
@@ -33,7 +34,6 @@
     "codecov": "^3.8.3",
     "eslint": "^7.8.1",
     "nock": "^13.0.5",
-    "nyc": "^15.1.0",
     "serverless": "^1.82.0",
     "serverless-plugin-aws-alerts": "^1.4.0",
     "serverless-plugin-include-dependencies": "^3.2.1",
