@@ -56,3 +56,53 @@ bst test --config test/e2e/testing.json /e2e.test.Hannan
 bst test --config test/e2e/testing.json /e2e.test.Shwetha
 bst test --config test/e2e/testing.json /e2e.test.Jason
 ```
+
+
+## Continuous Integration
+Done via Gitlab CI/CD. [Unit](#to-run-the-unit-tests) and [integration](#to-run-tests-via-skill-simulation-api) tests are run with every commit to master branch.
+
+## Continuous Deployment
+
+### Environment Rules
+If the test runs are successful, deployments are made to the `dev` and `uat` environments respectively.
+The relevant portion of the [gitlab-ci.yml](./gitlab-ci.yml) file is below:
+```
+dev-deploy:
+  stage: dev_deploy
+  before_script:
+    - npm install serverless@1.83.3
+  script:
+    - npm run dev-deploy
+  environment:
+    name: dev
+  only:
+    - master
+
+...
+
+uat-deploy:
+  stage: uat_deploy
+  before_script:
+    - npm install serverless@1.83.3
+  script:
+    - npm run uat-deploy
+  environment:
+    name: uat
+  only:
+    - master
+```
+
+### Deployment Script
+`deploy.sh` script is used to set up AWS and ASK config files.
+
+This is done with a bash script because of the powerful tools it provides for file manipulation and creation.
+
+These lines setup our AWS and ASK configs from environment variables configured securely in Gitlab-CI:
+```
+echo "[default]" > ~/.aws/credentials
+echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+
+sed -e s/ASK_ACCESS_TOKEN/${ASK_ACCESS_TOKEN}/g -e \
+    s/ASK_REFRESH_TOKEN/${ASK_REFRESH_TOKEN}/g conf/ask_cli.json > ~/.ask/cli_config
+```
