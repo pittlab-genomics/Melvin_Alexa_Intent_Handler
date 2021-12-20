@@ -26,8 +26,7 @@ unit-test:
   stage: unit_test
   script:
     - npm run unit-tests
-  after_script:
-    - bash <(curl -s https://codecov.io/bash) -t <CODECOV_TOKEN>
+    - npm run codecoverage
   only:
     - master
 
