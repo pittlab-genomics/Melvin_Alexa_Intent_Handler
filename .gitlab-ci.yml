@@ -38,6 +38,8 @@ unit-test:
       - test_output/coverage/
     when: always
     reports:
+      junit:
+        - junit.xml
       cobertura: test_output/coverage/cobertura-coverage.xml
 
 dev-deploy:

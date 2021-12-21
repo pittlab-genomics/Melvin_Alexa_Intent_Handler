@@ -5,7 +5,8 @@
     "jest": {
         "silent": true,
         "collectCoverageFrom": ["src/**/*.js"],
-        "coverageReporters": ["html", "text", "text-summary", "cobertura"]
+        "coverageReporters": ["html", "text", "text-summary", "cobertura"],
+        "testResultsProcessor": "jest-junit"
     },
     "filter": "config/filterModule.js",
     "env": "test/unit/config/.env",

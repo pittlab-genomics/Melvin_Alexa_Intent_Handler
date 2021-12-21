@@ -10,4 +10,5 @@ package-lock.json
 
 # unit test output
 test_output/
+junit.xml
 bst-debug.log

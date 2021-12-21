@@ -106,3 +106,8 @@ echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
 sed -e s/ASK_ACCESS_TOKEN/${ASK_ACCESS_TOKEN}/g -e \
     s/ASK_REFRESH_TOKEN/${ASK_REFRESH_TOKEN}/g conf/ask_cli.json > ~/.ask/cli_config
 ```
+
+Everytime, you commit changes to the `master` branch, we have to generate the ask-cli tokens. We then take the local ASK credentials and upload them to our project. In order to keep them secure, we make the ASK_ACCESS_TOKEN and the ASK_REFRESH_TOKEN in Gitlab-CI as environment variables.
+
+
+During the deployment, we replace the values using this [script](./deploy.sh). With that, we have a “good” ASK credentials file, which we can then use to interact with the [SMAPI](#to-run-tests-via-skill-simulation-api). 
