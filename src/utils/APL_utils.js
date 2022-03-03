@@ -1,8 +1,12 @@
 const _ = require("lodash");
 const {
     MelvinAttributes,
-    MELVIN_APP_NAME
+    MELVIN_APP_NAME,
+    MELVIN_EXPLORER_REGION
 } = require("../common.js");
+const {
+    sign_request, build_presigned_url 
+} = require("./sigv4_utils");
 
 const APLDocs = {
     image_pager: require("../../resources/APL/image_pager.json"),
@@ -145,8 +149,8 @@ function add_context_to_urls(handlerInput, url_list) {
 
 const add_to_APL_text_pager = function (handlerInput, text) {
     let response_text = "";
-    if(!_.isEmpty(text)) response_text = text.replace(ssml_regex, "");
-    if(supportsAPL(handlerInput)) {
+    if (!_.isEmpty(text)) response_text = text.replace(ssml_regex, "");
+    if (supportsAPL(handlerInput)) {
         const text_pager_doc = APLDocs.text_pager;
         handlerInput.responseBuilder.addDirective({
             type:        "Alexa.Presentation.APL.RenderDocument",
@@ -176,10 +180,16 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
         return;
     }
 
-    if (supportsAPL(handlerInput)) {
-        // add context information to image URLs
-        add_context_to_urls(handlerInput, url_list);
+    // add context information to image URLs and populate pre-signed URLs
+    add_context_to_urls(handlerInput, url_list);
+    const signed_url_list = [];
+    url_list.forEach(function (url) {
+        const signed_req = sign_request(url, MELVIN_EXPLORER_REGION, handlerInput, true);
+        const presigned_url = build_presigned_url(signed_req);
+        signed_url_list.push(presigned_url);
+    });
 
+    if (supportsAPL(handlerInput)) {
         const image_pager_doc = APLDocs.image_pager;
         image_pager_doc["layouts"] = build_APL_layouts(url_list);
         image_pager_doc["mainTemplate"]["items"][0]["items"] = build_APL_main_template_items(url_list);
@@ -191,13 +201,13 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
             document:    image_pager_doc,
             datasources: { "pagerTemplateData": {
                 "type":        "object",
-                "properties":  build_APL_datasource_properties(url_list),
+                "properties":  build_APL_datasource_properties(signed_url_list),
                 "footer_text": build_APL_footer_text(handlerInput)
             }},
         });
 
         const apl_img_update_commands = [];
-        url_list.forEach(function (url, index) {
+        signed_url_list.forEach(function (url, index) {
             apl_img_update_commands.push({
                 "type":        "SetValue",
                 "property":    "source",
@@ -227,7 +237,7 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                             "type":     "Parallel",
                             "delay":    3500,
                             "commands": apl_img_update_commands
-                        }   
+                        }
                     ]
                 }
             ]
@@ -237,8 +247,8 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
         handlerInput.responseBuilder.withStandardCard(
             "Melvin",
             build_APL_footer_text(handlerInput),
-            url_list[0],
-            url_list[0]
+            signed_url_list[0],
+            signed_url_list[0]
         );
     }
 };

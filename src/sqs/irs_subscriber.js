@@ -1,5 +1,3 @@
-"use strict";
-
 const AWS = require("aws-sdk");
 const ses = new AWS.SES({ region: "eu-west-1" });
 
@@ -66,7 +64,7 @@ async function process_message(msg_data) {
         duration,
         count,
         MelvinEventTypes.ANALYSIS_EVENT);
-    console.log(`[process_message] utterrance_list.len: ${utterance_list.length}`);
+    console.debug(`[process_message] utterrance_list: ${JSON.stringify(utterance_list)}`);
     const html_part_text = await get_utterances_html(greeting_text, utterance_list, count);
     await irs_send_email(user_email, sub_text, body_part_text, html_part_text);
 }
@@ -81,7 +79,7 @@ async function get_utterances_html(greeting_text, utterance_list, count) {
 
     let results_table_html = greeting_text;
     let counter = 1;
-    for (const [i, item] of utterance_list.entries()) {
+    for (let item of Object.values(utterance_list)) {
         let melvin_response = item["melvin_response"];
         let ssml_text = JSON.stringify(melvin_response["outputSpeech"]["ssml"]);
         let response_text = ssml_text.replace(ssml_regex, "");
@@ -109,7 +107,7 @@ async function get_utterances_html(greeting_text, utterance_list, count) {
         results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`;
 
         for (let image_item in image_properties) {
-            let image_url = image_properties[image_item]["URL"]["href"];
+            let image_url = image_properties[image_item]["URL"];
             results_table_html += "<tr><td style=\"padding: 20px 0 30px 0;\">\n";
             let image_element = `<img src="${image_url}" width="300" style="display:block;width:100%" alt="Image" />`;
             results_table_html += `<a href="${image_url}">${image_element}</a>\n`;

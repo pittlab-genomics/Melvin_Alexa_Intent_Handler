@@ -40,7 +40,7 @@ const get_state_change_diff = function (state_change) {
     const diff_s = {};
     console.debug(`[get_state_change_diff] state_change: ${JSON.stringify(state_change)}`);
 
-    for (let [_ignore, value] of Object.entries(MelvinAttributes)) {
+    for (let value of Object.values(MelvinAttributes)) {
         let prev_val = _.get(prev_s, value, "");
         let new_val = _.get(new_s, value, "");
         if (new_val === "") {

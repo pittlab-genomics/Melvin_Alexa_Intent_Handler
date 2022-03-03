@@ -28,7 +28,9 @@ const {
     build_loss_response, build_loss_compare_response
 } = require("../cna/loss_response_builder.js");
 
-const { build_gene_definition_response, build_gene_target_response } = require("../gene/gene_response_builder.js");
+const {
+    build_gene_definition_response, build_gene_target_response 
+} = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
 const {
     build_gene_expression_response, build_gene_expression_compare_response 
@@ -65,7 +67,6 @@ const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 function add_followup_text(handlerInput, speech) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     if (Object.keys(sessionAttributes["MELVIN.STATE"]).length <= FOLLOW_UP_TEXT_THRESHOLD) {
-        //speech.prosody({ rate: "110%" }, "What would you like to know?");
         speech.say("What would you like to know?");
     }
 }
@@ -86,19 +87,16 @@ const ack_attribute_change = function (handlerInput, state_change) {
         speech.say(`Ok, ${study_name}.`);
         add_followup_text(handlerInput, speech);
 
-        // } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE) {
-        //     const dsource = state_diff["entity_value"];
-        //     speech.say(`Ok, switching to ${dsource}.`);
-
     } else if (state_diff["entity_type"] === MelvinAttributes.DTYPE) {
         const dtype = state_diff["entity_value"];
         const dtype_name = get_dtype_name_text(dtype);
         speech.say(`Ok, ${dtype_name}.`);
         add_followup_text(handlerInput, speech);
+
     } else if (state_diff["entity_type"] === MelvinAttributes.DSOURCE || _.isEmpty(state_diff)) {
-        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}` +
-            " To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
-            " Now, What would you like to know? ";
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}. To start exploring, just say 'Tell me about'` +
+            " followed by the name of a gene, cancer type, or data type. " +
+            " Now, what would you like to know?";
         speech.say(speechText);
     }
 

@@ -1,4 +1,3 @@
-"use strict";
 const Alexa = require("ask-sdk-core");
 const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
 var AWS = require("aws-sdk");
@@ -9,7 +8,8 @@ const { add_event_configuration } = require("./utils/handler_configuration.js");
 const {
     RequestLogInterceptor,
     ResponseLogInterceptor,
-    UserUtteranceTrackInterceptor
+    UserUtteranceTrackInterceptor,
+    STSCredentialsInterceptor
 } = require("./interceptors.js");
 
 const {
@@ -29,7 +29,7 @@ const {
 const { LaunchRequestHandler } = require("./skill_handlers/launch_handler.js");
 const { NavigateSplitbyIntentHandler } = require("./skill_handlers/splitby_handler.js");
 const {
-    EnableUserPreferenceIntentHandler, DisableUserPreferenceIntentHandler 
+    EnableUserPreferenceIntentHandler, DisableUserPreferenceIntentHandler
 } = require("./skill_handlers/user_preference_handler.js");
 
 // const {
@@ -144,20 +144,19 @@ const ErrorHandler = {
     },
     handle(handlerInput, error) {
         console.log(`~~~~ Error handled: ${error.message}`, error);
-        const speechText = "Sorry, I'm unable to process that request for the moment. Please try again later. What else?";
-        const repromptText = "What else?";
+        const speechText = "Sorry, I'm unable to process that request for the moment. Please try again later.";
 
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt(repromptText)
+            .reprompt(speechText)
             .getResponse();
     }
 };
 
 
-add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+add_event_configuration("NavigateGeneDefinitionIntent", MelvinEventTypes.ANALYSIS_EVENT,
     NavigateGeneDefinitionIntentHandler);
-add_event_configuration("NavigateGeneTargetIntent", MelvinEventTypes.ANALYSIS_EVENT, 
+add_event_configuration("NavigateGeneTargetIntent", MelvinEventTypes.ANALYSIS_EVENT,
     NavigateGeneTargetIntentHandler);
 add_event_configuration("NavigateJoinFilterIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateJoinFilterIntentHandler);
 add_event_configuration("NavigateCompareIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateCompareIntentHandler);
@@ -177,7 +176,8 @@ add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT
 //     NavigateGainIntentHandler);
 // add_event_configuration("NavigateLossIntent", MelvinEventTypes.ANALYSIS_EVENT, 
 //     NavigateLossIntentHandler);
-// add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT, NavigateExpressionIntentHandler);
+// add_event_configuration("NavigateExpressionIntent", MelvinEventTypes.ANALYSIS_EVENT,
+//     NavigateExpressionIntentHandler);
 
 // add_event_configuration("ClinicalTrialsNearbyIntent", MelvinEventTypes.ANALYSIS_EVENT, 
 //     ClinicalTrialsNearbyIntentHandler);
@@ -190,15 +190,15 @@ add_event_configuration("NavigateSplitbyIntent", MelvinEventTypes.ANALYSIS_EVENT
 add_event_configuration("NavigateResetIntent", MelvinEventTypes.NAVIGATION_RESET_EVENT, NavigateResetIntentHandler);
 add_event_configuration("NavigateGoBackIntent", MelvinEventTypes.NAVIGATION_REVERT_EVENT, NavigateGoBackIntentHandler);
 
-add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT, 
+add_event_configuration("NavigateRestoreSessionIntent", MelvinEventTypes.NAVIGATION_EVENT,
     NavigateRestoreSessionIntentHandler);
 add_event_configuration("NavigateRepeatIntent", MelvinEventTypes.NAVIGATION_EVENT, NavigateRepeatIntentHandler);
 
 
 add_event_configuration("NavigateEmailIntent", MelvinEventTypes.IRS_EVENT, NavigateEmailIntentHandler);
-add_event_configuration("EnableUserPreferenceIntent", MelvinEventTypes.ENABLE_PREFERENCE_EVENT, 
+add_event_configuration("EnableUserPreferenceIntent", MelvinEventTypes.ENABLE_PREFERENCE_EVENT,
     EnableUserPreferenceIntentHandler);
-add_event_configuration("DisableUserPreferenceIntent", MelvinEventTypes.DISABLE_PREFERENCE_EVENT, 
+add_event_configuration("DisableUserPreferenceIntent", MelvinEventTypes.DISABLE_PREFERENCE_EVENT,
     DisableUserPreferenceIntentHandler);
 
 
@@ -209,6 +209,7 @@ add_event_configuration("DisableUserPreferenceIntent", MelvinEventTypes.DISABLE_
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestInterceptors(RequestLogInterceptor)
     .addResponseInterceptors(ResponseLogInterceptor)
+    .addRequestInterceptors(STSCredentialsInterceptor)
     .addResponseInterceptors(UserUtteranceTrackInterceptor)
     .addRequestHandlers(
         LaunchRequestHandler,

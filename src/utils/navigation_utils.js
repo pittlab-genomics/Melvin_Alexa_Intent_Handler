@@ -59,7 +59,7 @@ const get_prev_melvin_state = function (handlerInput) {
     let prev_melvin_state = {};
     for (let item in melvin_history) {
         const prev_item = melvin_history[item];
-        if(!_.isEqual(prev_item["melvin_state"], melvin_state)) {
+        if (!_.isEqual(prev_item["melvin_state"], melvin_state)) {
             prev_melvin_state = prev_item["melvin_state"];
             break;
         }
@@ -77,15 +77,15 @@ const get_melvin_history = function (handlerInput) {
 };
 
 
-const resolve_oov_entity = async function(handlerInput, query) {
+const resolve_oov_entity = async function (handlerInput, query) {
     const attributesManager = handlerInput.attributesManager;
     const attributes = await attributesManager.getPersistentAttributes() || {};
 
-    const mapping_preference = _.has(attributes, "CUSTOM_MAPPINGS")? attributes["CUSTOM_MAPPINGS"] : false;
-    if(mapping_preference) {
+    const mapping_preference = _.has(attributes, "CUSTOM_MAPPINGS") ? attributes["CUSTOM_MAPPINGS"] : false;
+    if (mapping_preference) {
         console.log(`Check custom mappings ${attributes}, mapping setting: ${mapping_preference}`);
         let result = await voicerecords_doc.getOOVMappingForQuery(query);
-        if(result!=null) {
+        if (result != null) {
             console.log(`response - ${JSON.stringify(result[0]["entity_data"])}`);
             return { "data": result[0]["entity_data"] };
         }
@@ -93,20 +93,20 @@ const resolve_oov_entity = async function(handlerInput, query) {
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
     const response = get_oov_mappings_response(query);
-    if(!response) {
+    if (!response) {
         const t0 = performance.now();
         try {
             const params = {
-                query, request_id, session_id, 
+                query, request_id, session_id,
             };
-            const query_response = await get_oov_mapping_by_query(params);
+            const query_response = await get_oov_mapping_by_query(handlerInput, params);
             const t1 = performance.now();
-            console.log("[resolve_oov_entity] oov request took " + (t1 - t0) + " ms | " + 
-            `query_response: ${JSON.stringify(query_response)}`);
+            console.log("[resolve_oov_entity] OOV mapping took " + (t1 - t0) + " ms | " +
+                `query_response: ${JSON.stringify(query_response)}`);
             return query_response;
         } catch (error) {
             const t2 = performance.now();
-            console.error("[resolve_oov_entity] oov request failed and took " + (t2 - t0) + " ms", error);
+            console.error("[resolve_oov_entity] OOV request failed and took " + (t2 - t0) + " ms", error);
             throw melvin_error(`Error while mapping query: ${query}`,
                 MelvinIntentErrors.OOV_ERROR,
                 DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
@@ -142,11 +142,11 @@ const update_melvin_state = async function (
             oov_entity[MelvinAttributes.STUDY_ABBRV] = _.get(query_response, "data.val");
         } else if (query_response.data.type === OOVEntityTypes.DTYPE) {
             const curr_datatype = _.get(query_response, "data.val");
-            if(curr_datatype === DataTypes.PROTEIN_DOMAINS) {
+            if (curr_datatype === DataTypes.PROTEIN_DOMAINS) {
                 const prev_datatype = prev_state[MelvinAttributes.DTYPE];
-                if(prev_datatype === DataTypes.MUTATIONS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.MUT_DOMAINS;
-                else if(prev_datatype === DataTypes.INDELS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.IND_DOMAINS;
-                else if(prev_datatype === DataTypes.SNV) oov_entity[MelvinAttributes.DTYPE] = DataTypes.SNV_DOMAINS;
+                if (prev_datatype === DataTypes.MUTATIONS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.MUT_DOMAINS;
+                else if (prev_datatype === DataTypes.INDELS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.IND_DOMAINS;
+                else if (prev_datatype === DataTypes.SNV) oov_entity[MelvinAttributes.DTYPE] = DataTypes.SNV_DOMAINS;
                 else oov_entity[MelvinAttributes.DTYPE] = DataTypes.PROTEIN_DOMAINS;
             }
             else oov_entity[MelvinAttributes.DTYPE] = curr_datatype;
@@ -159,7 +159,7 @@ const update_melvin_state = async function (
 
         // Merge the previous state and new state. Overwrite with the latest.
         updated_state = {
-            ...prev_state, ...oov_entity, 
+            ...prev_state, ...oov_entity,
         };
         sessionAttributes[session_path] = updated_state;
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -167,7 +167,7 @@ const update_melvin_state = async function (
 
     return {
         oov_entity,
-        prev_state,        
+        prev_state,
         updated_state,
     };
 };
@@ -232,14 +232,14 @@ const validate_required_attributes = function (melvin_state) {
     if (!(data_type_val in DataTypes)) {
         throw melvin_error(
             "[validate_required_attributes] error while validating required attributes | " +
-                `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
+            `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.INVALID_DATA_TYPE,
             "I could not understand that data type. Please try again."
         );
     }
 
     let req_attr_dict = RequiredAttributesTCGA;
-    if (_.has(melvin_state, MelvinAttributes.DSOURCE) 
+    if (_.has(melvin_state, MelvinAttributes.DSOURCE)
         && melvin_state[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         req_attr_dict = RequiredAttributesClinvar;
     }
@@ -247,7 +247,7 @@ const validate_required_attributes = function (melvin_state) {
     if (!_.has(req_attr_dict, data_type_val) || !_.isArray(req_attr_dict[data_type_val])) {
         throw melvin_error(
             "Error while validating required attributes | " +
-                `req_attr_dict: ${JSON.stringify(req_attr_dict)}, melvin_state: ${JSON.stringify(melvin_state)}`,
+            `req_attr_dict: ${JSON.stringify(req_attr_dict)}, melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.INVALID_DATA_TYPE,
             `This data type is not supported in ${melvin_state[MelvinAttributes.DSOURCE]}.`
         );
@@ -271,7 +271,7 @@ const validate_required_attributes = function (melvin_state) {
     if (!is_valid && !has_gene) {
         throw melvin_error(
             "Error while validating required attributes in melvin_state | " +
-                `melvin_state: ${JSON.stringify(melvin_state)}`,
+            `melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.MISSING_GENE,
             "I need to know a gene name first. What gene are you interested in?"
         );
@@ -280,23 +280,23 @@ const validate_required_attributes = function (melvin_state) {
     if (!is_valid && !has_study) {
         throw melvin_error(
             "Error while validating required attributes in melvin_state | " +
-                `melvin_state: ${JSON.stringify(melvin_state)}`,
+            `melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.MISSING_STUDY,
             "I need to know a cancer type first. What cancer type are you interested in?"
         );
     }
 };
 
-const validate_required_datatypes = function(state_change) {
+const validate_required_datatypes = function (state_change) {
     const melvin_state = state_change["updated_state"];
     console.log(`[validate_required_datatypes] melvin_state: ${JSON.stringify(melvin_state)}`);
 
     const data_type_val = melvin_state[MelvinAttributes.DTYPE];
 
-    if(data_type_val === DataTypes.PROTEIN_DOMAINS) {
+    if (data_type_val === DataTypes.PROTEIN_DOMAINS) {
         throw melvin_error(
             "[validate_required_attributes] error while validating required datatype | " +
-                    `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
+            `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.INVALID_DATA_TYPE,
             "Domains are supported only when the previous data type is mutations, SNVs, or indels."
         );
@@ -309,7 +309,7 @@ const validate_navigation_intent_state = function (handlerInput, state_change) {
 
     // Merge the previous state and new state. Overwrite with the latest.
     const melvin_state = {
-        ...state_change["prev_state"], ...state_change["updated_state"] 
+        ...state_change["prev_state"], ...state_change["updated_state"]
     };
 
     sessionAttributes["MELVIN.STATE"] = melvin_state;
@@ -324,7 +324,7 @@ const validate_action_intent_state = function (handlerInput, state_change, inten
 
     // merge the previous state and new state. Overwrite with the latest
     const melvin_state = {
-        ...state_change["prev_state"], ...state_change["updated_state"] 
+        ...state_change["prev_state"], ...state_change["updated_state"]
     };
     melvin_state["data_type"] = intent_data_type;
     sessionAttributes["MELVIN.STATE"] = melvin_state;
@@ -344,7 +344,7 @@ const clean_melvin_aux_state = function (handlerInput, session_path = "MELVIN.AU
 };
 
 
-const resolve_splitby_query = async function(handlerInput) {
+const resolve_splitby_query = async function (handlerInput) {
     const splitby_queries = {
         "splitby_query": _.get(handlerInput, "requestEnvelope.request.intent.slots.query.value"),
         "dtype_query":   _.get(handlerInput, "requestEnvelope.request.intent.slots.dtype_query.value"),
@@ -355,18 +355,18 @@ const resolve_splitby_query = async function(handlerInput) {
     for (const [key, query] of Object.entries(splitby_queries)) {
         if (!_.isEmpty(query)) {
             let query_response = await resolve_oov_entity(handlerInput, query);
-            if (query_response.data.type === OOVEntityTypes.DTYPE && 
+            if (query_response.data.type === OOVEntityTypes.DTYPE &&
                 (key === "splitby_query" || key === "dtype_query")) {
                 oov_entity[MelvinAttributes.DTYPE] = _.get(query_response, "data.val");
             }
 
-            if (query_response.data.type === OOVEntityTypes.GENE && 
+            if (query_response.data.type === OOVEntityTypes.GENE &&
                 (key === "splitby_query" || key === "gene_query")) {
                 oov_entity[MelvinAttributes.GENE_NAME] = _.get(query_response, "data.val");
             }
         }
     }
-    
+
     // update and store melvin_aux_state with slot values provided in this turn
     let melvin_aux_state = get_melvin_aux_state(handlerInput);
     melvin_aux_state = {
@@ -380,18 +380,18 @@ const resolve_splitby_query = async function(handlerInput) {
     return melvin_aux_state;
 };
 
-const validate_splitby_melvin_state = function(melvin_state) {
+const validate_splitby_melvin_state = function (melvin_state) {
     if (_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV]) ||
         _.isEmpty(melvin_state[MelvinAttributes.GENE_NAME]) ||
-            _.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
+        _.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
         throw melvin_error(
             "[validate_splitby_melvin_state] empty/incomplete melvin state " +
-                `| melvin_state: ${JSON.stringify(melvin_state)}`,
+            `| melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.MISSING_STUDY,
             "Sorry, this split-by operation is not supported. " +
-                "You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. " +
-                "Only then you can splitby another gene or datatype within the same cancer type. " +
-                "Now, what would you like to know?"
+            "You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. " +
+            "Only then you can splitby another gene or datatype within the same cancer type. " +
+            "Now, what would you like to know?"
         );
     }
 };
@@ -424,9 +424,9 @@ const elicit_splitby_slots = async function (handlerInput, melvin_aux_state, pre
 
 const is_splitby_supported = function (query_dtypes) {
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
-        if ((query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][0] 
+        if ((query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][0]
             && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][1])
-            || (query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][1] 
+            || (query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][1]
                 && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][0])
         ) {
             return true;

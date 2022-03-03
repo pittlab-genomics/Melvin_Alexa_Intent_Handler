@@ -9,7 +9,7 @@ const {
 } = require("../gene/gene_response_builder.js");
 
 const {
-    validate_action_intent_state, update_melvin_state 
+    validate_action_intent_state, update_melvin_state
 } = require("../utils/navigation_utils.js");
 
 
@@ -28,7 +28,12 @@ const NavigateGeneDefinitionIntentHandler = {
             const params = { ...melvin_state };
             const response = await build_gene_definition_response(handlerInput, params);
             speechText = response["speech_text"];
-
+            if (!speechText.trim().endsWith("?")) {
+                speechText += " What else?";
+                repromptText = "What else?";
+            } else {
+                repromptText = speechText;
+            }
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -36,13 +41,6 @@ const NavigateGeneDefinitionIntentHandler = {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error("Error in NavigateGeneDefinitionIntent", error);
-        }
-
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
         }
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -76,7 +74,7 @@ const NavigateGeneTargetIntentHandler = {
             console.error("Error in NavigateGeneTargetIntent", error);
         }
 
-        if(!speechText.trim().endsWith("?")) {
+        if (!speechText.trim().endsWith("?")) {
             speechText += " What else?";
             repromptText = "What else?";
         } else {

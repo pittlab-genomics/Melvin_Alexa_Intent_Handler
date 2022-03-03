@@ -1,5 +1,4 @@
 var AWS = require("aws-sdk");
-var _ = require("lodash");
 const moment = require("moment");
 
 const {
@@ -37,7 +36,7 @@ sessions_doc.prototype.getMostRecentSession = async (user_id) => {
         ExpressionAttributeNames:  { "#user_id": "user_id", },
         ExpressionAttributeValues: { ":uid": user_id },
         ScanIndexForward:          false,
-        Limit:                     10
+        Limit:                     100
     };
 
     session_list = await queryEntireTable(docClient, query_params);
@@ -59,7 +58,7 @@ sessions_doc.prototype.getRecentSessions = async (duration=3600) => {
         ExpressionAttributeNames:  { "#session_start": "session_start" },
         ExpressionAttributeValues: { ":start": start_timestamp },
         ScanIndexForward:          false,
-        Limit:                     10
+        Limit:                     100
     };
 
     session_list = await scanEntireTable(docClient, query_params);

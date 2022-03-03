@@ -5,13 +5,13 @@ const {
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT
 } = require("../common.js");
 
-const {    
+const {
     build_navigation_response,
     build_compare_response
 } = require("../navigation/navigation_helper.js");
 
 const {
-    get_melvin_state, 
+    get_melvin_state,
     update_melvin_state,
     update_melvin_aux_state,
     get_melvin_history,
@@ -40,7 +40,12 @@ const NavigateJoinFilterIntentHandler = {
             validate_required_datatypes(state_change);
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
-
+            if (!speechText.trim().endsWith("?")) {
+                speechText += " What else?";
+                repromptText = "What else?";
+            } else {
+                repromptText = speechText;
+            }
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -51,12 +56,6 @@ const NavigateJoinFilterIntentHandler = {
             console.error("[NavigateJoinFilterIntentHandler] Error! except: ", error);
         }
 
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
-        }
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(repromptText)
@@ -76,12 +75,17 @@ const NavigateCompareIntentHandler = {
             const state_change = await update_melvin_aux_state(handlerInput);
             const melvin_state = get_melvin_state(handlerInput);
             const compare_state = {
-                ...melvin_state, ...state_change["updated_state"] 
+                ...melvin_state, ...state_change["updated_state"]
             };
             const state_diff = get_state_change_diff(state_change);
             let response = await build_compare_response(handlerInput, melvin_state, compare_state, state_diff);
             speechText = response["speech_text"];
-
+            if (!speechText.trim().endsWith("?")) {
+                speechText += " What else?";
+                repromptText = "What else?";
+            } else {
+                repromptText = speechText;
+            }
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -91,13 +95,6 @@ const NavigateCompareIntentHandler = {
             console.trace("[NavigateCompareIntentHandler] Error! except: ", error);
         } finally {
             clean_melvin_aux_state(handlerInput);
-        }
-
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
         }
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -112,14 +109,12 @@ const NavigateResetIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateResetIntent";
     },
     async handle(handlerInput) {
-        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}` +
-            " To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type. " +
-            " Now, What would you like to know? ";
-        const repromptText = "You can say 'Tell me about' followed by the name of a gene, cancer type, or data type. What would you like to know? ";
+        const speechText = `Ok. ${MELVIN_WELCOME_GREETING}`;
+        const repromptText = "What would you like to know?";
         clean_melvin_state(handlerInput);
         clean_melvin_aux_state(handlerInput);
 
-        const response_text = `Welcome to ${MELVIN_APP_NAME}. You can start with a gene or cancer type.`;
+        const response_text = `Welcome to ${MELVIN_APP_NAME}. You can start with a gene, cancer type, or data type.`;
         add_to_APL_text_pager(handlerInput, response_text);
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -202,7 +197,12 @@ const NavigateRepeatIntentHandler = {
 
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
-
+            if (!speechText.trim().endsWith("?")) {
+                speechText += " What else?";
+                repromptText = "What else?";
+            } else {
+                repromptText = speechText;
+            }
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -210,13 +210,6 @@ const NavigateRepeatIntentHandler = {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error("[NavigateRepeatIntentHandler] Error! except: ", error);
-        }
-
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
         }
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -289,7 +282,12 @@ const NavigateGoBackIntentHandler = {
         try {
             let response = await build_navigation_response(handlerInput, state_change);
             speechText = response["speech_text"];
-
+            if (!speechText.trim().endsWith("?")) {
+                speechText += " What else?";
+                repromptText = "What else?";
+            } else {
+                repromptText = speechText;
+            }
         } catch (error) {
             if (error["speech"]) {
                 speechText = error["speech"];
@@ -297,13 +295,6 @@ const NavigateGoBackIntentHandler = {
                 speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
             }
             console.error("[NavigateGoBackIntentHandler} Error! except: ", error);
-        }
-
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
         }
         return handlerInput.responseBuilder
             .speak(speechText)

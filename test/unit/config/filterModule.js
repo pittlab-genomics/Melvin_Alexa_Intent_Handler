@@ -46,12 +46,6 @@ module.exports = {
             callback(null, "successfully put rule");
         });
 
-        AWS.mock("CloudWatchEvents", "listTagsForResource", function(params, callback) {
-            callback(null, { Tags: [{
-                Key: "label", Value: "melvin-alexa-intent-handlers-test-warmup_service"
-            }]});
-        });
-
         AWS.mock("STS", "assumeRole", function(params, callback) {
             callback(null, { Credentials: {
                 SecretAccessKey: "",

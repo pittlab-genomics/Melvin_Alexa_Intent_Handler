@@ -6,12 +6,11 @@ const { CANCER_TYPES } = require("./utils/cancer_types.js");
 const { DATA_TYPES } = require("./utils/data_types.js");
 const { OOVMappings } = require("./utils/oov_mappings.js");
 
-// common types
 
 const MELVIN_MAX_HISTORY_ITEMS = 30;
 const FOLLOW_UP_TEXT_THRESHOLD = 2;
 const MAX_EMAIL_RESULT_COUNT = 1000;
-const MAX_EMAIL_DURATION = 604800; //1 week
+const MAX_EMAIL_DURATION = 604800; // 1 week
 
 const UserPreferences = { "custom mappings": "CUSTOM_MAPPINGS" };
 const MelvinEventTypes = {
@@ -53,7 +52,8 @@ const MelvinIntentErrors = {
     MISSING_GENE:         "MISSING_GENE",
     MISSING_DTYPE:        "MISSING_DTYPE",
     MISSING_STUDY:        "MISSING_STUDY",
-    NOT_IMPLEMENTED:      "NOT_IMPLEMENTED"
+    NOT_IMPLEMENTED:      "NOT_IMPLEMENTED",
+    AUTH_ERROR:           "AUTH_ERROR"
 };
 
 const OOVEntityTypes = {
@@ -127,7 +127,7 @@ const get_gene_speech_text = function (gene_name) {
         gene_speech_text = GeneSSMLMappings[gene_name];
         console.debug(`[get_gene_speech_text] gene_name: ${gene_name}, gene_speech_text: ${gene_speech_text}`);
     }
-    
+
     return gene_speech_text;
 };
 
@@ -137,7 +137,7 @@ const get_oov_mappings_response = function (query) {
         response = OOVMappings[query];
         console.log(`[get_oov_mappings_response] query: ${query}, response: ${response}`);
     }
-    
+
     return response;
 };
 
@@ -158,7 +158,7 @@ const melvin_round = function (value, precision) {
     return Math.round(value * multiplier) / multiplier;
 };
 
-const filter_domains = function(records) {
+const filter_domains = function (records) {
     return records.filter(item => item.domain !== "none");
 };
 
@@ -191,12 +191,10 @@ const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while pro
     " Please try again later.";
 const DEFAULT_INVALID_STATE_RESPONSE = "Sorry, I got lost during the conversation. Please start over.";
 const DEFAULT_NOT_IMPLEMENTED_RESPONSE = "I'm still working on implementing this analysis. Please try again later.";
-const DEFAULT_OOV_MAPPING_ERROR_RESPONSE = "Sorry, something went wrong while resolving the query utterance. " + 
-    "Please try again later.";
-const DEFAULT_OOV_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the mapper service. " + 
+const DEFAULT_OOV_MAPPING_ERROR_RESPONSE = "Sorry, something went wrong while resolving the query utterance. " +
     "Please try again later.";
 const DEFAULT_AE_ACCESS_ERROR_RESPONSE = "Sorry, I'm having trouble accessing the dataset. Please try again later.";
-const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " + 
+const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " +
     "Please try again later.";
 
 const melvin_error = function (message, type, speech = null) {
@@ -231,13 +229,12 @@ module.exports = {
     MELVIN_WELCOME_GREETING:  process.env.MELVIN_WELCOME_GREETING,
     MELVIN_EXPLORER_ENDPOINT: process.env.MELVIN_EXPLORER_ENDPOINT,
     MELVIN_EXPLORER_REGION:   process.env.MELVIN_EXPLORER_REGION,
-    MELVIN_EXPLORER_ROLE:     process.env.MELVIN_EXPLORER_INVOKE_ROLE,
+    MELVIN_API_INVOKE_ROLE:   process.env.MELVIN_API_INVOKE_ROLE,
     OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
     OOV_MAPPER_REGION:        process.env.OOV_MAPPER_REGION,
-    OOV_MAPPER_ROLE:          process.env.OOV_MAPPER_INVOKE_ROLE,
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
     STAGE:                    process.env.STAGE,
-    WARMUP_SERVICE_CW_RULE:   process.env.WARMUP_SERVICE_CW_RULE,
+    WARMUP_SERVICE_ENABLED:   process.env.WARMUP_SERVICE_ENABLED,
     MelvinAttributes,
     MelvinEventTypes,
     get_user_preference_name,
@@ -245,7 +242,6 @@ module.exports = {
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
-    DEFAULT_OOV_CONNECT_ERROR_RESPONSE,
     DEFAULT_AE_ACCESS_ERROR_RESPONSE,
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
     SUPPORTED_SPLITBY_DTYPES,

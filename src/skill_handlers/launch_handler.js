@@ -1,12 +1,11 @@
 
 const AWS = require("aws-sdk");
 const moment = require("moment");
-const _ = require("lodash");
 
 const {
     MELVIN_WELCOME_GREETING,
     MELVIN_APP_NAME,
-    STAGE 
+    WARMUP_SERVICE_ENABLED
 } = require("../common.js");
 
 const APLDocs = { welcome: require("../../resources/APL/welcome.json") };
@@ -50,62 +49,33 @@ function add_launch_apl_docs(handlerInput) {
         handlerInput.responseBuilder
             .withStandardCard(
                 `Welcome to ${MELVIN_APP_NAME}`,
-                "You can start with a gene or cancer type.",
+                "You can start with a gene, cancer type, or data type.",
                 melvin_logo_url,
                 melvin_img_url
             );
     }
 }
 
-async function update_cloudwatch_events() {
+async function update_warmup_cloudwatch_rule() {
     const cloudwatchevents = new AWS.CloudWatchEvents();
-    var params = {
-        NamePrefix: "melvin",
-        Limit:      10,
-    };
+    const params = { Name: process.env.WARMUP_EVENT_RULE_NAME };
 
     try {
-        const list_result = await cloudwatchevents.listRules(params).promise();
-        console.log(`[LaunchRequestHandler] listRules | success: ${JSON.stringify(list_result)}`);
+        const result = await cloudwatchevents.describeRule(params).promise();
+        console.info(`[LaunchRequestHandler] warmup event rule: ${JSON.stringify(result)}`);
+        const timestamp = moment().valueOf().toString();
+        const description = `warmup service cloudwatch rule | last_updated: ${timestamp}`;
+        const cloudwatchevent_params = {
+            Name:               params.Name,
+            Description:        description,
+            ScheduleExpression: `rate(${process.env.WARMUP_EVENT_SCHEDULE_RATE} minutes)`,
+            State:              "ENABLED"
+        };
+        const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
+        console.info(`[LaunchRequestHandler] update_cloudwatch_events | success: ${JSON.stringify(update_result)}`);
 
-        const rule_list = list_result["Rules"];
-        let warmup_rule_name = null;
-        for (const rule_item of rule_list) {
-            console.log(`[LaunchRequestHandler] rule_item | success: ${JSON.stringify(rule_item)}`);
-            var tag_params = { ResourceARN: rule_item["Arn"] };
-            const tag_result = await cloudwatchevents.listTagsForResource(tag_params).promise();
-            console.log(`[LaunchRequestHandler] tag_result | success: ${JSON.stringify(tag_result)}`);
-            const tag_list = tag_result["Tags"];
-            for (const tag_item of tag_list) {
-                if (tag_item["Key"] === "label" && tag_item["Value"] === process.env.WARMUP_RULE_LABEL) {
-                    warmup_rule_name = rule_item["Name"];
-                }
-            }
-        }
-        
-        if (!_.isEmpty(warmup_rule_name)) {
-            const timestamp = moment().valueOf().toString();
-            const description = "warmup service cloudwatch rule | " + 
-                `stage: ${STAGE}, last_updated: ${timestamp}`;
-            const cloudwatchevent_params = {
-                Name:               warmup_rule_name,
-                Description:        description,
-                ScheduleExpression: "rate(5 minutes)",
-                State:              "ENABLED",
-                Tags:               [
-                    {
-                        Key:   "last_updated",
-                        Value: timestamp
-                    }
-                ]
-            };
-            const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
-            console.log(`[LaunchRequestHandler] putRule | success: ${JSON.stringify(update_result)}`);
-        } else {
-            console.log("[LaunchRequestHandler] failed to find warmup event rule");
-        }
-    } catch(err) {
-        console.log(`[LaunchRequestHandler] event error: ${JSON.stringify(err)}`, err.stack);
+    } catch (err) {
+        console.error(`[LaunchRequestHandler] update_cloudwatch_events | error: ${JSON.stringify(err)}`, err.stack);
     }
 }
 
@@ -124,13 +94,17 @@ const LaunchRequestHandler = {
             };
             await sessions_doc.addUserSession(new_session_rec);
         }
-        await update_cloudwatch_events();        
+        if (WARMUP_SERVICE_ENABLED) {
+            await update_warmup_cloudwatch_rule();
+        } else {
+            console.info("[launch_handler] warmup service feature is disabled");
+        }
 
-        const speechText = MELVIN_WELCOME_GREETING + 
-            " Melvin Alexa skill is a voice based cancer genome analytics tool. " +
-            " To start exploring, just say 'Tell me about' followed by the name of a gene, cancer type, or data type.  " +
+        const speechText = MELVIN_WELCOME_GREETING + " Melvin is a voice based cancer genome analytics tool." +
+            " To start exploring, just say 'tell me about' followed by the name of a gene, cancer type, or data type." +
             " For more information, say help. Now, What would you like to know? ";
-        const repromptText = "You can say 'Tell me about' followed by the name of a gene, cancer type, or data type. What would you like to know? ";
+        const repromptText = "You can say 'tell me about' followed by the name of a gene, cancer type, or data type." +
+            " What would you like to know? ";
         add_launch_apl_docs(handlerInput);
         return handlerInput.responseBuilder
             .speak(speechText)

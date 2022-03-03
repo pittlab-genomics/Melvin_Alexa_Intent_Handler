@@ -1,10 +1,7 @@
 var AWS = require("aws-sdk");
-var _ = require("lodash");
 const moment = require("moment");
 
-const {
-    queryEntireTable, scanEntireTable 
-} = require("./dao_utils.js");
+const { queryEntireTable } = require("./dao_utils.js");
 
 AWS.config.update({ region: "eu-west-1" });
 var docClient = new AWS.DynamoDB.DocumentClient();

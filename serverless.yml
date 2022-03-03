@@ -1,24 +1,23 @@
 service: melvin-alexa-intent-handlers
 
-frameworkVersion: ">=1.4.0 <2.0.0"
+frameworkVersion: ">=3.0.0 <4.0.0"
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs14.x
   stage: ${self:custom.stage}
   region: eu-west-1
-  memorySize: 2048
-  reservedConcurrency: 1
   tracing:
     lambda: true
     apiGateway: true
   environment: ${self:custom.config.environment}
-  timeout: 150
+  lambdaHashingVersion: 20201221
+  timeout: 30
   iamRoleStatements:
     - Effect: Allow
       Action:
         - ssm:GetParameter
-      Resource: "arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:service}/{self:provider.stage}/*"
+      Resource: "arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}/{self:provider.stage}/*"
 
     - Effect: Allow
       Action:
@@ -75,27 +74,21 @@ provider:
 
     - Effect: Allow
       Action:
-        - events:ListRules
+        - events:describeRule
         - events:putRule
-        - events:listTagsForResource
-        - events:TagResource
-      Resource: "*"
-
-    - Effect: Allow
-      Action:
-        - ec2:CreateNetworkInterface
-        - ec2:DescribeNetworkInterfaces
-        - ec2:DeleteNetworkInterface
-      Resource: "*"
+      Resource: "arn:aws:events:${self:provider.region}:${aws:accountId}:rule/melvin-warmup-event-rule-${self:provider.stage}"
 
     - Effect: Allow
       Action:
         - sts:AssumeRole
-      Resource: "arn:aws:iam::073302257160:role/*"
+      Resource: "arn:aws:iam::${aws:accountId}:role/melvin-${self:provider.stage}-skill-intent-handler-role"
 
 functions:
   alexa-skill:
     handler: src/alexa-skill.handler
+    provisionedConcurrency: 1
+    reservedConcurrency: 10
+    memorySize: 2048
     events:
       - alexaSkill:
           appId: ${self:custom.config.alexa.appId}
@@ -103,26 +96,28 @@ functions:
 
   sqs_irs_subscriber:
     handler: src/sqs/irs_subscriber.handler
+    reservedConcurrency: 10
+    memorySize: 2048
     events:
       - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
 
   warmup_service:
     handler: src/warmup_service/warmup_service.handler
+    timeout: 60
+    reservedConcurrency: 1
+    memorySize: 1024
     events:
       - schedule:
-          description: 'warmup service scheduled event rule'
-          rate: rate(10 minutes)
+          name: ${self:provider.environment.WARMUP_EVENT_RULE_NAME}
+          description: "warmup service scheduled event rule"
+          rate: rate(${self:provider.environment.WARMUP_EVENT_SCHEDULE_RATE} minutes)
           enabled: false
           input:
-            stage: ${self:custom.stage}
-          tags:
-            label: "melvin-alexa-intent-handlers-${self:provider.stage}-warmup_service"
+            stage: ${self:provider.stage}
 
 plugins:
-  - serverless-plugin-include-dependencies
   - serverless-prune-plugin
-  - serverless-pseudo-parameters
-  - serverless-plugin-tag-events
+  - serverless-plugin-include-dependencies
 
 package:
   exclude:
@@ -135,7 +130,7 @@ custom:
   stage: ${opt:stage, 'dev'}
 
   # Load our configuration file specific to the environment based on the stage parameter
-  config: ${file(config/${self:custom.stage}.yml)}
+  config: ${file(config/${self:provider.stage}.yml)}
 
   # This will delete all but the n-most recent versions of each function deployed.
   prune:

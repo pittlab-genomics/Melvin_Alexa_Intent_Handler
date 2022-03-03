@@ -5,7 +5,7 @@ const _ = require("lodash");
 const moment = require("moment");
 
 const {
-    parse, toSeconds 
+    parse, toSeconds
 } = require("iso8601-duration");
 
 const NavigateEmailIntentHandler = {
@@ -19,12 +19,12 @@ const NavigateEmailIntentHandler = {
         const DEFAULT_RESULT_COUNT = 1;
 
         try {
-            // const state_change = await update_melvin_state(handlerInput);
-            // validate_navigation_intent_state(handlerInput, state_change);
-
-            const upsServiceClient = handlerInput.serviceClientFactory.getUpsServiceClient();
-            const profileEmail = await upsServiceClient.getProfileEmail();
-
+            let user_email = "";
+            if (process.env.IS_LOCAL) {
+                user_email = process.env.MELVIN_USER_PROFILE_EMAIL; 
+            } else {
+                user_email = await handlerInput.serviceClientFactory.getUpsServiceClient().getProfileEmail();
+            }
             const queue_url = get_irs_queue_url();
             const timestamp = moment().valueOf();
             const user_id = handlerInput.requestEnvelope.session.user.userId;
@@ -34,7 +34,7 @@ const NavigateEmailIntentHandler = {
                 "irs_channel": "EMAIL",
                 "timestamp":   timestamp,
                 "user_id":     user_id,
-                "user_email":  profileEmail
+                "user_email":  user_email
             };
 
             const results_count = _.get(handlerInput, "requestEnvelope.request.intent.slots.count.value",
@@ -46,20 +46,15 @@ const NavigateEmailIntentHandler = {
                 msg_data["irs_duration_sec"] = duration_sec;
                 console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url}
                     msg_data: ${JSON.stringify(msg_data)}`);
-                speechText = "Ok, I'm emailing results during that period.";
+                speechText = "Ok, I'm emailing results during that period." + 
+                " Please check your inbox in a while. What else?";
 
             } else {
                 msg_data["irs_results_count"] = results_count;
                 console.log(`[NavigateEmailIntentHandler] publishing to ${queue_url} 
                     msg_data: ${JSON.stringify(msg_data)}`);
-
-                // if (results_count == DEFAULT_RESULT_COUNT) {
-                speechText = "Ok, I'm emailing that to you now.";
-                // } else {
-                //     speechText = `Ok, I'm emailing last ${results_count} results to you now.`;
-                // }
+                speechText = "Ok, I'm emailing that to you now. Please check your inbox in a while. What else?";
             }
-            speechText += " Please check your inbox in a while.";
 
             // publish IRS message to AWS SQS
             await publish_irs_message(JSON.stringify(msg_data), queue_url);
@@ -68,11 +63,9 @@ const NavigateEmailIntentHandler = {
             if (error.statusCode === 403) {
                 speechText = "In order to email, Melvin will need access to your email address. " +
                     "Go to the home screen in your Alexa app and grant me permissions.";
-                speechText += " What else?";
-                repromptText = "What else?";
                 return handlerInput.responseBuilder
                     .speak(speechText)
-                    .reprompt(repromptText)
+                    .reprompt(speechText)
                     .withAskForPermissionsConsentCard(["alexa::profile:email:read"])
                     .getResponse();
             }
@@ -82,13 +75,6 @@ const NavigateEmailIntentHandler = {
                 speechText = "Something went wrong while sending the results. Please try again later.";
             }
             console.error("Error in NavigateEmailIntent", error);
-        }
-
-        if(!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
         }
         return handlerInput.responseBuilder
             .speak(speechText)

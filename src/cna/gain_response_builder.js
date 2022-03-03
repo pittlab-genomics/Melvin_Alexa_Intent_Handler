@@ -38,7 +38,7 @@ async function build_gain_compare_tcga_response(handlerInput, melvin_state, comp
     const nunjucks_context = {
         melvin_state:     melvin_state,
         compare_params:   compare_params,
-        state_diff:        state_diff,
+        state_diff:       state_diff,
         response:         results[0],
         compare_response: results[1]
     };
