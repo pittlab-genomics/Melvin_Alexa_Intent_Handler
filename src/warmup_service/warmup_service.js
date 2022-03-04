@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const allSettled = require("promise.allsettled");
@@ -7,6 +8,7 @@ const {
 } = require("../utils/sigv4_utils");
 const https = require("https");
 const moment = require("moment");
+const { performance } = require("perf_hooks");
 
 const sessions_doc = require("../dao/sessions.js");
 const {
@@ -20,12 +22,9 @@ const {
     WARMUP_SERVICE_ENABLED
 } = require("../common.js");
 
-const agent = new https.Agent({ maxSockets: 100 });
+const agent = new https.Agent({ maxSockets: 200 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
-const STATS_EP_TIMEOUT = 5000;
-const PLOT_EP_TIMEOUT = 5000;
-const MAPPER_EP_TIMEOUT = 2000;
 const WARMUP_SESSION_TIMEOUT = 900; // disable warmup rule if there is no new user sessions after `timeout` seconds
 
 /*
@@ -243,13 +242,14 @@ const request_async = function (url, timeout) {
     setTimeout(() => {
         controller.abort();
     }, timeout);
-
+    const t1 = performance.now();
     return fetch(url, {
         headers, signal, agent
     }).then(async (response) => {
         if (response.ok) {
+            const duration = performance.now() - t1;
             return {
-                "url": url, "status_code": response.status
+                "url": url, "status_code": response.status, "duration": duration
             };
         } else {
             const body = await response.json();
@@ -341,39 +341,39 @@ function get_splitby_stats_url(endpoint, dtypes) {
     case "MUTATIONS:MUTATIONS":
         splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
         break;
-    // case "MUTATIONS:SNV":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
-    //     break;
-    // case "MUTATIONS:INDELS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
-    //     break;
-    // case "MUTATIONS:CNA":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
-    //     break;
-    // case "MUTATIONS:GAIN":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
-    //     break;
-    // case "MUTATIONS:LOSS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
-    //     break;
+        // case "MUTATIONS:SNV":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
+        //     break;
+        // case "MUTATIONS:INDELS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
+        //     break;
+        // case "MUTATIONS:CNA":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
+        //     break;
+        // case "MUTATIONS:GAIN":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
+        //     break;
+        // case "MUTATIONS:LOSS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_stats`);
+        //     break;
     case "GENE_EXPRESSION:MUTATIONS":
         splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
         break;
-    // case "GENE_EXPRESSION:SNV":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
-    //     break;
-    // case "GENE_EXPRESSION:INDELS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
-    //     break;
-    // case "GENE_EXPRESSION:CNA":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
-    //     break;
-    // case "GENE_EXPRESSION:GAIN":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
-    //     break;
-    // case "GENE_EXPRESSION:LOSS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
-    //     break;
+        // case "GENE_EXPRESSION:SNV":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
+        //     break;
+        // case "GENE_EXPRESSION:INDELS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
+        //     break;
+        // case "GENE_EXPRESSION:CNA":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
+        //     break;
+        // case "GENE_EXPRESSION:GAIN":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
+        //     break;
+        // case "GENE_EXPRESSION:LOSS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_stats`);
+        //     break;
     }
 
     return splitby_url;
@@ -430,39 +430,39 @@ function get_splitby_plots_url(endpoint, dtypes) {
     case "MUTATIONS:MUTATIONS":
         splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
         break;
-    // case "MUTATIONS:SNV":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
-    //     break;
-    // case "MUTATIONS:INDELS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
-    //     break;
-    // case "MUTATIONS:CNA":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
-    //     break;
-    // case "MUTATIONS:GAIN":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
-    //     break;
-    // case "MUTATIONS:LOSS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
-    //     break;
+        // case "MUTATIONS:SNV":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
+        //     break;
+        // case "MUTATIONS:INDELS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
+        //     break;
+        // case "MUTATIONS:CNA":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
+        //     break;
+        // case "MUTATIONS:GAIN":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
+        //     break;
+        // case "MUTATIONS:LOSS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/MUT_plot`);
+        //     break;
     case "GENE_EXPRESSION:MUTATIONS":
         splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
         break;
-    // case "GENE_EXPRESSION:SNV":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
-    //     break;
-    // case "GENE_EXPRESSION:INDELS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
-    //     break;
-    // case "GENE_EXPRESSION:CNA":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
-    //     break;
-    // case "GENE_EXPRESSION:GAIN":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
-    //     break;
-    // case "GENE_EXPRESSION:LOSS":
-    //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
-    //     break;
+        // case "GENE_EXPRESSION:SNV":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
+        //     break;
+        // case "GENE_EXPRESSION:INDELS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
+        //     break;
+        // case "GENE_EXPRESSION:CNA":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
+        //     break;
+        // case "GENE_EXPRESSION:GAIN":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
+        //     break;
+        // case "GENE_EXPRESSION:LOSS":
+        //     splitby_url = new URL(`${endpoint}/analysis/splitby/tcga/EXP_plot`);
+        //     break;
     }
 
     return splitby_url;
@@ -503,8 +503,19 @@ function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
 }
 
 
-const send_parallel_requests = async function (request_id) {
+const send_parallel_requests = async function (request_id, options = {}) {
     const response = {};
+    _.defaults(options,
+        { mapper_enabled: true },
+        { mapper_timeout: 2000 },
+        { stats_enabled: true },
+        { stats_timeout: 4000 },
+        { plots_enabled: true },
+        { plots_timeout: 5000 },
+        { splitby_enabled: true },
+        { splitby_timeout: 5000 }
+    );
+
     try {
         /*
          group endpoints separate sets in order to increase the parallelism
@@ -516,45 +527,57 @@ const send_parallel_requests = async function (request_id) {
         // get auth creds via STS
         const creds_data = await assume_role(MELVIN_API_INVOKE_ROLE, request_id);
 
-        for (let cat_item in oov_mapper_ep_path_dict) {
-            const cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]
-                , OOV_MAPPER_REGION, creds_data);
-            results[cat_item] = await allSettled(cat_url_list.map((url) => request_async(url, MAPPER_EP_TIMEOUT)));
+        // collect promises for each service type 
+        // TODO: refactor
+        const req_promises1 = [];
+        if (options.mapper_enabled) {
+            for (let cat_item in oov_mapper_ep_path_dict) {
+                const cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]
+                    , OOV_MAPPER_REGION, creds_data);
+                cat_url_list.map((url) => req_promises1.push(request_async(url, options.mapper_timeout)));
+                // results[cat_item] = await allSettled();
+            }
         }
 
-        for (let cat_item in stats_ep_path_dict) {
-            const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]
-                , MELVIN_EXPLORER_REGION, creds_data);
-            results[cat_item] = await allSettled(cat_url_list.map((url) => request_async(url, STATS_EP_TIMEOUT)));
+        if (options.stats_enabled) {
+            for (let cat_item in stats_ep_path_dict) {
+                const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]
+                    , MELVIN_EXPLORER_REGION, creds_data);
+                cat_url_list.map((url) => req_promises1.push(request_async(url, options.stats_timeout)));
+                // results[cat_item] = await allSettled(
+                //     cat_url_list.map((url) => request_async(url, options.stats_timeout)));
+            }
         }
 
-        const plots_promises = [];
-        for (let cat_item in plots_ep_path_dict) {
-            const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]
-                , MELVIN_EXPLORER_REGION, creds_data);
-            cat_url_list.map((url) => plots_promises.push(request_async(url, PLOT_EP_TIMEOUT)));
+        if (options.plots_enabled) {
+            for (let cat_item in plots_ep_path_dict) {
+                const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]
+                    , MELVIN_EXPLORER_REGION, creds_data);
+                cat_url_list.map((url) => req_promises1.push(request_async(url, options.plots_timeout)));
+            }
         }
-        results["plots_results"] = await allSettled(plots_promises);
+        results["results_part1"] = await allSettled(req_promises1);
+        
+        if (options.splitby_enabled) {
+            const req_promises2 = [];
+            const splitby_stats_urls = get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT,
+                MELVIN_EXPLORER_REGION, creds_data);
+            console.info(`splitby_stats_urls: ${JSON.stringify(splitby_stats_urls)}`);
+            splitby_stats_urls.forEach(async function (url_item) {
+                const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
+                repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
+            });
 
-        const splitby_stats_urls = get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT,
-            MELVIN_EXPLORER_REGION, creds_data);
-        console.info(`splitby_stats_urls: ${JSON.stringify(splitby_stats_urls)}`);
-        splitby_stats_urls.forEach(async function (url_item, index) {
-            const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
-            const results_key = "splitby_stats_" + index;
-            results[results_key] = await allSettled(repeat_url_items.map(
-                (data) => request_async(data, STATS_EP_TIMEOUT)));
-        });
+            const splitby_plot_urls = get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT,
+                MELVIN_EXPLORER_REGION, creds_data);
+            splitby_plot_urls.forEach(async function (url_item) {
+                const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
+                repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
+            });
 
-        const splitby_plot_urls = get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT,
-            MELVIN_EXPLORER_REGION, creds_data);
-        splitby_plot_urls.forEach(async function (url_item, index) {
-            const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
-            const results_key = "splitby_plot_" + index;
-            results[results_key] = await allSettled(repeat_url_items.map(
-                (data) => request_async(data, PLOT_EP_TIMEOUT)));
-
-        });
+            results["results_part2"] = await allSettled(req_promises2);
+        }
+        
 
         response["data"] = results;
     } catch (err) {
@@ -627,4 +650,7 @@ const handler = async function (event, context, callback) {
     callback(null, response);
 };
 
-exports.handler = handler;
+module.exports = {
+    handler,
+    send_parallel_requests
+};

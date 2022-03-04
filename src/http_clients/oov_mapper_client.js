@@ -15,7 +15,7 @@ const {
 
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
-const oov_timeout = 7000;
+const oov_timeout = 3000;
 
 const send_request_async = function (url, timeout, headers) {
     const controller = new AbortController();

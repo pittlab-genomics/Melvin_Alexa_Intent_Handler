@@ -11,6 +11,8 @@ const {
 const APLDocs = { welcome: require("../../resources/APL/welcome.json") };
 const { supportsAPL } = require("../utils/APL_utils.js");
 const sessions_doc = require("../dao/sessions.js");
+const { send_parallel_requests } = require("../warmup_service/warmup_service.js"); 
+
 
 function add_launch_apl_docs(handlerInput) {
     const melvin_img_url = "https://melvin-public.s3-ap-southeast-1.amazonaws.com/en-US_largeIconUri.png";
@@ -84,18 +86,36 @@ const LaunchRequestHandler = {
         return handlerInput.requestEnvelope.request.type === "LaunchRequest";
     },
     async handle(handlerInput) {
-        if (handlerInput.requestEnvelope.session.new) {
+        const requestEnvelope = handlerInput.requestEnvelope;
+        if (requestEnvelope.session.new) {
             const new_session_rec = {
-                "user_id":       handlerInput.requestEnvelope.session.user.userId,
-                "session_start": moment(handlerInput.requestEnvelope.request.timestamp).valueOf(),
-                "session_id":    handlerInput.requestEnvelope.session.sessionId,
-                "request":       handlerInput.requestEnvelope.request,
-                "device":        handlerInput.requestEnvelope.context.System.device
+                "user_id":       requestEnvelope.session.user.userId,
+                "session_start": moment(requestEnvelope.request.timestamp).valueOf(),
+                "session_id":    requestEnvelope.session.sessionId,
+                "request":       requestEnvelope.request,
+                "device":        requestEnvelope.context.System.device
             };
             await sessions_doc.addUserSession(new_session_rec);
         }
         if (WARMUP_SERVICE_ENABLED) {
+            // publish event to warmup queue in SQS which will be processed async via warmup service 
             await update_warmup_cloudwatch_rule();
+
+            /*
+             Send the initial warmup request to external services since it takes a while for warmup service to kick in.
+             We set a lower timeout to avoid Launch intent handler from getting stuck on network calls.
+            */
+            const warmup_opts = {
+                mapper_enabled:  true,
+                mapper_timeout:  1500,
+                stats_enabled:   true,
+                stats_timeout:   1500,
+                plots_enabled:   true,
+                plots_timeout:   1500,
+                splitby_enabled: false,
+            };
+            const warmup_result = await send_parallel_requests(requestEnvelope.request.requestId, warmup_opts);
+            console.info(`[launch_handler] warmup_result: ${JSON.stringify(warmup_result, null, 4)}`);
         } else {
             console.info("[launch_handler] warmup service feature is disabled");
         }

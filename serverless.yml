@@ -88,7 +88,7 @@ functions:
     handler: src/alexa-skill.handler
     provisionedConcurrency: 1
     reservedConcurrency: 10
-    memorySize: 2048
+    memorySize: 3008
     events:
       - alexaSkill:
           appId: ${self:custom.config.alexa.appId}
@@ -96,6 +96,7 @@ functions:
 
   sqs_irs_subscriber:
     handler: src/sqs/irs_subscriber.handler
+    timeout: 300
     reservedConcurrency: 10
     memorySize: 2048
     events:
@@ -105,7 +106,7 @@ functions:
     handler: src/warmup_service/warmup_service.handler
     timeout: 60
     reservedConcurrency: 1
-    memorySize: 1024
+    memorySize: 2048
     events:
       - schedule:
           name: ${self:provider.environment.WARMUP_EVENT_RULE_NAME}
