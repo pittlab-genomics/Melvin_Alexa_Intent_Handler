@@ -2,6 +2,7 @@ const _ = require("lodash");
 const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const allSettled = require("promise.allsettled");
+const sqs = new AWS.SQS({ region: "eu-west-1" });
 const AbortController = require("abort-controller");
 const {
     sign_request, assume_role, build_presigned_url
@@ -26,6 +27,10 @@ const agent = new https.Agent({ maxSockets: 200 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
 const WARMUP_SESSION_TIMEOUT = 900; // disable warmup rule if there is no new user sessions after `timeout` seconds
+const WARMUP_EVENT_COUNT = process.env.WARMUP_EVENT_COUNT || 5;
+const WARMUP_EVENT_DELAY_BASE = 5;
+const WARMUP_EVENT_DELAY_OFFSET_MAX = 15;
+const WARMUP_EVENT_DELAY_MAX = 60;
 
 /*
     make sure to include at least N number of entries for each unique path 
@@ -502,18 +507,26 @@ function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
     return splitby_urls;
 }
 
+function get_warmup_queue_url() {
+    const sqs_ep = process.env.SQS_WARMUP.split(":");
+    const account_id = sqs_ep[0];
+    const service_name = sqs_ep[1];
+    const queue_url = `https://sqs.eu-west-1.amazonaws.com/${account_id}/${service_name}`;
+    return queue_url;
+}
+
 
 const send_parallel_requests = async function (request_id, options = {}) {
     const response = {};
     _.defaults(options,
         { mapper_enabled: true },
-        { mapper_timeout: 2000 },
+        { mapper_timeout: 3000 },
         { stats_enabled: true },
-        { stats_timeout: 4000 },
+        { stats_timeout: 8000 },
         { plots_enabled: true },
-        { plots_timeout: 5000 },
+        { plots_timeout: 15000 },
         { splitby_enabled: true },
-        { splitby_timeout: 5000 }
+        { splitby_timeout: 15000 }
     );
 
     try {
@@ -557,7 +570,7 @@ const send_parallel_requests = async function (request_id, options = {}) {
             }
         }
         results["results_part1"] = await allSettled(req_promises1);
-        
+
         if (options.splitby_enabled) {
             const req_promises2 = [];
             const splitby_stats_urls = get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT,
@@ -577,7 +590,7 @@ const send_parallel_requests = async function (request_id, options = {}) {
 
             results["results_part2"] = await allSettled(req_promises2);
         }
-        
+
 
         response["data"] = results;
     } catch (err) {
@@ -599,7 +612,7 @@ async function disable_warmup_cloudwatch_rule() {
         const cloudwatchevent_params = {
             Name:               params.Name,
             Description:        description,
-            ScheduleExpression: `rate(${process.env.WARMUP_EVENT_SCHEDULE_RATE} minutes)`,
+            ScheduleExpression: `rate(${process.env.WARMUP_EVENT_SCHEDULE_RATE})`,
             State:              "DISABLED"
         };
         const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();
@@ -607,6 +620,29 @@ async function disable_warmup_cloudwatch_rule() {
     } catch (err) {
         console.error(`[warmup_handler] disable_warmup_cloudwatch_rule | error: ${JSON.stringify(err)}`, err);
     }
+}
+
+async function publish_warmup_events() {
+    const queue_url = get_warmup_queue_url();
+    let params = {
+        QueueUrl: queue_url,
+        Entries:  []
+    };
+    for (var i = 0; i < WARMUP_EVENT_COUNT; i++) {
+        let event_delay_offset = Math.floor(Math.random() * WARMUP_EVENT_DELAY_OFFSET_MAX);
+        let delay = ((WARMUP_EVENT_DELAY_BASE + event_delay_offset) * WARMUP_EVENT_COUNT) % WARMUP_EVENT_DELAY_MAX;
+        params.Entries.push({
+            Id:           i.toString(),
+            MessageBody:  JSON.stringify({ stage: process.env.STAGE }),
+            DelaySeconds: delay
+        });
+    }
+
+    await sqs.sendMessageBatch(params, (err, data) => {
+        console.info(`[warmup_handler] batch request callback data: ${JSON.stringify(data)}, ` + 
+        `error: ${JSON.stringify(err)}`);
+    }).promise().catch(err => { console.error(err); });
+
 }
 
 const handler = async function (event, context, callback) {
@@ -621,8 +657,11 @@ const handler = async function (event, context, callback) {
                 console.info("[warmup_handler] No recent user sessions found, disabling rule...");
                 await disable_warmup_cloudwatch_rule();
             } else {
-                console.error("[warmup_handler] ${recent_sessions.length} recent user sessions found, " +
-                    "no changes will be made to cloudwatch rules");
+                if (event["water"]) {
+                    console.error(`[warmup_handler] ${recent_sessions.length} recent user sessions found, ` +
+                        "publishing delayed messages to warmup queue");
+                    await publish_warmup_events();
+                }
             }
             response = {
                 statusCode: response.status,

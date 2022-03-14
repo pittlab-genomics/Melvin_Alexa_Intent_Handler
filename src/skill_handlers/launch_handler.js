@@ -70,7 +70,7 @@ async function update_warmup_cloudwatch_rule() {
         const cloudwatchevent_params = {
             Name:               params.Name,
             Description:        description,
-            ScheduleExpression: `rate(${process.env.WARMUP_EVENT_SCHEDULE_RATE} minutes)`,
+            ScheduleExpression: `rate(${process.env.WARMUP_EVENT_SCHEDULE_RATE})`,
             State:              "ENABLED"
         };
         const update_result = await cloudwatchevents.putRule(cloudwatchevent_params).promise();

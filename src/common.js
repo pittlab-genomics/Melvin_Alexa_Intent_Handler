@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const nunjucks = require("nunjucks");
+require("console-stamp")(console, { format: ":date(yyyy/mm/dd HH:MM:ss.l) :label" } );
 
 const { GeneSSMLMappings } = require("./utils/gene_pronunciation_mappings.js");
 const { CANCER_TYPES } = require("./utils/cancer_types.js");
@@ -224,6 +225,10 @@ nunjucks_env.addGlobal("melvin_round", melvin_round);
 nunjucks_env.addGlobal("total_cancer_types", total_cancer_types);
 nunjucks_env.addGlobal("filter_domains", filter_domains);
 
+const delay_ms = ms => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
 module.exports = {
     // Welcome greeting specific to the deployment environment helps to identify which skill is being used
     MELVIN_WELCOME_GREETING:  process.env.MELVIN_WELCOME_GREETING,
@@ -235,6 +240,7 @@ module.exports = {
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
     STAGE:                    process.env.STAGE,
     WARMUP_SERVICE_ENABLED:   process.env.WARMUP_SERVICE_ENABLED,
+    delay_ms,
     MelvinAttributes,
     MelvinEventTypes,
     get_user_preference_name,

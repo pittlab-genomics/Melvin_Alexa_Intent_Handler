@@ -1,7 +1,6 @@
 const AWS = require("aws-sdk");
 const { sign_request } = require("../utils/sigv4_utils");
-const fetch = require("node-fetch");
-const AbortController = require("abort-controller");
+const fetch = require("@adobe/node-fetch-retry");
 const https = require("https");
 const { performance } = require("perf_hooks");
 
@@ -15,19 +14,19 @@ const {
 
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
-const oov_timeout = 3000;
+const oov_timeout = 4000;
 
 const send_request_async = function (url, timeout, headers) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-    setTimeout(() => {
-        controller.abort();
-    }, timeout);
-
     console.info(`[send_request_async] oov url: ${url.href}`);
     const t1 = performance.now();
     return fetch(url, {
-        headers, signal, agent
+        headers:      headers,
+        retryOptions: {
+            retryMaxDuration:  timeout,
+            retryInitialDelay: 1000,
+            retryBackoff:      1.0,
+            socketTimeout:     1500
+        }
     }).then(async (response) => {
         const t2 = performance.now();
         console.info(`[send_request_async] OOV request took ${(t2 - t1)} ms | response status: ${response.status}`);

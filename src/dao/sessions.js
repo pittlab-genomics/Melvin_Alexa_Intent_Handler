@@ -58,7 +58,7 @@ sessions_doc.prototype.getRecentSessions = async (duration=3600) => {
         ExpressionAttributeNames:  { "#session_start": "session_start" },
         ExpressionAttributeValues: { ":start": start_timestamp },
         ScanIndexForward:          false,
-        Limit:                     100
+        Limit:                     500
     };
 
     session_list = await scanEntireTable(docClient, query_params);

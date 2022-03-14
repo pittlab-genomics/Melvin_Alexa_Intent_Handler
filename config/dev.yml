@@ -15,6 +15,7 @@ environment:
   OOV_MAPPER_REGION: "ap-southeast-1"
   WARMUP_SERVICE_ENABLED: true
   WARMUP_EVENT_RULE_NAME: "melvin-warmup-event-rule-${self:provider.stage}"
-  WARMUP_EVENT_SCHEDULE_RATE: 2
+  WARMUP_EVENT_SCHEDULE_RATE: 1 minute
+  WARMUP_EVENT_COUNT: 3
 alexa:
   appId: amzn1.ask.skill.76bde827-301f-478d-af1a-c7241f046388
