@@ -5,7 +5,7 @@ const {
     MELVIN_EXPLORER_REGION
 } = require("../common.js");
 const {
-    sign_request, build_presigned_url 
+    sign_request, build_presigned_url
 } = require("./sigv4_utils");
 
 const APLDocs = {
@@ -155,7 +155,6 @@ const add_to_APL_text_pager = function (handlerInput, text) {
         handlerInput.responseBuilder.addDirective({
             type:        "Alexa.Presentation.APL.RenderDocument",
             token:       "pagerToken",
-            version:     "1.0",
             document:    text_pager_doc,
             datasources: { "pagerTemplateData": {
                 "type":        "object",
@@ -197,23 +196,12 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
         handlerInput.responseBuilder.addDirective({
             type:        "Alexa.Presentation.APL.RenderDocument",
             token:       "pagerToken",
-            version:     "1.0",
             document:    image_pager_doc,
             datasources: { "pagerTemplateData": {
                 "type":        "object",
                 "properties":  build_APL_datasource_properties(signed_url_list),
                 "footer_text": build_APL_footer_text(handlerInput)
             }},
-        });
-
-        const apl_img_update_commands = [];
-        signed_url_list.forEach(function (url, index) {
-            apl_img_update_commands.push({
-                "type":        "SetValue",
-                "property":    "source",
-                "value":       url,
-                "componentId": `Page${index}_image_container`
-            });
         });
 
         handlerInput.responseBuilder.addDirective({
@@ -225,18 +213,12 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                     "commands": [
                         {
                             "type":  "Idle",
-                            "delay": 120000
+                            "delay": 3000
                         },
                         {
                             "type":        "AutoPage",
                             "componentId": "pagerComponentId",
-                            "duration":    5000,
-                            "delay":       3000
-                        },
-                        {
-                            "type":     "Parallel",
-                            "delay":    3500,
-                            "commands": apl_img_update_commands
+                            "duration":    5000
                         }
                     ]
                 }

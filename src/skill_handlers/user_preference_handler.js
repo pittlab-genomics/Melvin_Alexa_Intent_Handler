@@ -1,6 +1,19 @@
 const _ = require("lodash");
-const { get_user_preference_name } = require("../common");
-const { getUserInfo } = require("../utils/preference_utils");
+
+const {
+    get_user_preference_name,
+    MelvinIntentErrors,
+    PREFERENCES_PROF_INFO_ERROR_RESPONSE,
+    PREFERENCES_PERMISSION_ERROR,
+    PREFERENCES_ERROR_REPROMPT,
+    PREFERENCES_UPDATE_SUCCESS,
+    melvin_error
+} = require("../common");
+
+const { build_melvin_voice_response } = require("../utils/response_builder_utils.js");
+
+const { get_profile_info } = require("../http_clients/profile_client");
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 
 const EnableUserPreferenceIntentHandler = {
     canHandle(handlerInput) {
@@ -8,41 +21,37 @@ const EnableUserPreferenceIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "EnableUserPreferenceIntent";
     },
     async handle(handlerInput) {
-        const { accessToken } = handlerInput.requestEnvelope.context.System.user;
-        let speechText = "";
-        let repromptText = "";
-    
-        if (!accessToken) {
-            speechText = "You must authenticate with your Amazon Account to use this feature." + 
-                " Go to the home screen in your Alexa app and follow the instructions. What else?";
-            repromptText = "What else?";
+        const access_token = _.get(handlerInput, "requestEnvelope.context.System.user.accessToken");
+        let speech_text = "";
+        let reprompt_text = "";
+
+        if (_.isNil(access_token)) {
+            speech_text = build_melvin_voice_response(PREFERENCES_PERMISSION_ERROR);
+            reprompt_text = build_melvin_voice_response(PREFERENCES_PERMISSION_ERROR);
             return handlerInput.responseBuilder
-                .speak(speechText)
-                .reprompt(repromptText)
+                .speak(speech_text)
+                .reprompt(reprompt_text)
                 .withLinkAccountCard()
-                .getResponse();
-        } else {
-            const preferenceName = get_user_preference_name(_.get(handlerInput, 
-                "requestEnvelope.request.intent.slots.preference.value"));
-            const userInfo = await getUserInfo(accessToken);
-            let { user_id } = userInfo;
-
-            const attributesManager = handlerInput.attributesManager;
-            let attributes = {
-                [preferenceName]: true, "user_id": user_id
-            };
-
-            attributesManager.setPersistentAttributes(attributes);
-            await attributesManager.savePersistentAttributes();
-            console.log(`[EnableUserPreferenceIntentHandler] preferenceName: ${preferenceName}, ` +
-                `userInfo: ${JSON.stringify(userInfo)}`);
-            speechText = "Your preference was updated. What else?";
-            repromptText = "What else?";
-            return handlerInput.responseBuilder
-                .speak(speechText)
-                .reprompt(repromptText)
+                .withShouldEndSession(false)
                 .getResponse();
         }
+
+        try {
+            const response = await update_preference_flag(handlerInput, access_token, true);
+            speech_text = build_melvin_voice_response(response["speech_text"]);
+            reprompt_text = build_melvin_voice_response(response["reprompt_text"]);
+        } catch (error) {
+            speech_text = build_melvin_voice_response(_.get(error, "speech", PREFERENCES_PROF_INFO_ERROR_RESPONSE));
+            reprompt_text = build_melvin_voice_response(PREFERENCES_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error("[EnableUserPreferenceIntentHandler] Error! except: ", error);
+        }
+
+        return handlerInput.responseBuilder
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
+            .getResponse();
     }
 };
 
@@ -52,42 +61,68 @@ const DisableUserPreferenceIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "DisableUserPreferenceIntent";
     },
     async handle(handlerInput) {
-        const { accessToken } = handlerInput.requestEnvelope.context.System.user;
-        let speechText = "";
-        let repromptText = "";
-    
-        if (!accessToken) {
-            speechText = "You must authenticate with your Amazon Account to use this feature." + 
-                " Go to the home screen in your Alexa app and follow the instructions. What else?";
-            repromptText = "What else?";
+        const access_token = _.get(handlerInput, "requestEnvelope.context.System.user.accessToken");
+        let speech_text = "";
+        let reprompt_text = "";
+
+        if (_.isNil(access_token)) {
+            speech_text = build_melvin_voice_response(PREFERENCES_PERMISSION_ERROR);
+            reprompt_text = build_melvin_voice_response(PREFERENCES_PERMISSION_ERROR);
             return handlerInput.responseBuilder
-                .speak(speechText)
-                .reprompt(repromptText)
+                .speak(speech_text)
+                .reprompt(reprompt_text)
                 .withLinkAccountCard()
-                .getResponse();
-        } else {
-            const preferenceName = get_user_preference_name(_.get(handlerInput, 
-                "requestEnvelope.request.intent.slots.preference.value"));
-            const userInfo = await getUserInfo(accessToken);
-            let { user_id } = userInfo;
-
-            const attributesManager = handlerInput.attributesManager;
-            let attributes = {
-                [preferenceName]: false, "user_id": user_id
-            };
-
-            attributesManager.setPersistentAttributes(attributes);
-            await attributesManager.savePersistentAttributes();
-            console.log(`[DisableUserPreferenceIntentHandler] preferenceName: ${preferenceName}, ` +
-                `userInfo: ${JSON.stringify(userInfo)}`);
-            speechText = "Your preference was updated. What else?";
-            repromptText = "What else?";
-            return handlerInput.responseBuilder
-                .speak(speechText)
-                .reprompt(repromptText)
+                .withShouldEndSession(false)
                 .getResponse();
         }
+
+        try {
+            const response = await update_preference_flag(handlerInput, access_token, false);
+            speech_text = build_melvin_voice_response(response["speech_text"]);
+            reprompt_text = build_melvin_voice_response(response["reprompt_text"]);
+        } catch (error) {
+            speech_text = build_melvin_voice_response(_.get(error, "speech", PREFERENCES_PROF_INFO_ERROR_RESPONSE));
+            reprompt_text = build_melvin_voice_response(PREFERENCES_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[DisableUserPreferenceIntentHandler] error: ${error.message}`, error);
+        }
+        return handlerInput.responseBuilder
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
+            .getResponse();
+
     }
+};
+
+const update_preference_flag = async (handlerInput, access_token, flag) => {
+    if (_.isNil(access_token) || _.isNil(flag)) {
+        throw melvin_error(
+            "[user_preference_handler] invalid arguments",
+            MelvinIntentErrors.INVALID_ARGUMENTS,
+            PREFERENCES_PROF_INFO_ERROR_RESPONSE);
+    }
+    const preference_name = get_user_preference_name(
+        _.get(handlerInput, "requestEnvelope.request.intent.slots.preference.value"));
+    const user_info = await get_profile_info(access_token);
+    const new_preferences = {
+        [preference_name]: flag,
+        "user_id":         user_info["user_id"],
+        "email":           user_info["email"]
+    };
+
+    const attributesManager = handlerInput.attributesManager;
+    const curr_preferences = attributesManager.getPersistentAttributes();
+    attributesManager.setPersistentAttributes({
+        ...curr_preferences, ...new_preferences
+    });
+    console.info(`[user_preference_handler] preference_name: ${preference_name}, ` +
+        `curr_preferences: ${JSON.stringify(curr_preferences)}, user_info: ${JSON.stringify(user_info)}`);
+    await attributesManager.savePersistentAttributes();
+    return {
+        "speech_text":   PREFERENCES_UPDATE_SUCCESS,
+        "reprompt_text": PREFERENCES_UPDATE_SUCCESS
+    };
 };
 
 module.exports = {

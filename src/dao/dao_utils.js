@@ -1,7 +1,7 @@
 
 
-const queryEntireTable = async function (docClient, query_params) {
-    console.debug("Querying entire table with params: ", query_params);
+const queryEntireTable = async function (docClient, query_params, limit = 0) {
+    console.debug(`[dao_utils] Querying entire table with params: ${JSON.stringify(query_params)}, limit: ${limit}`);
     let result = [];
     let hasMorePages = true;
     do {
@@ -17,12 +17,15 @@ const queryEntireTable = async function (docClient, query_params) {
         } else {
             hasMorePages = false;
         }
+        if (limit != 0 && result.length >= limit) {
+            hasMorePages = false;
+        }
     } while (hasMorePages);
     return result;
 };
 
-const scanEntireTable = async function (docClient, scan_params) {
-    console.debug("Scanning entire table with params: ", scan_params);
+const scanEntireTable = async function (docClient, scan_params, limit = 0) {
+    console.debug(`[dao_utils] Scanning entire table with params: ${JSON.stringify(scan_params)}, limit: ${limit}`);
     let result = [];
     let hasMorePages = true;
     do {
@@ -36,6 +39,9 @@ const scanEntireTable = async function (docClient, scan_params) {
             hasMorePages = true;
             scan_params.ExclusiveStartKey = data.LastEvaluatedKey;
         } else {
+            hasMorePages = false;
+        }
+        if (limit != 0 && result.length >= limit) {
             hasMorePages = false;
         }
     } while (hasMorePages);

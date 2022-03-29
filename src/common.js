@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const nunjucks = require("nunjucks");
-require("console-stamp")(console, { format: ":date(yyyy/mm/dd HH:MM:ss.l) :label" } );
+require("console-stamp")(console, { format: ":date(yyyy/mm/dd HH:MM:ss.l) :label" });
 
 const { GeneSSMLMappings } = require("./utils/gene_pronunciation_mappings.js");
 const { CANCER_TYPES } = require("./utils/cancer_types.js");
@@ -10,10 +10,15 @@ const { OOVMappings } = require("./utils/oov_mappings.js");
 
 const MELVIN_MAX_HISTORY_ITEMS = 30;
 const FOLLOW_UP_TEXT_THRESHOLD = 2;
-const MAX_EMAIL_RESULT_COUNT = 1000;
+const MAX_EMAIL_RESULT_COUNT = 100;
+const MIN_EMAIL_RESULT_COUNT = 1;
 const MAX_EMAIL_DURATION = 604800; // 1 week
 
-const UserPreferences = { "custom mappings": "CUSTOM_MAPPINGS" };
+const UserPreferences = {
+    "custom mappings": "CUSTOM_MAPPINGS",
+    "brief mode":      "BRIEF_MODE"
+};
+
 const MelvinEventTypes = {
     ANALYSIS_EVENT:           "analysis_event",
     NAVIGATION_REVERT_EVENT:  "navigation_revert_event",
@@ -50,6 +55,7 @@ const MelvinIntentErrors = {
     INVALID_ENTITY_TYPE:  "INVALID_ENTITY_TYPE",
     INVALID_DATA_TYPE:    "INVALID_DATA_TYPE",
     INVALID_API_RESPONSE: "INVALID_API_RESPONSE",
+    INVALID_ARGUMENTS:    "INVALID_ARGUMENTS",
     MISSING_GENE:         "MISSING_GENE",
     MISSING_DTYPE:        "MISSING_DTYPE",
     MISSING_STUDY:        "MISSING_STUDY",
@@ -132,11 +138,11 @@ const get_gene_speech_text = function (gene_name) {
     return gene_speech_text;
 };
 
-const get_oov_mappings_response = function (query) {
+const get_whitelisted_oov_mapping = function (query) {
     let response = null;
     if (_.has(OOVMappings, query)) {
         response = OOVMappings[query];
-        console.log(`[get_oov_mappings_response] query: ${query}, response: ${response}`);
+        console.info(`[whitelisted_oov_mapping] Whitelisted mapping found | query: ${query}, response: ${response}`);
     }
 
     return response;
@@ -188,15 +194,57 @@ const RequiredAttributesClinvar = {};
 RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
+const OOV_PR_SPEECH = "I'm still trying to resolve the query, please wait.<break time=\"2s\"/>";
+const AE_PR_SPEECH = "I'm still looking up on that, please wait.<break time=\"2s\"/>";
+const AE_PR_SPEECH_RETRY = "This is taking longer than usual, please wait.<break time=\"2s\"/>";
+
+const DEFAULT_ERROR_REPROMPT = "Please try again.";
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
     " Please try again later.";
 const DEFAULT_INVALID_STATE_RESPONSE = "Sorry, I got lost during the conversation. Please start over.";
 const DEFAULT_NOT_IMPLEMENTED_RESPONSE = "I'm still working on implementing this analysis. Please try again later.";
 const DEFAULT_OOV_MAPPING_ERROR_RESPONSE = "Sorry, something went wrong while resolving the query utterance. " +
     "Please try again later.";
+
+const PREFERENCES_UPDATE_SUCCESS = "Your preference was updated. <break time=\"1s\"/>What else?";
+const PREFERENCES_PROF_INFO_ERROR_RESPONSE = "Something went wrong while updating your preference." +
+    "Please try again later.";
+const PREFERENCES_PROF_INFO_API_ERROR_RESPONSE = "Something went wrong while retrieving your profile information." +
+    "Please try again later.";
+const PREFERENCES_PERMISSION_ERROR = "You must authenticate with your Amazon Account to use this feature." 
+    + "Please go to the home screen in your Alexa app and follow the instructions. <break time=\"1s\"/>What else?";
+    
 const DEFAULT_AE_ACCESS_ERROR_RESPONSE = "Sorry, I'm having trouble accessing the dataset. Please try again later.";
 const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " +
     "Please try again later.";
+const EMAIL_ERROR = "Something went wrong while sending the results. Please try again later.";
+const EMAIL_SUCCESS_RANGE = "Ok, I'm emailing results during that period. " 
+    + "Please check your inbox in a while. <break time=\"1s\"/> What else?";
+const EMAIL_SUCCESS_COUNT = "Ok, I'm emailing that to you now. Please check your inbox in a while." 
+    + "<break time=\"1s\"/>What else?";
+const EMAIL_SUCCESS_REPROMPT = "Please check your inbox in a while. <break time=\"1s\"/>What else?";
+const EMAIL_PERMISSION_ERROR = "In order to email, Melvin will need access to your email address. " 
+    + "Go to the home screen in your Alexa app and grant me permissions.";
+const RESTORE_SESSION_NO_PREV = "I could not find any previous sessions. " 
+    + "Please continue with current analysis.";
+const RESTORE_SESSION_NO_ANALYSIS = "I could not find any analysis performed in your previous session. " 
+    + "Please continue with current analysis.";
+const RESTORE_SESSION_ERROR = "Something went wrong while restoring the session. Please try again later.";
+const RESTORE_SESSION_SUCCESS = "Ok. Your last session was restored. You may continue from your last analysis now.";
+const RESTORE_SESSION_SUCCESS_REPROMPT = "Your last session was restored. <break time=\"1s\"/>What else?";
+const STEP_BACK_END = "I'm unable to step back as you have reached the end. Please provide a new query.";
+const STEP_BACK_END_REPROMPT = "Please provide a new query.";
+const SPLITBY_ERROR_INCOMPLETE_STATE = "Sorry, this split-by operation is not supported. "
+    + "You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. "
+    + "Only then you can splitby another gene or datatype within the same cancer type. "
+    + "Now, what would you like to know?";
+const SPLITBY_INVALID_GENE = "Please tell me a different gene from the preliminary analysis. "
+    + "Which gene would you like to split by?";
+const SPLITBY_DTYPE_NOT_SUPPORTED = "Sorry, this split-by operation is not supported. "
+    + "Please provide a different datatype. Which data type would you like to split by?";
+const SPLITBY_ELICIT_DTYPE = "Which data type would you like to split by?";
+const SPLITBY_ELICIT_GENE = "Which gene would you like to split by?";
+
 
 const melvin_error = function (message, type, speech = null) {
     let error = new Error(message);
@@ -236,6 +284,7 @@ module.exports = {
     MELVIN_EXPLORER_REGION:   process.env.MELVIN_EXPLORER_REGION,
     MELVIN_API_INVOKE_ROLE:   process.env.MELVIN_API_INVOKE_ROLE,
     OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
+    PROFILE_INFO_ENDPOINT:    process.env.PROFILE_INFO_ENDPOINT,
     OOV_MAPPER_REGION:        process.env.OOV_MAPPER_REGION,
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
     STAGE:                    process.env.STAGE,
@@ -244,15 +293,40 @@ module.exports = {
     MelvinAttributes,
     MelvinEventTypes,
     get_user_preference_name,
+    OOV_PR_SPEECH,
+    AE_PR_SPEECH,
+    AE_PR_SPEECH_RETRY,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,
     DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
     DEFAULT_AE_ACCESS_ERROR_RESPONSE,
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
+    PREFERENCES_PROF_INFO_ERROR_RESPONSE,
+    PREFERENCES_PROF_INFO_API_ERROR_RESPONSE,
+    PREFERENCES_PERMISSION_ERROR,
+    PREFERENCES_UPDATE_SUCCESS,
+    DEFAULT_ERROR_REPROMPT,
+    EMAIL_ERROR,
+    EMAIL_SUCCESS_RANGE,
+    EMAIL_SUCCESS_COUNT,
+    EMAIL_SUCCESS_REPROMPT,
+    EMAIL_PERMISSION_ERROR,
+    RESTORE_SESSION_NO_PREV,
+    RESTORE_SESSION_NO_ANALYSIS,
+    RESTORE_SESSION_ERROR,
+    RESTORE_SESSION_SUCCESS,
+    RESTORE_SESSION_SUCCESS_REPROMPT,
+    STEP_BACK_END,
+    STEP_BACK_END_REPROMPT,
+    SPLITBY_ERROR_INCOMPLETE_STATE,
+    SPLITBY_INVALID_GENE,
+    SPLITBY_DTYPE_NOT_SUPPORTED,
+    SPLITBY_ELICIT_DTYPE,
+    SPLITBY_ELICIT_GENE,
     SUPPORTED_SPLITBY_DTYPES,
     get_gene_speech_text,
-    get_oov_mappings_response,
+    get_whitelisted_oov_mapping,
     get_study_name_text,
     get_dtype_name_text,
     melvin_round,
@@ -270,6 +344,8 @@ module.exports = {
     MELVIN_MAX_HISTORY_ITEMS,
     FOLLOW_UP_TEXT_THRESHOLD,
     MAX_EMAIL_RESULT_COUNT,
+    MIN_EMAIL_RESULT_COUNT,
     MAX_EMAIL_DURATION,
+    RESPONSE_TEMPLATES_PATH,
     nunjucks_env
 };

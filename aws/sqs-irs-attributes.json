@@ -1,4 +1,0 @@
-{
-    "MessageRetentionPeriod": "300",
-    "VisibilityTimeout": "60"
-}

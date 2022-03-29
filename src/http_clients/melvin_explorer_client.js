@@ -1,7 +1,7 @@
 const _ = require("lodash");
 const AWS = require("aws-sdk");
 const { sign_request } = require("../utils/sigv4_utils");
-const fetch = require("node-fetch");
+const fetch = require("@adobe/node-fetch-retry");
 const allSettled = require("promise.allsettled");
 const AbortController = require("abort-controller");
 const https = require("https");
@@ -12,54 +12,91 @@ const {
     melvin_error,
     DEFAULT_AE_ACCESS_ERROR_RESPONSE,
     DEFAULT_AE_CONNECT_ERROR_RESPONSE,
+    AE_PR_SPEECH,
+    AE_PR_SPEECH_RETRY,
     MELVIN_EXPLORER_ENDPOINT,
     MELVIN_EXPLORER_REGION,
     MelvinExplorerErrors,
     delay_ms
 } = require("../common.js");
-
 const {
     add_query_params, add_query_list_params, call_directive_service, build_ssml_response_from_nunjucks
 } = require("../utils/response_builder_utils.js");
+const { build_melvin_voice_response } = require("../utils/response_builder_utils.js");
 
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
-const ae_timeout_1 = 4500;
-const ae_timeout_2 = 8000;
-const pr_delay = 3500;
-const ae_break_timeout_1 = 3000;
-const pr_speech = "<speak>I'm still working on it, please wait. <break time=\"2s\"/></speak>";
+const AE_DEFAULT_MAX_DURATION = 18000;
+const AE_DEFAULT_SOCKET_TIMEOUT = 8000;
+const AE_DEFAULT_INITIAL_DELAY = 500;
+const PR_DELAY_FIRST = 2000;
+const PR_DELAY_SECOND = 5000;
 
-const send_request_async = function (url, headers, signal) {
-    console.info(`[send_request_async] AE url: ${url}`);
+const send_request_async = function (url, headers, handlerInput) {
+    console.info(`[melvin_explorer_client] AE url: ${url}`);
+    const t1 = performance.now();
     return fetch(url, {
-        headers, signal, agent
-    }).then((response) => {
-        let body = response.json();
+        headers:      headers,
+        retryOptions: {
+            retryMaxDuration:  AE_DEFAULT_MAX_DURATION,
+            retryInitialDelay: AE_DEFAULT_INITIAL_DELAY,
+            retryBackoff:      1.0,
+            socketTimeout:     AE_DEFAULT_SOCKET_TIMEOUT,
+            onRetry:           async (error) => {
+                console.error(`[melvin_explorer_client] AE request failed: ${JSON.stringify(error)}`);
+                const speech_ssml = build_melvin_voice_response(AE_PR_SPEECH_RETRY);
+                await call_directive_service(handlerInput, speech_ssml)
+                    .then(data => {
+                        console.info("[melvin_explorer_client] progressive response on retry sent | "
+                            + `res: ${JSON.stringify(data)}`);
+                    })
+                    .catch(error => {
+                        console.error("[oov_mapper_client] progressive response on retry failed | "
+                            + `error: ${JSON.stringify(error)}`);
+                    });
+            }
+        }
+    }).then(async (response) => {
+        const t2 = performance.now();
+        console.info(`[melvin_explorer_client] AE request took ${(t2 - t1)} ms | response status: ${response.status}`);
         if (response.ok) {
-            return body;
+            return response.json();
         } else {
-            new Promise((resolve, reject) => setTimeout(reject(body), ae_break_timeout_1));
-        }        
-    }).then((response) => {
+            throw await response.json();
+        }
+    }).catch((err) => {
+        throw melvin_error(
+            `[melvin_explorer_client] Melvin Explorer error: ${JSON.stringify(err)}`,
+            MelvinIntentErrors.INVALID_API_RESPONSE,
+            DEFAULT_AE_CONNECT_ERROR_RESPONSE
+        );
+    });
+};
+
+const process_repeat_requests = async function (handlerInput, url, headers) {
+    const controller_pr = new AbortController();
+    const reqAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const oov_pr_sent = _.has(reqAttributes, "OOV_PR_SENT");
+    const ae_req_async = async () => {
+        const response = await send_request_async(url, headers, handlerInput);
+        controller_pr.abort();
         if (_.has(response, "data")) {
             return response;
         } else if (_.has(response, "error")) {
-            console.log(`${JSON.stringify(response)}`);
             if (response["error"] === MelvinExplorerErrors.DATA_IS_ZERO) {
                 let description = "There is no data in the database.";
                 if (response.description != null) {
                     description = response["description"];
                     if (!description.trim().endsWith(".")) description += ".";
                 }
-                throw melvin_error(`[send_request_async] Data is zero error: ${JSON.stringify(response)}`,
+                throw melvin_error(`[melvin_explorer_client] Data is zero error: ${JSON.stringify(response)}`,
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
             } else {
                 console.log(`${JSON.stringify(response)}`);
                 throw melvin_error(
-                    `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
+                    `[melvin_explorer_client] AE response contains error | ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPONSE,
                     DEFAULT_AE_ACCESS_ERROR_RESPONSE
                 );
@@ -67,54 +104,36 @@ const send_request_async = function (url, headers, signal) {
         } else {
             console.log(`${JSON.stringify(response)}`);
             throw melvin_error(
-                `[send_request_async] AE response not ok | ${JSON.stringify(response)}`,
+                `[melvin_explorer_client] AE response does not contain data | ${JSON.stringify(response)}`,
                 MelvinIntentErrors.INVALID_API_RESPONSE,
                 DEFAULT_AE_ACCESS_ERROR_RESPONSE
             );
         }
-    }).catch((err) => {
-        throw melvin_error(
-            `[send_request_async] Melvin Explorer error: ${JSON.stringify(err)}`,
-            (err.type) ? err.type : MelvinIntentErrors.INVALID_API_RESPONSE,
-            (err.speech) ? err.speech : DEFAULT_AE_CONNECT_ERROR_RESPONSE
-        );
-    });
-};
-
-const process_repeat_requests = async function (handlerInput, url, headers, timeout1 = ae_timeout_1,
-    timeout2 = ae_timeout_2) {
-    const controller_short = new AbortController();
-    const controller_pr = new AbortController();
-    setTimeout(() => {
-        controller_short.abort();
-    }, timeout1);
-
-    const t1 = performance.now();
-    const ae_req_1_async = async (resolve) => {
-        let res = await send_request_async(url, headers, controller_short.signal).catch(error => console.error(error));
-        const t2 = performance.now();
-        controller_pr.abort();
-        console.info("[process_repeat_requests] first AE request took " + (t2 - t1) + " ms");
-        resolve(res);
     };
-    const ae_req_1_promise = new Promise(resolve => {
-        ae_req_1_async(resolve);
-    });
-    
-     
-    // schedule Alexa progressive response to indicate that this is going to take little longer
+
+
+    // Alexa progressive response to indicate that analysis engine is going to take little longer
     const send_pr_req_async = async (resolve) => {
-        await delay_ms(pr_delay);
-        let res = {};
+        const adaptive_delay = oov_pr_sent ? PR_DELAY_SECOND : PR_DELAY_FIRST;
+        console.info(`[melvin_explorer_client] adaptive_delay: ${adaptive_delay}`);
+        await delay_ms(adaptive_delay);
         if (!controller_pr.signal.aborted) {
             if (!process.env.IS_LOCAL) {
-                res = await call_directive_service(handlerInput, pr_speech).catch(error => { return error; });
-                console.info("[process_repeat_requests] progressive response sent");
+                const speech_ssml = build_melvin_voice_response(AE_PR_SPEECH);
+                await call_directive_service(handlerInput, speech_ssml)
+                    .then(data => {
+                        console.info("[melvin_explorer_client] progressive response sent | "
+                            + `res: ${JSON.stringify(data)}`);
+                    })
+                    .catch(error => {
+                        console.error("[oov_mapper_client] progressive response failed | "
+                            + `error: ${JSON.stringify(error)}`);
+                    });
             } else {
-                console.info("[process_repeat_requests] skipping progressive response in local environment");
+                console.info("[melvin_explorer_client] skipping progressive response in local environment");
             }
         }
-        resolve(res);
+        resolve();
     };
 
     const pr_promise = new Promise(resolve => {
@@ -124,36 +143,12 @@ const process_repeat_requests = async function (handlerInput, url, headers, time
         send_pr_req_async(resolve);
     });
 
-    try {
-        const result1 = await allSettled([pr_promise, ae_req_1_promise]);
-        console.info(`[process_repeat_requests] promises results: ${JSON.stringify(result1)}`);
-        let t3 = performance.now();
-        console.info("[process_repeat_requests] first AE attempt took " + (t3 - t1) + " ms");
-        if (result1[1]["status"] === "fulfilled") {
-            return result1[1]["value"];
-        }        
-    } catch (err) {
-        let t3 = performance.now();
-        console.error("[process_repeat_requests] first AE attempt failed and took " + (t3 - t1) +
-            ` ms | err: ${JSON.stringify(err)}`);
-    }
-
-    const controller_long = new AbortController();
-    setTimeout(() => {
-        controller_long.abort();
-    }, timeout2);
-
-    const t4 = performance.now();
-    try {
-        const result2 = await send_request_async(url, headers, controller_long.signal);
-        const t5 = performance.now();
-        console.info("[process_repeat_requests] second AE request took " + (t5 - t4) + " ms");
-        return result2;
-    } catch (err) {
-        const t6 = performance.now();
-        console.error("[process_repeat_requests] second AE request failed and took " + (t6 - t4) +
-            ` ms | err: ${JSON.stringify(err)}`);
-        throw err;
+    const t1 = performance.now();
+    const results = await allSettled([pr_promise, ae_req_async()]);
+    const t2 = performance.now();
+    console.info(`[melvin_explorer_client] AE process took ${t2 - t1} ms, results: ${JSON.stringify(results)}`);
+    if (results[1]["status"] === "fulfilled") {
+        return results[1]["value"];
     }
 };
 
@@ -172,7 +167,7 @@ const get_mutations_tcga_stats = async function (handlerInput, params) {
         return await process_repeat_requests(handlerInput, mutations_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
-            const nunjucks_context = { melvin_state: params, };
+            const nunjucks_context = { melvin_state: params };
             const speech_ssml = build_ssml_response_from_nunjucks("error/data_is_zero.njk", nunjucks_context);
             throw melvin_error(
                 `[get_mutations_tcga_stats] Melvin Explorer error: ${JSON.stringify(err)}`,

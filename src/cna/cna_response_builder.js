@@ -15,21 +15,19 @@ const {
 const { get_cna_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
-async function build_cna_tcga_response(handlerInput, melvin_state) {
+async function build_cna_tcga_response(handlerInput, melvin_state, opts={}) {
     const image_list = [];
     const response = await get_cna_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
         response:     response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("cna/cna_tcga.njk", nunjucks_context);
     add_cna_tcga_plot(image_list, melvin_state);
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("cna/cna_tcga.njk", nunjucks_context, opts);
 }
 
-async function build_cna_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff) {
+async function build_cna_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff, opts={}) {
     const image_list = [];
     const results = await Promise.all([
         get_cna_tcga_stats(handlerInput, melvin_state),
@@ -42,12 +40,10 @@ async function build_cna_compare_tcga_response(handlerInput, melvin_state, compa
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("cna/cna_compare_tcga.njk", nunjucks_context);
     add_cna_tcga_plot(image_list, melvin_state);
     add_cna_tcga_plot(image_list, compare_params);
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("cna/cna_compare_tcga.njk", nunjucks_context, opts);
 }
 
 

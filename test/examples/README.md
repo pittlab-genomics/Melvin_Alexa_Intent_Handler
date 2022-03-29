@@ -94,6 +94,10 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateC
 
 
 ### Splitby - MUTATIONS vs CNA
+
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateSplitbyIntent_exp_mut.json
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateSplitbyIntent_exp_G1_G2.json
+
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateSplitbyIntent_exp_mut_G1_G2.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateSplitbyIntent_mut_exp_G1_G2.json
 
@@ -136,3 +140,6 @@ serverless invoke local --function sqs_irs_subscriber --path ./test/examples/irs
 
 ### Warmup service
 serverless invoke local --function warmup_service
+
+### User Preferences
+serverless invoke local --function alexa-skill -p ./test/examples/other/EnableBriefMode_payload.json

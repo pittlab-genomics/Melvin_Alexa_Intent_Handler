@@ -17,17 +17,15 @@ const {
     get_mutations_tcga_stats,
     get_mutations_tcga_domain_stats
 } = require("../http_clients/melvin_explorer_client.js");
-//const { get_mutations_clinvar_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
-async function build_mutations_tcga_response(handlerInput, melvin_state) {
+async function build_mutations_tcga_response(handlerInput, melvin_state, opts={}) {
     const image_list = [];
     const response = await get_mutations_tcga_stats(handlerInput, melvin_state);
     const nunjucks_context = {
         melvin_state: melvin_state,
         response:     response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -47,11 +45,10 @@ async function build_mutations_tcga_response(handlerInput, melvin_state) {
     }
 
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context, opts);
 }
 
-async function build_mutations_tcga_domain_response(handlerInput, melvin_state) {
+async function build_mutations_tcga_domain_response(handlerInput, melvin_state, opts={}) {
     const image_list = [];
     const response = await get_mutations_tcga_domain_stats(handlerInput, melvin_state);
     const records_list = response["data"]["records"].filter(item => item["domain"] !== "none");
@@ -61,7 +58,6 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
         response:     response,
         records_list: records_list
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -70,11 +66,10 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state) 
         add_mutations_tcga_plot(image_list, melvin_state, "domstack");
     }
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context, opts);
 }
 
-async function build_mutations_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff) {
+async function build_mutations_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff, opts={}) {
     const image_list = [];
     const results = await Promise.all([
         get_mutations_tcga_stats(handlerInput, melvin_state),
@@ -87,8 +82,6 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context);
-
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
 
@@ -114,26 +107,8 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
     }
 
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context, opts);
 }
-
-// async function build_mutations_clinvar_response(handlerInput, params) {
-//     const image_list = [];
-//     const response = await get_mutations_clinvar_stats(handlerInput, params);
-//     const nunjucks_context = {
-//         melvin_state: params,
-//         response:     response
-//     };
-//     const speech_ssml = build_ssml_response_from_nunjucks("mutations/mutations_clinvar.njk", nunjucks_context);
-
-//     if (!_.isEmpty(params[MelvinAttributes.GENE_NAME]) && !_.isEmpty(params[MelvinAttributes.STUDY_ABBRV])) {
-//         add_mutations_clinvar_stats_plot(image_list, params);
-//     }
-//     add_to_APL_image_pager(handlerInput, image_list);
-
-//     return { "speech_text": speech_ssml };
-// }
 
 const add_mutations_tcga_plot = function (image_list, params, style) {
     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_plot`);
@@ -144,20 +119,13 @@ const add_mutations_tcga_plot = function (image_list, params, style) {
     image_list.push(count_plot_url);
 };
 
-// const add_mutations_clinvar_stats_plot = function (image_list, params) {
-//     const count_plot_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/clinvar/plot`);
-//     add_query_params(count_plot_url, params);
-//     image_list.push(count_plot_url);
-// };
-
-async function build_mutations_response(handlerInput, params) {
+async function build_mutations_response(handlerInput, params, opts={}) {
     console.info(`[build_mutations_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_response(handlerInput, params);
+        response = await build_mutations_tcga_response(handlerInput, params, opts);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
-        //response = await build_mutations_clinvar_response(handlerInput, params);
         throw melvin_error(
             `[build_mutations_response] not implemented: ${JSON.stringify(params)}`,
             MelvinIntentErrors.NOT_IMPLEMENTED,
@@ -174,11 +142,11 @@ async function build_mutations_response(handlerInput, params) {
     return response;
 }
 
-async function build_mutations_domain_response(handlerInput, params) {
+async function build_mutations_domain_response(handlerInput, params, opts={}) {
     console.info(`[build_mutations_domain_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_tcga_domain_response(handlerInput, params);
+        response = await build_mutations_tcga_domain_response(handlerInput, params, opts);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(
@@ -197,11 +165,11 @@ async function build_mutations_domain_response(handlerInput, params) {
     return response;
 }
 
-async function build_mutations_compare_response(handlerInput, params, compare_params, state_diff) {
+async function build_mutations_compare_response(handlerInput, params, compare_params, state_diff, opts={}) {
     console.info(`[build_mutations_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_mutations_compare_tcga_response(handlerInput, params, compare_params, state_diff);
+        response = await build_mutations_compare_tcga_response(handlerInput, params, compare_params, state_diff, opts);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(

@@ -1,7 +1,8 @@
 environment:
   STAGE: ${self:provider.stage}
+  REGION: ${self:provider.region}
   WARMUP_EVENT_RULE_NAME: "melvin-warmup-event-rule-${self:provider.stage}"
-  MELVIN_WELCOME_GREETING: "Welcome to Melvin."
+  MELVIN_WELCOME_GREETING: "Welcome to Melvin"
   MELVIN_APP_NAME: "Melvin"
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}
   DYNAMODB_TABLE_USER_SESSION: melvin-user-session-${self:provider.stage}
@@ -14,8 +15,9 @@ environment:
   MELVIN_EXPLORER_REGION: "ap-southeast-1"
   OOV_MAPPER_ENDPOINT: "https://api.uat.oovm.pittlabgenomics.com/v0.1"
   OOV_MAPPER_REGION: "ap-southeast-1"
+  PROFILE_INFO_ENDPOINT: "https://api.amazon.com/user/profile"
   WARMUP_SERVICE_ENABLED: true
   WARMUP_EVENT_SCHEDULE_RATE: 1 minute
-  WARMUP_EVENT_COUNT: 5
+  WARMUP_EVENT_COUNT: 3
 alexa:
   appId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d

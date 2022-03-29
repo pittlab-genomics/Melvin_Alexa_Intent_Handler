@@ -31,7 +31,9 @@ const {
 } = require("../http_clients/melvin_explorer_client.js");
 
 const { add_to_APL_image_pager } = require("../utils/APL_utils.js");
-const { build_ssml_response_from_nunjucks } = require("../utils/response_builder_utils.js");
+const {
+    build_ssml_response_from_nunjucks, build_text_speech_and_reprompt_response 
+} = require("../utils/response_builder_utils.js");
 
 async function build_splitby_clinvar_response(handlerInput, melvin_state, splitby_state) {
     const nunjucks_context = {
@@ -40,8 +42,7 @@ async function build_splitby_clinvar_response(handlerInput, melvin_state, splitb
         splitby_state: splitby_state,
     };
 
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_clinvar.njk", nunjucks_context);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_clinvar.njk", nunjucks_context);
 }
 
 const add_gain_gain_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -63,11 +64,9 @@ async function build_gain_gain_splitby_tcga_response(handlerInput, melvin_state,
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_gain_gain_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_gain_loss_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -89,11 +88,9 @@ async function build_gain_loss_splitby_tcga_response(handlerInput, melvin_state,
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_gain_loss_splitby_tcga_stats_plot(image_list, m_state, s_state);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_loss_loss_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -115,11 +112,9 @@ async function build_loss_loss_splitby_tcga_response(handlerInput, melvin_state,
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_loss_loss_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_cna_cna_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -141,11 +136,9 @@ async function build_cna_cna_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_cna_cna_splitby_tcga_stats_plot(image_list, m_state, s_state);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_cna_gain_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -167,11 +160,9 @@ async function build_cna_gain_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_cna_gain_splitby_tcga_stats_plot(image_list, m_state, s_state);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_cna_loss_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -193,11 +184,9 @@ async function build_cna_loss_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_cna_loss_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_ind_ind_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -219,11 +208,9 @@ async function build_ind_ind_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_ind_ind_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_ind_cna_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -245,11 +232,9 @@ async function build_ind_cna_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_ind_cna_splitby_tcga_stats_plot(image_list, m_state, s_state);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_ind_gain_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -271,11 +256,9 @@ async function build_ind_gain_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_ind_gain_splitby_tcga_stats_plot(image_list, m_state, s_state);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_ind_loss_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -297,11 +280,9 @@ async function build_ind_loss_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_ind_loss_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_snv_snv_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -323,11 +304,9 @@ async function build_snv_snv_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_snv_snv_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_snv_ind_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -349,11 +328,9 @@ async function build_snv_ind_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_snv_ind_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_snv_cna_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -375,11 +352,9 @@ async function build_snv_cna_splitby_tcga_response(handlerInput, melvin_state, s
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_snv_cna_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_snv_gain_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -401,11 +376,9 @@ async function build_snv_gain_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_snv_gain_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_snv_loss_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -427,11 +400,9 @@ async function build_snv_loss_splitby_tcga_response(handlerInput, melvin_state, 
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_snv_loss_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 const add_exp_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -453,11 +424,9 @@ async function build_exp_splitby_tcga_response(handlerInput, melvin_state, split
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_exp_tcga.njk", nunjucks_context);
-
     add_exp_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_exp_tcga.njk", nunjucks_context);
 }
 
 const add_mut_splitby_tcga_stats_plot = function(image_list, melvin_state, splitby_state) {
@@ -479,16 +448,17 @@ async function build_mut_splitby_tcga_response(handlerInput, melvin_state, split
         splitby_state:    splitby_state,
         splitby_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
-
     add_mut_splitby_tcga_stats_plot(image_list, m_state, s_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("splitby/splitby_tcga.njk", nunjucks_context);
 }
 
 async function build_splitby_response(handlerInput, melvin_state, splitby_state) {
+    const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+    const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+    const opts = { "BRIEF_MODE": brief_mode_preference };
     console.info(`[build_splitby_response] melvin_state: ${JSON.stringify(melvin_state)}, ` + 
-        `splitby_state: ${JSON.stringify(splitby_state)}`);
+        `splitby_state: ${JSON.stringify(splitby_state)}, opts: ${JSON.stringify(opts)}`);
     let response = {};
     if (!_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
         splitby_state[MelvinAttributes.STUDY_ABBRV] = melvin_state[MelvinAttributes.STUDY_ABBRV];
@@ -550,7 +520,7 @@ async function build_splitby_response(handlerInput, melvin_state, splitby_state)
             DEFAULT_INVALID_STATE_RESPONSE
         );
     }
-    return response;
+    return build_text_speech_and_reprompt_response(response, opts);
 }
 
 const match_either_splitby_dtype = function(query_dtypes, target) {

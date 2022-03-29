@@ -30,24 +30,10 @@ async function build_gene_expression_tcga_response(handlerInput, params) {
         melvin_state: params,
         exp_response: response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks(
-        "gene_expression/gene_expression_tcga.njk", nunjucks_context);
-
     add_gene_expression_tcga_plot(image_list, params);
-    add_to_APL_image_pager(handlerInput, image_list);    
-    return { "speech_text": speech_ssml };
+    add_to_APL_image_pager(handlerInput, image_list);
+    return build_ssml_response_from_nunjucks("gene_expression/gene_expression_tcga.njk", nunjucks_context);
 }
-
-// async function build_gene_expression_clinvar_response(handlerInput, params) {
-//     const nunjucks_context = {
-//         MelvinAttributes,
-//         melvin_state: params
-//     };
-
-//     const speech_ssml = build_ssml_response_from_nunjucks(
-//         "gene_expression/gene_expression_clinvar.njk", nunjucks_context);
-//     return { "speech_text": speech_ssml };
-// }
 
 async function build_gene_expression_response(handlerInput, params) {
     console.info(`[build_gene_expression_response] params: ${JSON.stringify(params)}`);
@@ -86,13 +72,10 @@ async function build_gene_expression_compare_tcga_response(handlerInput, melvin_
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = 
-        build_ssml_response_from_nunjucks("gene_expression/gene_expression_compare_tcga.njk", nunjucks_context);
     add_gene_expression_tcga_plot(image_list, melvin_state);
     add_gene_expression_tcga_plot(image_list, compare_params);
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("gene_expression/gene_expression_compare_tcga.njk", nunjucks_context);
 }
 
 async function build_gene_expression_compare_response(handlerInput, params, compare_params, state_diff) {

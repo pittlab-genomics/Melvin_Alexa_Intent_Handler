@@ -2,7 +2,7 @@ const _ = require("lodash");
 const AWS = require("aws-sdk");
 const fetch = require("node-fetch");
 const allSettled = require("promise.allsettled");
-const sqs = new AWS.SQS({ region: "eu-west-1" });
+const sqs = new AWS.SQS({ region: process.env.REGION });
 const AbortController = require("abort-controller");
 const {
     sign_request, assume_role, build_presigned_url
@@ -511,7 +511,7 @@ function get_warmup_queue_url() {
     const sqs_ep = process.env.SQS_WARMUP.split(":");
     const account_id = sqs_ep[0];
     const service_name = sqs_ep[1];
-    const queue_url = `https://sqs.eu-west-1.amazonaws.com/${account_id}/${service_name}`;
+    const queue_url = `https://sqs.${process.env.REGION}.amazonaws.com/${account_id}/${service_name}`;
     return queue_url;
 }
 
@@ -519,6 +519,7 @@ function get_warmup_queue_url() {
 const send_parallel_requests = async function (request_id, options = {}) {
     const response = {};
     _.defaults(options,
+        { verbose: true },
         { mapper_enabled: true },
         { mapper_timeout: 3000 },
         { stats_enabled: true },
@@ -540,15 +541,13 @@ const send_parallel_requests = async function (request_id, options = {}) {
         // get auth creds via STS
         const creds_data = await assume_role(MELVIN_API_INVOKE_ROLE, request_id);
 
-        // collect promises for each service type 
-        // TODO: refactor
+        // collect promises for each service type
         const req_promises1 = [];
         if (options.mapper_enabled) {
             for (let cat_item in oov_mapper_ep_path_dict) {
                 const cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]
                     , OOV_MAPPER_REGION, creds_data);
                 cat_url_list.map((url) => req_promises1.push(request_async(url, options.mapper_timeout)));
-                // results[cat_item] = await allSettled();
             }
         }
 
@@ -557,8 +556,6 @@ const send_parallel_requests = async function (request_id, options = {}) {
                 const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]
                     , MELVIN_EXPLORER_REGION, creds_data);
                 cat_url_list.map((url) => req_promises1.push(request_async(url, options.stats_timeout)));
-                // results[cat_item] = await allSettled(
-                //     cat_url_list.map((url) => request_async(url, options.stats_timeout)));
             }
         }
 
@@ -591,8 +588,9 @@ const send_parallel_requests = async function (request_id, options = {}) {
             results["results_part2"] = await allSettled(req_promises2);
         }
 
-
-        response["data"] = results;
+        if (options.verbose) {
+            response["data"] = results;
+        }        
     } catch (err) {
         response["error"] = err;
         console.error(`[send_parallel_requests] error: ${JSON.stringify(err)}`, err);
@@ -641,7 +639,7 @@ async function publish_warmup_events() {
     await sqs.sendMessageBatch(params, (err, data) => {
         console.info(`[warmup_handler] batch request callback data: ${JSON.stringify(data)}, ` + 
         `error: ${JSON.stringify(err)}`);
-    }).promise().catch(err => { console.error(err); });
+    }).promise();
 
 }
 
@@ -658,7 +656,7 @@ const handler = async function (event, context, callback) {
                 await disable_warmup_cloudwatch_rule();
             } else {
                 if (event["water"]) {
-                    console.error(`[warmup_handler] ${recent_sessions.length} recent user sessions found, ` +
+                    console.info(`[warmup_handler] ${recent_sessions.length} recent user sessions found, ` +
                         "publishing delayed messages to warmup queue");
                     await publish_warmup_events();
                 }
@@ -671,7 +669,7 @@ const handler = async function (event, context, callback) {
                 },
             };
         } catch (err) {
-            console.error(`[warmup_handler] Failed to perform idle check | ${JSON.stringify(err)}`);
+            console.error(`[warmup_handler] error: ${err.message}`, err);
             response = {
                 statusCode: 500,
                 body:       err,

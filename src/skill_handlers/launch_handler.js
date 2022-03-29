@@ -1,6 +1,8 @@
 
-const AWS = require("aws-sdk");
+const _ = require("lodash");
+const allSettled = require("promise.allsettled");
 const moment = require("moment");
+const AWS = require("aws-sdk");
 
 const {
     MELVIN_WELCOME_GREETING,
@@ -11,6 +13,9 @@ const {
 const APLDocs = { welcome: require("../../resources/APL/welcome.json") };
 const { supportsAPL } = require("../utils/APL_utils.js");
 const sessions_doc = require("../dao/sessions.js");
+const {
+    build_ssml_response_from_nunjucks, build_melvin_voice_response 
+} = require("../utils/response_builder_utils.js");
 const { send_parallel_requests } = require("../warmup_service/warmup_service.js"); 
 
 
@@ -86,8 +91,10 @@ const LaunchRequestHandler = {
         return handlerInput.requestEnvelope.request.type === "LaunchRequest";
     },
     async handle(handlerInput) {
+        const async_tasks = [];
         const requestEnvelope = handlerInput.requestEnvelope;
         if (requestEnvelope.session.new) {
+            console.info("[LaunchRequestHandler] Adding new session record...");
             const new_session_rec = {
                 "user_id":       requestEnvelope.session.user.userId,
                 "session_start": moment(requestEnvelope.request.timestamp).valueOf(),
@@ -95,17 +102,18 @@ const LaunchRequestHandler = {
                 "request":       requestEnvelope.request,
                 "device":        requestEnvelope.context.System.device
             };
-            await sessions_doc.addUserSession(new_session_rec);
+            async_tasks.push(sessions_doc.addUserSession(new_session_rec));
         }
         if (WARMUP_SERVICE_ENABLED) {
             // publish event to warmup queue in SQS which will be processed async via warmup service 
-            await update_warmup_cloudwatch_rule();
+            async_tasks.push(update_warmup_cloudwatch_rule());
 
             /*
              Send the initial warmup request to external services since it takes a while for warmup service to kick in.
              We set a lower timeout to avoid Launch intent handler from getting stuck on network calls.
             */
             const warmup_opts = {
+                verbose:         false,
                 mapper_enabled:  true,
                 mapper_timeout:  1500,
                 stats_enabled:   true,
@@ -114,21 +122,29 @@ const LaunchRequestHandler = {
                 plots_timeout:   1500,
                 splitby_enabled: false,
             };
-            const warmup_result = await send_parallel_requests(requestEnvelope.request.requestId, warmup_opts);
-            console.info(`[launch_handler] warmup_result: ${JSON.stringify(warmup_result, null, 4)}`);
+            async_tasks.push(send_parallel_requests(requestEnvelope.request.requestId, warmup_opts));
         } else {
             console.info("[launch_handler] warmup service feature is disabled");
         }
 
-        const speechText = MELVIN_WELCOME_GREETING + " Melvin is a voice based cancer genome analytics tool." +
-            " To start exploring, just say 'tell me about' followed by the name of a gene, cancer type, or data type." +
-            " For more information, say help. Now, What would you like to know? ";
-        const repromptText = "You can say 'tell me about' followed by the name of a gene, cancer type, or data type." +
-            " What would you like to know? ";
+        async_tasks.push(handlerInput.attributesManager.getPersistentAttributes());
+        const task_results = await allSettled(async_tasks);
+        console.info(`[launch_handler] task_results: ${JSON.stringify(task_results)}`);
+
+        const preferences = task_results.slice(-1)[0]["value"];
+        const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+        const opts = { "BRIEF_MODE": brief_mode_preference };
+
+        const nunjucks_context = { greeting: MELVIN_WELCOME_GREETING };
+        const speech_ssml = build_melvin_voice_response(
+            build_ssml_response_from_nunjucks("system/welcome.njk", nunjucks_context, opts));
+        const reprompt_text = build_melvin_voice_response(
+            build_ssml_response_from_nunjucks("system/welcome_reprompt.njk", nunjucks_context, opts));
         add_launch_apl_docs(handlerInput);
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(repromptText)
+            .speak(speech_ssml)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };

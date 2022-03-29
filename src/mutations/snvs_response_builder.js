@@ -26,7 +26,6 @@ async function build_snvs_tcga_response(handlerInput, melvin_state) {
         melvin_state: melvin_state,
         response:     response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/snvs_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -41,8 +40,7 @@ async function build_snvs_tcga_response(handlerInput, melvin_state) {
     }
     
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/snvs_tcga.njk", nunjucks_context);
 }
 
 async function build_snvs_tcga_domain_response(handlerInput, melvin_state) {
@@ -55,7 +53,6 @@ async function build_snvs_tcga_domain_response(handlerInput, melvin_state) {
         response:     response,
         records_list: records_list
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/snvs_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && !_.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -63,8 +60,7 @@ async function build_snvs_tcga_domain_response(handlerInput, melvin_state) {
         add_snv_tcga_plot(image_list, melvin_state, "domstack");
     }
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/snvs_tcga.njk", nunjucks_context);
 }
 
 const add_snv_tcga_plot = function (image_list, params, style) {
@@ -134,7 +130,6 @@ async function build_snvs_compare_tcga_response(handlerInput, melvin_state, comp
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("mutations/snvs_compare_tcga.njk", nunjucks_context);
 
     if (!_.isEmpty(melvin_state[MelvinAttributes.GENE_NAME])
         && _.isEmpty(melvin_state[MelvinAttributes.STUDY_ABBRV])) {
@@ -160,8 +155,7 @@ async function build_snvs_compare_tcga_response(handlerInput, melvin_state, comp
     }
 
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("mutations/snvs_compare_tcga.njk", nunjucks_context);
 }
 
 async function build_snvs_compare_response(handlerInput, params, compare_params, state_diff) {

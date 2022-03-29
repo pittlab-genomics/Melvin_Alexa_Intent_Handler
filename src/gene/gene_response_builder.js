@@ -27,7 +27,7 @@ const build_gene_definition_response = async function (handlerInput, params) {
             speech
                 .sayWithSSML(gene_speech_text)
                 .say(`is at ${location}.`)
-                .pause("200ms")
+                .pause("800ms")
                 .say(sentence_sum);
         } else {
             speech.say(sentence_sum);
@@ -37,7 +37,7 @@ const build_gene_definition_response = async function (handlerInput, params) {
     }
 
     add_to_APL_text_pager(handlerInput, speech.ssml(true));
-    return { "speech_text": speech.ssml(true) };
+    return speech;
 };
 
 const build_gene_target_response = async function (handlerInput, params) {
@@ -59,7 +59,7 @@ const build_gene_target_response = async function (handlerInput, params) {
             .say("According to the US FDA,")
             .sayWithSSML(gene_speech_text)
             .say(`has ${count} therapeutic ${bm_sentence} relevant to oncology.`)
-            .pause("200ms")
+            .pause("800ms")
             .say(drugs_sentence);
     } else {
         speech
@@ -67,7 +67,7 @@ const build_gene_target_response = async function (handlerInput, params) {
     }
 
     add_to_APL_text_pager(handlerInput, speech.ssml(true));
-    return { "speech_text": speech.ssml(true) };
+    return speech;
 };
 
 

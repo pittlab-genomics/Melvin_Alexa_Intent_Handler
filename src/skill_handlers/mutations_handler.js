@@ -1,12 +1,21 @@
+const _ = require("lodash");
+
 const {
     DataTypes,
-    DEFAULT_GENERIC_ERROR_SPEECH_TEXT
+    DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
+    DEFAULT_ERROR_REPROMPT
 } = require("../common.js");
 
 const {
     validate_action_intent_state,
     update_melvin_state
 } = require("../utils/navigation_utils.js");
+
+const {
+    build_melvin_voice_response, build_text_speech_and_reprompt_response 
+} = require("../utils/response_builder_utils.js");
+
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 
 const {
     build_mutations_response,
@@ -30,26 +39,30 @@ const NavigateMutationsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateMutationsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
-
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATIONS);
-            const response = await build_mutations_response(handlerInput, melvin_state);
-            speechText = response["speech_text"];
-
+            let response = await build_mutations_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateMutationsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error(`NavigateMutationsIntentHandler: message: ${error.message}`, error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateMutationsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -60,25 +73,30 @@ const NavigateMutationDomainsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateMutationDomainsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.PROTEIN_DOMAINS);
-            const domain_response = await build_mutations_domain_response(handlerInput, melvin_state);
-            speechText = domain_response["speech_text"];
-
+            let response = await build_mutations_domain_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateMutationDomainsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error("Error in NavigateMutationDomainsIntentHandler", error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateMutationDomainsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -89,26 +107,30 @@ const NavigateIndelsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateIndelsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
-
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.INDELS);
-            const response = await build_indels_response(handlerInput, melvin_state);
-            speechText = response["speech_text"];
-
+            let response = await build_indels_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateIndelsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error(`NavigateIndelsIntentHandler: message: ${error.message}`, error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateIndelsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -119,25 +141,30 @@ const NavigateIndelDomainsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateIndelDomainsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.PROTEIN_DOMAINS);
-            const domain_response = await build_indels_domain_response(handlerInput, melvin_state);
-            speechText = domain_response["speech_text"];
-
+            let response = await build_indels_domain_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateIndelDomainsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error("Error in NavigateIndelDomainsIntentHandler", error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateIndelDomainsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -148,26 +175,30 @@ const NavigateSNVsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateSNVsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
-
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.SNV);
-            const response = await build_snvs_response(handlerInput, melvin_state);
-            speechText = response["speech_text"];
-
+            let response = await build_snvs_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateSNVsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error(`NavigateSNVsIntentHandler: message: ${error.message}`, error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateSNVsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -178,25 +209,30 @@ const NavigateSNVDomainsIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateSNVDomainsIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
+        let speech_text = "";
+        let reprompt_text = "";
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.PROTEIN_DOMAINS);
-            const domain_response = await build_snv_domains_response(handlerInput, melvin_state);
-            speechText = domain_response["speech_text"];
-
+            let response = await build_snv_domains_response(handlerInput, melvin_state);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateSNVDomainsIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error("Error in NavigateSNVDomainsIntentHandler", error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateSNVDomainsIntentHandler] error: ${error.message}`, error);
         }
 
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };

@@ -10,6 +10,9 @@ const {
     MELVIN_MAX_HISTORY_ITEMS,
     DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
     DEFAULT_INVALID_STATE_RESPONSE,
+    SPLITBY_ERROR_INCOMPLETE_STATE,
+    SPLITBY_ELICIT_GENE,
+    SPLITBY_ELICIT_DTYPE,
     SUPPORTED_SPLITBY_DTYPES,
     MelvinAttributes,
     MelvinEventTypes,
@@ -20,11 +23,11 @@ const {
     DataTypes,
     DataSources,
     melvin_error,
-    get_oov_mappings_response
+    get_whitelisted_oov_mapping
 } = require("../common.js");
 
+const { build_melvin_voice_response } = require("../utils/response_builder_utils.js");
 const { get_event_type } = require("./handler_configuration.js");
-
 const NAVIGATION_TOPICS = yaml.load("../../resources/navigation/topics.yml");
 
 const get_melvin_state = function (handlerInput) {
@@ -58,7 +61,7 @@ const get_prev_melvin_state = function (handlerInput) {
     const melvin_state = get_melvin_state(handlerInput);
     let prev_melvin_state = {};
     for (let item in melvin_history) {
-        const prev_item = melvin_history[item];
+        let prev_item = melvin_history[item];
         if (!_.isEqual(prev_item["melvin_state"], melvin_state)) {
             prev_melvin_state = prev_item["melvin_state"];
             break;
@@ -78,32 +81,26 @@ const get_melvin_history = function (handlerInput) {
 
 
 const resolve_oov_entity = async function (handlerInput, query) {
-    const attributesManager = handlerInput.attributesManager;
-    const attributes = await attributesManager.getPersistentAttributes() || {};
-
-    const mapping_preference = _.has(attributes, "CUSTOM_MAPPINGS") ? attributes["CUSTOM_MAPPINGS"] : false;
+    const t0 = performance.now();
+    const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+    const mapping_preference = _.has(preferences, "CUSTOM_MAPPINGS") ? preferences["CUSTOM_MAPPINGS"] : false;
     if (mapping_preference) {
-        console.log(`Check custom mappings ${attributes}, mapping setting: ${mapping_preference}`);
+        console.info("[resolve_oov_entity] Looking up custom mappings...");
         let result = await voicerecords_doc.getOOVMappingForQuery(query);
         if (result != null) {
-            console.log(`response - ${JSON.stringify(result[0]["entity_data"])}`);
+            console.debug(`[resolve_oov_entity] response: ${JSON.stringify(result)}`);
             return { "data": result[0]["entity_data"] };
         }
     }
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
     const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
-    const response = get_oov_mappings_response(query);
-    if (!response) {
-        const t0 = performance.now();
+    let result = get_whitelisted_oov_mapping(query);
+    if (!result) {
         try {
             const params = {
                 query, request_id, session_id,
             };
-            const query_response = await get_oov_mapping_by_query(handlerInput, params);
-            const t1 = performance.now();
-            console.log("[resolve_oov_entity] OOV mapping took " + (t1 - t0) + " ms | " +
-                `query_response: ${JSON.stringify(query_response)}`);
-            return query_response;
+            result = await get_oov_mapping_by_query(handlerInput, params);
         } catch (error) {
             const t2 = performance.now();
             console.error("[resolve_oov_entity] OOV request failed and took " + (t2 - t0) + " ms", error);
@@ -112,7 +109,12 @@ const resolve_oov_entity = async function (handlerInput, query) {
                 DEFAULT_OOV_MAPPING_ERROR_RESPONSE);
         }
     }
-    return response;
+    const t1 = performance.now();
+    const reqAttributes = handlerInput.attributesManager.getRequestAttributes();
+    reqAttributes["OOV_COMPLETED_TS"] = t1;
+    handlerInput.attributesManager.setRequestAttributes(reqAttributes);
+    console.info(`[resolve_oov_entity] OOV query resolution took ${t1 - t0} | result: ${JSON.stringify(result)}`);
+    return result;
 };
 
 const update_melvin_state = async function (
@@ -375,7 +377,7 @@ const resolve_splitby_query = async function (handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     sessionAttributes["MELVIN.AUX.STATE"] = melvin_aux_state;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    console.log(`[resolve_splitby_query] updated melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
+    console.info(`[resolve_splitby_query] updated melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
 
     return melvin_aux_state;
 };
@@ -388,28 +390,27 @@ const validate_splitby_melvin_state = function (melvin_state) {
             "[validate_splitby_melvin_state] empty/incomplete melvin state " +
             `| melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.MISSING_STUDY,
-            "Sorry, this split-by operation is not supported. " +
-            "You need to perform a preliminary analysis with a gene and a cancer type in a particular datatype. " +
-            "Only then you can splitby another gene or datatype within the same cancer type. " +
-            "Now, what would you like to know?"
+            SPLITBY_ERROR_INCOMPLETE_STATE
         );
     }
 };
 
-const elicit_splitby_slots = async function (handlerInput, melvin_aux_state, pre_prompt = "") {
+const elicit_splitby_slots = async function (handlerInput, melvin_aux_state) {
     console.log(`[elicit_splitby_slots] melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
-
+    const response = handlerInput.responseBuilder.withShouldEndSession(false);
     if (_.isEmpty(melvin_aux_state[MelvinAttributes.DTYPE])) {
-        return handlerInput.responseBuilder
-            .speak(pre_prompt + "Which data type would you like to split by?")
-            .reprompt("Which data type would you like to split by?")
+        const elicit_text = build_melvin_voice_response(SPLITBY_ELICIT_DTYPE);
+        return response
+            .speak(elicit_text)
+            .reprompt(elicit_text)
             .addElicitSlotDirective("dtype_query")
             .getResponse();
 
     } else if (_.isEmpty(melvin_aux_state[MelvinAttributes.GENE_NAME])) {
-        return handlerInput.responseBuilder
-            .speak(pre_prompt + "Which gene would you like to split by?")
-            .reprompt("Which gene would you like to split by?")
+        const elicit_text = build_melvin_voice_response(SPLITBY_ELICIT_GENE);
+        return response
+            .speak(elicit_text)
+            .reprompt(elicit_text)
             .addElicitSlotDirective("gene_query")
             .getResponse();
 
@@ -437,19 +438,6 @@ const is_splitby_supported = function (query_dtypes) {
     return false;
 };
 
-const validate_splitby_aux_state = function (handlerInput, melvin_state, splitby_state) {
-    const query_dtypes = [melvin_state[MelvinAttributes.DTYPE], splitby_state[MelvinAttributes.DTYPE]];
-
-    if (!is_splitby_supported(query_dtypes)) {
-        return handlerInput.responseBuilder
-            .speak("Sorry, this split-by operation is not supported. " +
-                "Please provide a different datatype. Which data type would you like to split by?")
-            .reprompt("Which data type would you like to split by?")
-            .addElicitSlotDirective("dtype_query")
-            .getResponse();
-    }
-};
-
 const match_compare_dtype = function (query_dtypes, target_dtypes) {
     if ((query_dtypes[0] === target_dtypes[0] && query_dtypes[1] === target_dtypes[1])
         || (query_dtypes[0] === target_dtypes[1] && query_dtypes[1] === target_dtypes[0])
@@ -475,7 +463,7 @@ module.exports = {
     clean_melvin_state,
     clean_melvin_aux_state,
     resolve_splitby_query,
-    validate_splitby_aux_state,
+    is_splitby_supported,
     elicit_splitby_slots,
     validate_splitby_melvin_state,
     match_compare_dtype

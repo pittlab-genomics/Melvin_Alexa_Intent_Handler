@@ -14,7 +14,7 @@ const {
 const { get_ind_gain_compare_tcga_stats } = require("../http_clients/melvin_explorer_client.js");
 
 
-async function build_ind_gain_compare_tcga_response(handlerInput, melvin_state, compare_state, state_diff) {
+async function build_ind_gain_compare_tcga_response(handlerInput, melvin_state, compare_state, state_diff, opts) {
     const image_list = [];
     const response = await get_ind_gain_compare_tcga_stats(handlerInput, melvin_state, compare_state);
     const nunjucks_context = {
@@ -22,18 +22,16 @@ async function build_ind_gain_compare_tcga_response(handlerInput, melvin_state, 
         state_diff:   state_diff,
         response:     response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("dtype_compare/ind_gain.njk", nunjucks_context);
-
     add_ind_gain_tcga_plot(image_list, melvin_state);
     add_to_APL_image_pager(handlerInput, image_list);
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("dtype_compare/ind_gain.njk", nunjucks_context, opts);
 }
 
-async function build_ind_gain_compare_response(handlerInput, params, compare_state, state_diff) {
+async function build_ind_gain_compare_response(handlerInput, params, compare_state, state_diff, opts={}) {
     console.info(`[build_ind_gain_compare_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = await build_ind_gain_compare_tcga_response(handlerInput, params, compare_state, state_diff);
+        response = await build_ind_gain_compare_tcga_response(handlerInput, params, compare_state, state_diff, opts);
 
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         throw melvin_error(

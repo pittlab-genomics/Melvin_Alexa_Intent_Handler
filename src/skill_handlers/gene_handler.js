@@ -1,6 +1,9 @@
+const _ = require("lodash");
+
 const {
     DataTypes,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
+    DEFAULT_ERROR_REPROMPT
 } = require("../common.js");
 
 const {
@@ -8,6 +11,10 @@ const {
     build_gene_target_response
 } = require("../gene/gene_response_builder.js");
 
+const {
+    build_melvin_voice_response, build_text_speech_and_reprompt_response 
+} = require("../utils/response_builder_utils.js");
+const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
 const {
     validate_action_intent_state, update_melvin_state
 } = require("../utils/navigation_utils.js");
@@ -19,32 +26,31 @@ const NavigateGeneDefinitionIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateGeneDefinitionIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
-        let repromptText = "";
+        let speech_text = "";
+        let reprompt_text = "";
 
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_DEFINITION);
             const params = { ...melvin_state };
-            const response = await build_gene_definition_response(handlerInput, params);
-            speechText = response["speech_text"];
-            if (!speechText.trim().endsWith("?")) {
-                speechText += " What else?";
-                repromptText = "What else?";
-            } else {
-                repromptText = speechText;
-            }
+            let response = await build_gene_definition_response(handlerInput, params);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateGeneDefinitionIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error("Error in NavigateGeneDefinitionIntent", error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateGeneDefinitionIntentHandler] error: ${error.message}`, error);
         }
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(repromptText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -55,34 +61,32 @@ const NavigateGeneTargetIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateGeneTargetIntent";
     },
     async handle(handlerInput) {
-        let speechText = "";
-        let repromptText = "";
+        let speech_text = "";
+        let reprompt_text = "";
 
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.GENE_TARGETS);
             const params = { ...melvin_state };
-            const target_response = await build_gene_target_response(handlerInput, params);
-            speechText = target_response["speech_text"];
-
+            let response = await build_gene_target_response(handlerInput, params);
+            const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
+            const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
+            const opts = { "BRIEF_MODE": brief_mode_preference };
+            response = build_text_speech_and_reprompt_response(response, opts);
+            speech_text = response["speech_text"];
+            reprompt_text = response["reprompt_text"];
+            console.info(`[NavigateGeneTargetIntentHandler] response: ${JSON.stringify(response)}`);
         } catch (error) {
-            if (error["speech"]) {
-                speechText = error["speech"];
-            } else {
-                speechText = DEFAULT_GENERIC_ERROR_SPEECH_TEXT;
-            }
-            console.error("Error in NavigateGeneTargetIntent", error);
+            speech_text = build_melvin_voice_response(_.get(error, "speech", DEFAULT_GENERIC_ERROR_SPEECH_TEXT));
+            reprompt_text = build_melvin_voice_response(DEFAULT_ERROR_REPROMPT);
+            add_to_APL_text_pager(handlerInput, "");
+            console.error(`[NavigateGeneTargetIntentHandler] error: ${error.message}`, error);
         }
 
-        if (!speechText.trim().endsWith("?")) {
-            speechText += " What else?";
-            repromptText = "What else?";
-        } else {
-            repromptText = speechText;
-        }
         return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(repromptText)
+            .speak(speech_text)
+            .reprompt(reprompt_text)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };

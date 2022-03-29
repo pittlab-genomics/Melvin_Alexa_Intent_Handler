@@ -41,7 +41,7 @@ function sign_request(url, region, creds_provider, presigned = false, method = "
     const cred_data = get_creds_data(creds_provider);
     if (cred_data.Credentials) {
         const path = url.pathname + url.search;
-        console.debug(`[sigv4_utils] signing request method: ${method}, path: ${path}`);
+        // console.debug(`[sigv4_utils] signing request method: ${method}, path: ${path}`);
 
         const opts = {
             host: url.host, path: path, service: "execute-api", region: region, signQuery: presigned 

@@ -12,8 +12,11 @@ async function build_sv_response(handlerInput, params) {
     console.info(`[build_sv_response] params: ${JSON.stringify(params)}`);
     let response = {};
     if (params[MelvinAttributes.DSOURCE] === DataSources.TCGA) {
-        response = { "speech_text": "Structural variants analysis is not supported in TCGA." };
-
+        throw melvin_error(
+            `[build_sv_response] not implemented: ${JSON.stringify(params)}`,
+            MelvinIntentErrors.NOT_IMPLEMENTED,
+            "Structural variants analysis is not supported in TCGA."
+        );
     } else if (params[MelvinAttributes.DSOURCE] === DataSources.CLINVAR) {
         response = await build_sv_clinvar_response(handlerInput, params);
 

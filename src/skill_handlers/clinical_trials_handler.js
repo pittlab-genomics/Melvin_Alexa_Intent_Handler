@@ -92,6 +92,7 @@ const ClinicalTrialsNearbyIntentHandler = {
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -159,6 +160,7 @@ const ClinicalTrialsWithinIntentHandler = {
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };
@@ -222,6 +224,7 @@ const ClinicalTrialClosestIntentHandler = {
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt(speechText)
+            .withShouldEndSession(false)
             .getResponse();
     }
 };

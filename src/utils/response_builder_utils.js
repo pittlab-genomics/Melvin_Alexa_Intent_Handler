@@ -1,4 +1,6 @@
 const _ = require("lodash");
+const fs = require("fs");
+var path = require("path");
 const Speech = require("ssml-builder");
 
 const {
@@ -6,6 +8,7 @@ const {
     MelvinIntentErrors,
     melvin_error,
     nunjucks_env,
+    RESPONSE_TEMPLATES_PATH,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE
 } = require("../common.js");
@@ -64,8 +67,16 @@ const round = function (value, precision) {
 };
 
 
-const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_context) {
+const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_context = {}, opts = {}) {
     const speech = new Speech();
+    if (_.get(opts, "BRIEF_MODE", false)) {
+        const brief_template = nunjucks_template.substring(0, nunjucks_template.lastIndexOf(".")) + "_brief.njk";
+        const brief_template_path = path.join(RESPONSE_TEMPLATES_PATH, brief_template);
+        if (fs.existsSync(brief_template_path)) {
+            console.info(`[build_ssml_response_from_nunjucks] brief mode template found: ${brief_template}`);
+            nunjucks_template = brief_template;
+        }
+    }
     const nunjucks_res = nunjucks_env
         .render(nunjucks_template, nunjucks_context)
         .replace(/\r?\n|\r/g, " ")
@@ -88,10 +99,31 @@ const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_
         );
     }
     speech.sayWithSSML(nunjucks_res);
-    return speech.ssml(true);
+    return speech;
 };
 
-const call_directive_service = async function(handlerInput, speech) {
+const build_text_speech_and_reprompt_response = function (speech, opts = {}) {
+    const speech_text = build_melvin_voice_response(speech.ssml(true));
+    let reprompt_text = "";
+    if (_.get(opts, "BRIEF_MODE", false)) {
+        reprompt_text = build_melvin_voice_response("What else?");
+    } else {
+        speech.pause("1s");
+        speech.say("What else?");
+        reprompt_text = build_melvin_voice_response(speech.ssml(true));
+    }
+    return {
+        "speech_text":   speech_text,
+        "reprompt_text": reprompt_text
+    };
+};
+
+const build_melvin_voice_response = function (speech) {
+    const speech_text = speech instanceof Speech ? speech.ssml(true) : speech;
+    return `<speak><voice name="Joanna">${speech_text}</voice></speak>`;
+};
+
+const call_directive_service = async function (handlerInput, speech) {
     const directiveServiceClient = handlerInput.serviceClientFactory.getDirectiveServiceClient();
     const requestEnvelope = handlerInput.requestEnvelope;
     const requestId = requestEnvelope.request.requestId;
@@ -113,5 +145,7 @@ module.exports = {
     add_query_list_params,
     get_state_change_diff,
     build_ssml_response_from_nunjucks,
+    build_text_speech_and_reprompt_response,
+    build_melvin_voice_response,
     call_directive_service
 };

@@ -105,9 +105,12 @@ functions:
     handler: src/sqs/irs_subscriber.handler
     timeout: 300
     reservedConcurrency: 10
-    memorySize: 2048
+    memorySize: 3008
     events:
-      - sqs: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+      - sqs: 
+          arn: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+          enabled: true
+          batchSize: 1
 
   warmup_service:
     handler: src/warmup_service/warmup_service.handler

@@ -22,11 +22,9 @@ async function build_gain_tcga_response(handlerInput, melvin_state) {
         melvin_state: melvin_state,
         response:     response
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("cna/gain_tcga.njk", nunjucks_context);
     add_gain_tcga_plot(image_list, melvin_state);
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("cna/gain_tcga.njk", nunjucks_context);
 }
 
 async function build_gain_compare_tcga_response(handlerInput, melvin_state, compare_params, state_diff) {
@@ -42,12 +40,10 @@ async function build_gain_compare_tcga_response(handlerInput, melvin_state, comp
         response:         results[0],
         compare_response: results[1]
     };
-    const speech_ssml = build_ssml_response_from_nunjucks("cna/gain_compare_tcga.njk", nunjucks_context);
     add_gain_tcga_plot(image_list, melvin_state);
     add_gain_tcga_plot(image_list, compare_params);
     add_to_APL_image_pager(handlerInput, image_list);
-
-    return { "speech_text": speech_ssml };
+    return build_ssml_response_from_nunjucks("cna/gain_compare_tcga.njk", nunjucks_context);
 }
 
 
