@@ -44,7 +44,7 @@ async function build_mutations_tcga_response(handlerInput, melvin_state, opts={}
         add_mutations_tcga_plot(image_list, melvin_state, "profile");
     }
 
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context, opts);
 }
 
@@ -65,7 +65,7 @@ async function build_mutations_tcga_domain_response(handlerInput, melvin_state, 
         add_mutations_tcga_plot(image_list, melvin_state, "dompie");
         add_mutations_tcga_plot(image_list, melvin_state, "domstack");
     }
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("mutations/mutations_tcga.njk", nunjucks_context, opts);
 }
 
@@ -106,7 +106,7 @@ async function build_mutations_compare_tcga_response(handlerInput, melvin_state,
 
     }
 
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("mutations/mutation_compare_tcga.njk", nunjucks_context, opts);
 }
 

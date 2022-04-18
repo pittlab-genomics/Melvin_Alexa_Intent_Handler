@@ -1,11 +1,13 @@
 ## Test Locally
 
-serverless invoke local --function alexa-skill -p ./test/examples/other/SearchGeneIntent_payload.json
-serverless invoke local --function alexa-skill -p ./test/examples/other/SearchGeneIntent_query_payload.json
-serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_payload.json
-serverless invoke local --function alexa-skill -p ./test/examples/legacy/MutationCountIntent_gene_payload.json
-serverless invoke local --function alexa-skill -p ./test/examples/legacy/MutationCountIntent_gene_study_payload.json
+### Gene Definition
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_HIF1A_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_BRCA1_payload.json
 
+### Gene Target
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneTarget_PIK3CA_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneTarget_BRCA1_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneTarget_payload.json
 
 ### Mutations
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateMutationsIntent_G.json
@@ -79,7 +81,6 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJ
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_SV-MD_TP53_BRCA_payload.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_OV_payload.json
 
-
 ### Compare - mutations
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mutations_G_vs_G.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_mutations_S_vs_S.json
@@ -142,4 +143,9 @@ serverless invoke local --function sqs_irs_subscriber --path ./test/examples/irs
 serverless invoke local --function warmup_service
 
 ### User Preferences
-serverless invoke local --function alexa-skill -p ./test/examples/other/EnableBriefMode_payload.json
+ask util generate-lwa-tokens --scopes profile
+
+serverless invoke local --function alexa-skill -p ./test/examples/other/Enable_Brief_Mode_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/Enable_Custom_Mappings_payload.json
+
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_TP53_custom_mapping_payload.json

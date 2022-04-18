@@ -103,14 +103,15 @@ const build_ssml_response_from_nunjucks = function (nunjucks_template, nunjucks_
 };
 
 const build_text_speech_and_reprompt_response = function (speech, opts = {}) {
-    const speech_text = build_melvin_voice_response(speech.ssml(true));
+    let speech_text = build_melvin_voice_response(speech.ssml(true), opts);
     let reprompt_text = "";
     if (_.get(opts, "BRIEF_MODE", false)) {
-        reprompt_text = build_melvin_voice_response("What else?");
+        reprompt_text = build_melvin_voice_response("What else?", opts);
     } else {
-        speech.pause("1s");
+        speech.pause("300ms");
         speech.say("What else?");
-        reprompt_text = build_melvin_voice_response(speech.ssml(true));
+        speech_text = build_melvin_voice_response(speech.ssml(true), opts);
+        reprompt_text = build_melvin_voice_response(speech.ssml(true), opts);
     }
     return {
         "speech_text":   speech_text,
@@ -118,9 +119,14 @@ const build_text_speech_and_reprompt_response = function (speech, opts = {}) {
     };
 };
 
-const build_melvin_voice_response = function (speech) {
+const build_melvin_voice_response = function (speech, opts) {
+    const style_enabled = _.get(opts, "ENABLE_VOICE_STYLE", false);
     const speech_text = speech instanceof Speech ? speech.ssml(true) : speech;
-    return `<speak><voice name="Joanna">${speech_text}</voice></speak>`;
+    let voice_text = speech_text;
+    if (style_enabled) {
+        voice_text = `<amazon:domain name="conversational">${speech_text}</amazon:domain>`;
+    }
+    return `<speak><voice name="Joanna">${voice_text}</voice></speak>`;
 };
 
 const call_directive_service = async function (handlerInput, speech) {

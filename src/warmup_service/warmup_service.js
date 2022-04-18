@@ -285,11 +285,11 @@ function get_splitby_state_with_dtype(dtype) {
     });
 }
 
-function generate_urls_from_paths(endpoint, endpoint_paths, region, cred_data) {
+async function generate_urls_from_paths(endpoint, endpoint_paths, region, cred_data) {
     const service_urls = [];
     for (const ep_path of endpoint_paths) {
         let ep_url = new URL(endpoint + ep_path);
-        let signed_req = sign_request(ep_url, region, cred_data, true);
+        let signed_req = await sign_request(ep_url, region, cred_data, true);
         service_urls.push(build_presigned_url(signed_req));
     }
     return service_urls;
@@ -473,7 +473,7 @@ function get_splitby_plots_url(endpoint, dtypes) {
     return splitby_url;
 }
 
-function get_melvin_splitby_stats_urls(endpoint, region, cred_data) {
+async function get_melvin_splitby_stats_urls(endpoint, region, cred_data) {
     const splitby_urls = [];
 
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
@@ -483,14 +483,14 @@ function get_melvin_splitby_stats_urls(endpoint, region, cred_data) {
         }
         splitby_url.searchParams.set("melvin_state", get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0]));
         splitby_url.searchParams.set("splitby_state", get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1]));
-        const signed_req = sign_request(splitby_url, region, cred_data, true);
+        const signed_req = await sign_request(splitby_url, region, cred_data, true);
         splitby_urls.push(build_presigned_url(signed_req));
     }
 
     return splitby_urls;
 }
 
-function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
+async function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
     const splitby_urls = [];
 
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
@@ -500,7 +500,7 @@ function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
         }
         splitby_url.searchParams.set("melvin_state", get_melvin_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][0]));
         splitby_url.searchParams.set("splitby_state", get_splitby_state_with_dtype(SUPPORTED_SPLITBY_DTYPES[index][1]));
-        const signed_req = sign_request(splitby_url, region, cred_data, true);
+        const signed_req = await sign_request(splitby_url, region, cred_data, true);
         splitby_urls.push(build_presigned_url(signed_req));
     }
 

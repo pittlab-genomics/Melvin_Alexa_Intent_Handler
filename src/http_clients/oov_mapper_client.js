@@ -62,45 +62,37 @@ const get_oov_mapping_by_query = async function (handlerInput, params) {
 
     // Alexa progressive response to indicate that OOV mapper service is going to take little longer
     const controller_pr = new AbortController();
-    const send_pr_req_async = async (resolve) => {
-        await delay_ms(OOV_PR_DELAY);
+    const send_pr_req_async = async (controller) => {
+        await delay_ms(OOV_PR_DELAY, controller);
         let res = null;
-        if (!controller_pr.signal.aborted) {
+        if (!controller.signal.aborted) {
             if (!process.env.IS_LOCAL) {
                 const speech_ssml = build_melvin_voice_response(OOV_PR_SPEECH);
                 res = await call_directive_service(handlerInput, speech_ssml)
-                    .then(data => {
+                    .then(() => {
                         const reqAttributes = handlerInput.attributesManager.getRequestAttributes();
                         reqAttributes["OOV_PR_SENT"] = true;
                         handlerInput.attributesManager.setRequestAttributes(reqAttributes);
-                        console.info(`[oov_mapper_client] progressive response sent | res: ${JSON.stringify(data)}`);
+                        console.info("[oov_mapper_client] progressive response sent");
                     })
                     .catch(error => {
-                        console.error("[oov_mapper_client] progressive response failed | "
-                            + `error: ${JSON.stringify(error)}`);
+                        console.error("[oov_mapper_client] progressive response failed", error);
                     });
             } else {
                 console.info("[oov_mapper_client] skipping progressive response in local environment");
             }
         }
-        resolve(res);
+        return res;
     };
 
-    const pr_promise = new Promise(resolve => {
-        controller_pr.signal.addEventListener("abort", () => {
-            resolve("cancelled progressive response");
-        });
-        send_pr_req_async(resolve);
-    });
-
-    const signed_req = sign_request(oov_url, OOV_MAPPER_REGION, handlerInput);
+    const signed_req = await sign_request(oov_url, OOV_MAPPER_REGION, handlerInput);
     const oov_req_async = async () => {
         const response = await send_request_async(oov_url, signed_req.headers);
         controller_pr.abort();
         return response;
     };
     const t1 = performance.now();
-    const results = await allSettled([pr_promise, oov_req_async()]);
+    const results = await allSettled([send_pr_req_async(controller_pr), oov_req_async()]);
     const t2 = performance.now();
     console.info(`[oov_mapper_client] OOV process took ${t2 - t1} ms, results: ${JSON.stringify(results)}`);
     if (results[1]["status"] === "fulfilled") {

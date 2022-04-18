@@ -34,7 +34,7 @@ function add_clinical_trials_map_plot(handlerInput, params) {
     const clinical_trial_map_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/clinical_trials/map_plot`);
     add_query_list_params(clinical_trial_map_url, params, ["location", "distance", "study"]);
     image_list.push(clinical_trial_map_url);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
 }
 
 const ClinicalTrialsNearbyIntentHandler = {

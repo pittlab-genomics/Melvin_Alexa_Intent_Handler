@@ -63,7 +63,7 @@ async function build_sv_clinvar_response(handlerInput, params) {
         );
     }
 
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return { "speech_text": speech.ssml() };
 }
 

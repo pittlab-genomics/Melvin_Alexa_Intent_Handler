@@ -1,6 +1,8 @@
 const _ = require("lodash");
 const { update_melvin_history } = require("./utils/navigation_utils.js");
-const { assume_role } = require("./utils/sigv4_utils");
+const {
+    assume_role, has_creds_expired
+} = require("./utils/sigv4_utils");
 const { performance } = require("perf_hooks");
 
 const { MELVIN_API_INVOKE_ROLE } = require("./common.js");
@@ -25,8 +27,10 @@ const UserUtteranceTrackInterceptor = { async process(handlerInput) {
 const STSCredentialsInterceptor = { async process(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");
-    if (!sessionAttributes["MELVIN.STS.CREDENTIALS"]) {
-        console.info(`[STSCredentialsInterceptor] Assuming IAM role ${MELVIN_API_INVOKE_ROLE}`);
+    const sts_creds = sessionAttributes["MELVIN.STS.CREDENTIALS"];
+    if (_.isNil(sts_creds) || has_creds_expired(sts_creds)) {
+        console.info(`[STSCredentialsInterceptor] Assuming IAM role ${MELVIN_API_INVOKE_ROLE},`
+                + ` roleSessionName: ${request_id}`);
         sessionAttributes["MELVIN.STS.CREDENTIALS"] = await assume_role(MELVIN_API_INVOKE_ROLE, request_id);
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
     }

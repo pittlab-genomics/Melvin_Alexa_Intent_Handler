@@ -27,11 +27,11 @@ const { build_melvin_voice_response } = require("../utils/response_builder_utils
 const agent = new https.Agent({ maxSockets: 100 });
 AWS.config.update({ httpOptions: { agent: agent }});
 
-const AE_DEFAULT_MAX_DURATION = 18000;
-const AE_DEFAULT_SOCKET_TIMEOUT = 8000;
-const AE_DEFAULT_INITIAL_DELAY = 500;
-const PR_DELAY_FIRST = 2000;
-const PR_DELAY_SECOND = 5000;
+const AE_DEFAULT_MAX_DURATION = 10000;
+const AE_DEFAULT_SOCKET_TIMEOUT = 6000;
+const AE_DEFAULT_INITIAL_DELAY = 200;
+const PR_DELAY_FIRST = 3000;
+const PR_DELAY_SECOND = 4000;
 
 const send_request_async = function (url, headers, handlerInput) {
     console.info(`[melvin_explorer_client] AE url: ${url}`);
@@ -47,13 +47,11 @@ const send_request_async = function (url, headers, handlerInput) {
                 console.error(`[melvin_explorer_client] AE request failed: ${JSON.stringify(error)}`);
                 const speech_ssml = build_melvin_voice_response(AE_PR_SPEECH_RETRY);
                 await call_directive_service(handlerInput, speech_ssml)
-                    .then(data => {
-                        console.info("[melvin_explorer_client] progressive response on retry sent | "
-                            + `res: ${JSON.stringify(data)}`);
+                    .then(() => {
+                        console.info("[melvin_explorer_client] progressive response on retry sent");
                     })
                     .catch(error => {
-                        console.error("[oov_mapper_client] progressive response on retry failed | "
-                            + `error: ${JSON.stringify(error)}`);
+                        console.error("[melvin_explorer_client] progressive response on retry failed", error);
                     });
             }
         }
@@ -113,56 +111,55 @@ const process_repeat_requests = async function (handlerInput, url, headers) {
 
 
     // Alexa progressive response to indicate that analysis engine is going to take little longer
-    const send_pr_req_async = async (resolve) => {
+    const send_pr_req_async = async (controller) => {
         const adaptive_delay = oov_pr_sent ? PR_DELAY_SECOND : PR_DELAY_FIRST;
         console.info(`[melvin_explorer_client] adaptive_delay: ${adaptive_delay}`);
-        await delay_ms(adaptive_delay);
-        if (!controller_pr.signal.aborted) {
+        await delay_ms(adaptive_delay, controller);
+        let res = null;
+        if (!controller.signal.aborted) {
             if (!process.env.IS_LOCAL) {
                 const speech_ssml = build_melvin_voice_response(AE_PR_SPEECH);
-                await call_directive_service(handlerInput, speech_ssml)
-                    .then(data => {
-                        console.info("[melvin_explorer_client] progressive response sent | "
-                            + `res: ${JSON.stringify(data)}`);
+                res = await call_directive_service(handlerInput, speech_ssml)
+                    .then(() => {
+                        console.info("[melvin_explorer_client] progressive response sent");
                     })
                     .catch(error => {
-                        console.error("[oov_mapper_client] progressive response failed | "
-                            + `error: ${JSON.stringify(error)}`);
+                        console.error("[melvin_explorer_client] progressive response failed", error);
                     });
             } else {
                 console.info("[melvin_explorer_client] skipping progressive response in local environment");
             }
         }
-        resolve();
+        return res;
     };
 
-    const pr_promise = new Promise(resolve => {
-        controller_pr.signal.addEventListener("abort", () => {
-            resolve("cancelled progressive response");
-        });
-        send_pr_req_async(resolve);
-    });
-
     const t1 = performance.now();
-    const results = await allSettled([pr_promise, ae_req_async()]);
+    const results = await allSettled([send_pr_req_async(controller_pr), ae_req_async()]);
     const t2 = performance.now();
     console.info(`[melvin_explorer_client] AE process took ${t2 - t1} ms, results: ${JSON.stringify(results)}`);
-    if (results[1]["status"] === "fulfilled") {
-        return results[1]["value"];
+    const ae_result = results[1];
+    if (ae_result["status"] === "fulfilled") {
+        return ae_result["value"];
+    } else {
+        throw melvin_error(
+            `[melvin_explorer_client] Melvin Explorer error: ${JSON.stringify(ae_result)}`,
+            _.get(ae_result, "reason.type", MelvinIntentErrors.INVALID_API_RESPONSE),
+            _.get(ae_result, "reason.speech", DEFAULT_AE_ACCESS_ERROR_RESPONSE)
+        );
     }
 };
 
 const get_mutations_tcga_top_genes = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/top_genes`);
     add_query_params(mutations_url, params);
-    const signed_req = sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, mutations_url, signed_req.headers);
 };
 
 const get_mutations_tcga_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
     add_query_params(mutations_url, params);
-    const signed_req = sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, mutations_url, signed_req.headers);
     } catch (err) {
@@ -183,7 +180,7 @@ const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
     const mutations_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/MUT_stats`);
     add_query_params(mutations_url, params);
     mutations_url.searchParams.set("style", "domain");
-    const signed_req = sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(mutations_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, mutations_url, signed_req.headers);
     } catch (err) {
@@ -206,7 +203,7 @@ const get_mutations_tcga_domain_stats = async function (handlerInput, params) {
 const get_indels_tcga_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
     add_query_params(indels_url, params);
-    const signed_req = sign_request(indels_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(indels_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, indels_url, signed_req.headers);
     } catch (err) {
@@ -227,7 +224,7 @@ const get_indels_tcga_domain_stats = async function (handlerInput, params) {
     const indels_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/IND_stats`);
     add_query_params(indels_url, params);
     indels_url.searchParams.set("style", "domain");
-    const signed_req = sign_request(indels_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(indels_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, indels_url, signed_req.headers);
     } catch (err) {
@@ -250,7 +247,7 @@ const get_indels_tcga_domain_stats = async function (handlerInput, params) {
 const get_snvs_tcga_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
-    const signed_req = sign_request(snvs_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(snvs_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, snvs_url, signed_req.headers);
     } catch (err) {
@@ -271,7 +268,7 @@ const get_snvs_tcga_domain_stats = async function (handlerInput, params) {
     const snvs_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/mutations/tcga/SNV_stats`);
     add_query_params(snvs_url, params);
     snvs_url.searchParams.set("style", "domain");
-    const signed_req = sign_request(snvs_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(snvs_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, snvs_url, signed_req.headers);
     } catch (err) {
@@ -295,21 +292,21 @@ const get_clinical_trials = async function (handlerInput, params) {
     const clinical_trials_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/clinical_trials/list`);
     add_query_list_params(clinical_trials_url, params, ["location", "distance", "study"]);
     add_query_params(clinical_trials_url, params);
-    const signed_req = sign_request(clinical_trials_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(clinical_trials_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, clinical_trials_url, signed_req.headers);
 };
 
 const get_cna_clinvar_stats = async function (handlerInput, params) {
     const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/clinvar/stats`);
     add_query_params(cna_url, params);
-    const signed_req = sign_request(cna_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(cna_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, cna_url, signed_req.headers);
 };
 
 const get_cna_tcga_stats = async function (handlerInput, params) {
     const cna_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/cna_stats`);
     add_query_params(cna_url, params);
-    const signed_req = sign_request(cna_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(cna_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, cna_url, signed_req.headers);
     } catch (err) {
@@ -329,7 +326,7 @@ const get_cna_tcga_stats = async function (handlerInput, params) {
 const get_gain_tcga_stats = async function (handlerInput, params) {
     const gain_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/gain_stats`);
     add_query_params(gain_stats_url, params);
-    const signed_req = sign_request(gain_stats_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(gain_stats_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, gain_stats_url, signed_req.headers);
     } catch (err) {
@@ -349,7 +346,7 @@ const get_gain_tcga_stats = async function (handlerInput, params) {
 const get_loss_tcga_stats = async function (handlerInput, params) {
     const loss_stats_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/cna/tcga/loss_stats`);
     add_query_params(loss_stats_url, params);
-    const signed_req = sign_request(loss_stats_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(loss_stats_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, loss_stats_url, signed_req.headers);
     } catch (err) {
@@ -368,13 +365,13 @@ const get_loss_tcga_stats = async function (handlerInput, params) {
 
 const get_gene_by_name = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/genes/${params.gene_name}`);
-    const signed_req = sign_request(gene_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(gene_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, gene_url, signed_req.headers);
 };
 
 const get_gene_target = async function (handlerInput, params) {
     const gene_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/gene_targets/${params.gene_name}`);
-    const signed_req = sign_request(gene_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(gene_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, gene_url, signed_req.headers);
     } catch (err) {
@@ -394,14 +391,14 @@ const get_gene_target = async function (handlerInput, params) {
 const get_gene_expression_clinvar_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/clinvar/stats`);
     add_query_params(gene_expression_url, params);
-    const signed_req = sign_request(gene_expression_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(gene_expression_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, gene_expression_url, signed_req.headers);
 };
 
 const get_gene_expression_tcga_stats = async function (handlerInput, params) {
     const gene_expression_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/gene_expression/tcga/stats`);
     add_query_params(gene_expression_url, params);
-    const signed_req = sign_request(gene_expression_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(gene_expression_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, gene_expression_url, signed_req.headers);
     } catch (err) {
@@ -429,7 +426,7 @@ const get_gain_gain_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -452,7 +449,7 @@ const get_gain_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/GAINsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -476,7 +473,7 @@ const get_loss_loss_splitby_tcga_stats = async function (handlerInput, melvin_st
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/LOSSsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -500,7 +497,7 @@ const get_cna_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
 
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -523,7 +520,7 @@ const get_cna_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -546,7 +543,7 @@ const get_cna_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/CNAsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -569,7 +566,7 @@ const get_ind_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -592,7 +589,7 @@ const get_ind_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -615,7 +612,7 @@ const get_ind_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -638,7 +635,7 @@ const get_ind_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/INDsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -661,7 +658,7 @@ const get_snv_snv_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsSNV_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -684,7 +681,7 @@ const get_snv_ind_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsIND_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -707,7 +704,7 @@ const get_snv_cna_splitby_tcga_stats = async function (handlerInput, melvin_stat
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsCNA_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -730,7 +727,7 @@ const get_snv_gain_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsGAIN_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -753,7 +750,7 @@ const get_snv_loss_splitby_tcga_stats = async function (handlerInput, melvin_sta
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/SNVsLOSS_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -776,7 +773,7 @@ const get_mut_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/MUT_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -799,7 +796,7 @@ const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, s
     const splitby_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/splitby/tcga/EXP_stats`);
     splitby_url.searchParams.set("melvin_state", JSON.stringify(melvin_state));
     splitby_url.searchParams.set("splitby_state", JSON.stringify(splitby_state));
-    const signed_req = sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(splitby_url, MELVIN_EXPLORER_REGION, handlerInput);
     try {
         return await process_repeat_requests(handlerInput, splitby_url, signed_req.headers);
     } catch (err) {
@@ -821,7 +818,7 @@ const get_exp_splitby_tcga_stats = async function (handlerInput, melvin_state, s
 const get_sv_clinvar_stats = async function (handlerInput, params) {
     const sv_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/structural_variants/clinvar/stats`);
     add_query_params(sv_url, params);
-    const signed_req = sign_request(sv_url, MELVIN_EXPLORER_REGION, handlerInput);
+    const signed_req = await sign_request(sv_url, MELVIN_EXPLORER_REGION, handlerInput);
     return await process_repeat_requests(handlerInput, sv_url, signed_req.headers);
 };
 
@@ -829,7 +826,7 @@ const get_mut_cna_compare_tcga_stats = async function (handlerInput, params, com
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvCNA_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -851,7 +848,7 @@ const get_mut_gain_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvGAIN_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -873,7 +870,7 @@ const get_mut_loss_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/MUTvLOSS_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -895,7 +892,7 @@ const get_gain_loss_compare_tcga_stats = async function (handlerInput, params, c
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/GAINvLOSS_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -917,7 +914,7 @@ const get_ind_cna_compare_tcga_stats = async function (handlerInput, params, com
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvCNA_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -939,7 +936,7 @@ const get_snv_cna_compare_tcga_stats = async function (handlerInput, params, com
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvCNA_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -961,7 +958,7 @@ const get_snv_ind_compare_tcga_stats = async function (handlerInput, params, com
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvIND_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -983,7 +980,7 @@ const get_ind_gain_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvGAIN_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -1005,7 +1002,7 @@ const get_ind_loss_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/INDvLOSS_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -1027,7 +1024,7 @@ const get_snv_gain_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvGAIN_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {
@@ -1049,7 +1046,7 @@ const get_snv_loss_compare_tcga_stats = async function (handlerInput, params, co
     const compare_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/analysis/comparison/tcga/SNVvLOSS_stats`);
     add_query_params(compare_url, params);
     try {
-        const signed_req = sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
+        const signed_req = await sign_request(compare_url, MELVIN_EXPLORER_REGION, handlerInput);
         return await process_repeat_requests(handlerInput, compare_url, signed_req.headers);
     } catch (err) {
         if (err.type == MelvinExplorerErrors.DATA_IS_ZERO) {

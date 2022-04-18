@@ -47,7 +47,10 @@ const NavigateMutationsIntentHandler = {
             let response = await build_mutations_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -81,7 +84,10 @@ const NavigateMutationDomainsIntentHandler = {
             let response = await build_mutations_domain_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -115,7 +121,10 @@ const NavigateIndelsIntentHandler = {
             let response = await build_indels_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -149,7 +158,10 @@ const NavigateIndelDomainsIntentHandler = {
             let response = await build_indels_domain_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -183,7 +195,10 @@ const NavigateSNVsIntentHandler = {
             let response = await build_snvs_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -217,7 +232,10 @@ const NavigateSNVDomainsIntentHandler = {
             let response = await build_snv_domains_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];

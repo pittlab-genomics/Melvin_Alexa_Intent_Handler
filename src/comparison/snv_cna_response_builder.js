@@ -23,7 +23,7 @@ async function build_snv_cna_compare_tcga_response(handlerInput, melvin_state, c
         response:     response
     };
     add_snv_cna_tcga_plot(image_list, melvin_state);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("dtype_compare/snv_cna.njk", nunjucks_context, opts);
 }
 

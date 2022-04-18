@@ -23,7 +23,7 @@ async function build_mut_loss_compare_tcga_response(handlerInput, melvin_state, 
         response:     response
     };
     add_mut_loss_tcga_plot(image_list, melvin_state);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("dtype_compare/mut_loss.njk", nunjucks_context, opts);
 }
 

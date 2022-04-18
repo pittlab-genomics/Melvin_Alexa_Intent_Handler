@@ -23,7 +23,7 @@ async function build_cna_tcga_response(handlerInput, melvin_state, opts={}) {
         response:     response
     };
     add_cna_tcga_plot(image_list, melvin_state);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("cna/cna_tcga.njk", nunjucks_context, opts);
 }
 
@@ -42,7 +42,7 @@ async function build_cna_compare_tcga_response(handlerInput, melvin_state, compa
     };
     add_cna_tcga_plot(image_list, melvin_state);
     add_cna_tcga_plot(image_list, compare_params);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("cna/cna_compare_tcga.njk", nunjucks_context, opts);
 }
 

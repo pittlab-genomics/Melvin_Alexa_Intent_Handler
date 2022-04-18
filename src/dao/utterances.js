@@ -1,4 +1,4 @@
-var AWS = require("aws-sdk");
+const AWS = require("aws-sdk");
 const moment = require("moment");
 
 const {
@@ -7,10 +7,8 @@ const {
 const { queryEntireTable } = require("./dao_utils.js");
 
 AWS.config.update({ region: process.env.REGION });
-var docClient = new AWS.DynamoDB.DocumentClient();
-
-
-var utterances_doc = function () { };
+const docClient = new AWS.DynamoDB.DocumentClient();
+const utterances_doc = function () { };
 
 utterances_doc.prototype.addUserUtterance = async (record) => {
     const params = {
@@ -46,11 +44,11 @@ utterances_doc.prototype.getUtteranceByTimestamp = async function (user_id, time
             ":timestamp": `_${timestamp}`
         },
         ScanIndexForward: false,
-        Limit:            1
+        Limit:            10
     };
 
     // since there is no filter expression, we can query the table once with a limit of 1.
-    utterance_list = await docClient.query(query_params).promise();
+    utterance_list = await queryEntireTable(docClient, query_params, 1);
     console.info(`[utterances_doc] retrieved utterances list size: ${utterance_list.length}`);
     return utterance_list;
 };
@@ -59,22 +57,30 @@ utterances_doc.prototype.get_events_for_count = async function (
     user_id, session_id, count, event_type) {
     console.info(`[utterances_doc] querying utterances for user_id: ${user_id}, session_id: ${session_id}, `
         + `count: ${count}`);
-    var query_params = {
+    let filter_exp = "#event_type = :event_type";
+    if (event_type === MelvinEventTypes.ANALYSIS_EVENT) {
+        filter_exp = "#event_type = :event_type " + 
+        "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
+    }
+    let query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
         ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type",
         KeyConditionExpression:   "#user_id = :uid AND begins_with(#utterance_id, :sid)",
-        FilterExpression:         "#event_type = :event_type",
+        FilterExpression:         filter_exp,
         ExpressionAttributeNames: {
             "#user_id":      "user_id",
             "#utterance_id": "utterance_id",
-            "#event_type":   "event_type"
+            "#event_type":   "event_type",
+            "#response":     "melvin_response",
+            "#card":         "card",
+            "#directives":   "directives"
         },
         ExpressionAttributeValues: {
             ":uid":        user_id,
             ":sid":        session_id,
             ":event_type": event_type
         },
-        ScanIndexForward: true,
+        ScanIndexForward: false,
         Limit:            100
     };
 
@@ -85,6 +91,9 @@ utterances_doc.prototype.get_events_for_count = async function (
         utterance_list = utterance_list
             .filter(item => Object.keys(item.melvin_state).length > FOLLOW_UP_TEXT_THRESHOLD);
     }
+    utterance_list.sort(function (a, b) {
+        return new Date(b["createdAt"]) - new Date(a["createdAt"]);
+    });
     return utterance_list.slice(0, Math.min(count, utterance_len));
 };
 
@@ -98,15 +107,23 @@ utterances_doc.prototype.get_events_for_period = async function (
 
     console.info(`[utterances_doc] querying utterance for user_id: ${user_id}, session_id: ${session_id}, `
         + `s_time: ${s_time}, limit: ${limit}`);
-    var query_params = {
+    let filter_exp = "#event_type = :event_type AND #time > :s_time";
+    if (event_type === MelvinEventTypes.ANALYSIS_EVENT) {
+        filter_exp = "#event_type = :event_type AND #time > :s_time " + 
+            "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
+    }
+    let query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
         ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type",
         KeyConditionExpression:   "#user_id = :uid",
-        FilterExpression:         "#event_type = :event_type AND #time > :s_time",
+        FilterExpression:         filter_exp,
         ExpressionAttributeNames: {
             "#user_id":    "user_id",
             "#event_type": "event_type",
-            "#time":       "createdAt"
+            "#time":       "createdAt",
+            "#response":   "melvin_response",
+            "#card":       "card",
+            "#directives": "directives"
         },
         ExpressionAttributeValues: {
             ":uid":        user_id,
@@ -151,11 +168,11 @@ utterances_doc.prototype.getMostRecentUtterance = async function (user_id, sessi
             ":sid": session_id
         },
         ScanIndexForward: false,
-        Limit:            1
+        Limit:            10
     };
 
     // since there is no filter expression, we can query the table once with a limit of 1.
-    utterance_list = await docClient.query(query_params).promise();
+    utterance_list = await queryEntireTable(docClient, query_params, 1);
     console.info(`[utterances_doc] retrieved utterances list size: ${utterance_list.length}`);
 
     return utterance_list;

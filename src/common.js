@@ -195,9 +195,10 @@ RequiredAttributesClinvar[DataTypes.MUTATIONS] = [3]; // ['GC'];
 RequiredAttributesClinvar[DataTypes.STRUCTURAL_VARIANTS] = [3]; // ['GC'];
 
 const OOV_PR_SPEECH = "I'm still trying to resolve the query, please wait.<break time=\"2s\"/>";
-const AE_PR_SPEECH = "I'm still looking up on that, please wait.<break time=\"2s\"/>";
+const AE_PR_SPEECH = "I'm still working on that, please wait.<break time=\"2s\"/>";
 const AE_PR_SPEECH_RETRY = "This is taking longer than usual, please wait.<break time=\"2s\"/>";
 
+const GOODBYE_SPEECH = "Thank you for using Melvin. Goodbye!";
 const DEFAULT_ERROR_REPROMPT = "Please try again.";
 const DEFAULT_GENERIC_ERROR_SPEECH_TEXT = "Sorry, something went wrong while processing the request." +
     " Please try again later.";
@@ -206,23 +207,23 @@ const DEFAULT_NOT_IMPLEMENTED_RESPONSE = "I'm still working on implementing this
 const DEFAULT_OOV_MAPPING_ERROR_RESPONSE = "Sorry, something went wrong while resolving the query utterance. " +
     "Please try again later.";
 
-const PREFERENCES_UPDATE_SUCCESS = "Your preference was updated. <break time=\"1s\"/>What else?";
+const PREFERENCES_UPDATE_SUCCESS = "Your preference was updated. <break time=\"300ms\"/>What else?";
 const PREFERENCES_PROF_INFO_ERROR_RESPONSE = "Something went wrong while updating your preference." +
     "Please try again later.";
 const PREFERENCES_PROF_INFO_API_ERROR_RESPONSE = "Something went wrong while retrieving your profile information." +
     "Please try again later.";
 const PREFERENCES_PERMISSION_ERROR = "You must authenticate with your Amazon Account to use this feature." 
-    + "Please go to the home screen in your Alexa app and follow the instructions. <break time=\"1s\"/>What else?";
+    + "Please go to the home screen in your Alexa app and follow the instructions. <break time=\"300ms\"/>What else?";
     
 const DEFAULT_AE_ACCESS_ERROR_RESPONSE = "Sorry, I'm having trouble accessing the dataset. Please try again later.";
 const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " +
     "Please try again later.";
 const EMAIL_ERROR = "Something went wrong while sending the results. Please try again later.";
 const EMAIL_SUCCESS_RANGE = "Ok, I'm emailing results during that period. " 
-    + "Please check your inbox in a while. <break time=\"1s\"/> What else?";
+    + "Please check your inbox in a while. <break time=\"300ms\"/> What else?";
 const EMAIL_SUCCESS_COUNT = "Ok, I'm emailing that to you now. Please check your inbox in a while." 
-    + "<break time=\"1s\"/>What else?";
-const EMAIL_SUCCESS_REPROMPT = "Please check your inbox in a while. <break time=\"1s\"/>What else?";
+    + "<break time=\"300ms\"/>What else?";
+const EMAIL_SUCCESS_REPROMPT = "Please check your inbox in a while. <break time=\"300ms\"/>What else?";
 const EMAIL_PERMISSION_ERROR = "In order to email, Melvin will need access to your email address. " 
     + "Go to the home screen in your Alexa app and grant me permissions.";
 const RESTORE_SESSION_NO_PREV = "I could not find any previous sessions. " 
@@ -231,7 +232,7 @@ const RESTORE_SESSION_NO_ANALYSIS = "I could not find any analysis performed in 
     + "Please continue with current analysis.";
 const RESTORE_SESSION_ERROR = "Something went wrong while restoring the session. Please try again later.";
 const RESTORE_SESSION_SUCCESS = "Ok. Your last session was restored. You may continue from your last analysis now.";
-const RESTORE_SESSION_SUCCESS_REPROMPT = "Your last session was restored. <break time=\"1s\"/>What else?";
+const RESTORE_SESSION_SUCCESS_REPROMPT = "Your last session was restored. <break time=\"300ms\"/>What else?";
 const STEP_BACK_END = "I'm unable to step back as you have reached the end. Please provide a new query.";
 const STEP_BACK_END_REPROMPT = "Please provide a new query.";
 const SPLITBY_ERROR_INCOMPLETE_STATE = "Sorry, this split-by operation is not supported. "
@@ -273,8 +274,13 @@ nunjucks_env.addGlobal("melvin_round", melvin_round);
 nunjucks_env.addGlobal("total_cancer_types", total_cancer_types);
 nunjucks_env.addGlobal("filter_domains", filter_domains);
 
-const delay_ms = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+const delay_ms = (ms, controller) => {
+    return new Promise(resolve => {
+        controller.signal.addEventListener("abort", () => {
+            resolve();
+        });
+        setTimeout(resolve, ms);
+    });
 };
 
 module.exports = {
@@ -284,8 +290,8 @@ module.exports = {
     MELVIN_EXPLORER_REGION:   process.env.MELVIN_EXPLORER_REGION,
     MELVIN_API_INVOKE_ROLE:   process.env.MELVIN_API_INVOKE_ROLE,
     OOV_MAPPER_ENDPOINT:      process.env.OOV_MAPPER_ENDPOINT,
-    PROFILE_INFO_ENDPOINT:    process.env.PROFILE_INFO_ENDPOINT,
     OOV_MAPPER_REGION:        process.env.OOV_MAPPER_REGION,
+    PROFILE_INFO_ENDPOINT:    process.env.PROFILE_INFO_ENDPOINT,
     MELVIN_APP_NAME:          process.env.MELVIN_APP_NAME,
     STAGE:                    process.env.STAGE,
     WARMUP_SERVICE_ENABLED:   process.env.WARMUP_SERVICE_ENABLED,
@@ -296,6 +302,7 @@ module.exports = {
     OOV_PR_SPEECH,
     AE_PR_SPEECH,
     AE_PR_SPEECH_RETRY,
+    GOODBYE_SPEECH,
     DEFAULT_GENERIC_ERROR_SPEECH_TEXT,
     DEFAULT_INVALID_STATE_RESPONSE,
     DEFAULT_NOT_IMPLEMENTED_RESPONSE,

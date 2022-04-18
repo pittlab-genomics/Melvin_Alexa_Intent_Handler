@@ -39,7 +39,10 @@ const NavigateCNAIntentHandler = {
             let response = await build_cna_response(handlerInput, params);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -77,7 +80,10 @@ const NavigateGainIntentHandler = {
             let response = await build_gain_response(handlerInput, params);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -115,7 +121,10 @@ const NavigateLossIntentHandler = {
             let response = await build_loss_response(handlerInput, params);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-            const opts = { "BRIEF_MODE": brief_mode_preference };
+            const opts = {
+                "BRIEF_MODE":         brief_mode_preference,
+                "ENABLE_VOICE_STYLE": true 
+            };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];

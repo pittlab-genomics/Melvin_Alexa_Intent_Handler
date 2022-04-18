@@ -93,7 +93,10 @@ const ack_attribute_change = function (handlerInput, state_change) {
 const build_compare_response = async function (handlerInput, melvin_state, compare_state, state_diff) {
     const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
     const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-    const opts = { "BRIEF_MODE": brief_mode_preference };
+    const opts = {
+        "BRIEF_MODE":         brief_mode_preference,
+        "ENABLE_VOICE_STYLE": true 
+    };
     let response = {};
     console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
         + `compare_state: ${JSON.stringify(compare_state)}, state_diff: ${JSON.stringify(state_diff)},`
@@ -202,7 +205,10 @@ const build_navigation_response = async function (handlerInput, state_change) {
     const attr_count = Object.keys(melvin_state).length;
     const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
     const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
-    const opts = { "BRIEF_MODE": brief_mode_preference };
+    const opts = {
+        "BRIEF_MODE":         brief_mode_preference,
+        "ENABLE_VOICE_STYLE": true 
+    };
     console.info(`[build_navigation_response] state_change: ${JSON.stringify(state_change)}, ` +
     `attr_count: ${attr_count}, opts: ${JSON.stringify(opts)}`);
 

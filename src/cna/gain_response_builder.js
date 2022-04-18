@@ -23,7 +23,7 @@ async function build_gain_tcga_response(handlerInput, melvin_state) {
         response:     response
     };
     add_gain_tcga_plot(image_list, melvin_state);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("cna/gain_tcga.njk", nunjucks_context);
 }
 
@@ -42,7 +42,7 @@ async function build_gain_compare_tcga_response(handlerInput, melvin_state, comp
     };
     add_gain_tcga_plot(image_list, melvin_state);
     add_gain_tcga_plot(image_list, compare_params);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("cna/gain_compare_tcga.njk", nunjucks_context);
 }
 

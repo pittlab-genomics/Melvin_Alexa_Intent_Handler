@@ -47,7 +47,8 @@ async function process_message(msg_data) {
     const user_email = msg_data["user_email"];
 
     let duration = MAX_EMAIL_DURATION;
-    let count = _.get(msg_data, "irs_results_count", MIN_EMAIL_RESULT_COUNT);
+    const irs_results_count =_.get(msg_data, "irs_results_count", 0);
+    const count = Math.min(Math.max(irs_results_count, MIN_EMAIL_RESULT_COUNT), MAX_EMAIL_RESULT_COUNT);
 
     let utterance_list = [];
     if (_.has(msg_data, "irs_duration_sec")) {
@@ -60,7 +61,6 @@ async function process_message(msg_data) {
             MelvinEventTypes.ANALYSIS_EVENT,
             MAX_EMAIL_RESULT_COUNT);
     } else {
-        count = Math.min(count, MAX_EMAIL_RESULT_COUNT);
         console.info(`[process_message] requested count: ${count}`);
         utterance_list = await utterances_doc.get_events_for_count(
             msg_data["user_id"],
@@ -69,7 +69,8 @@ async function process_message(msg_data) {
             MelvinEventTypes.ANALYSIS_EVENT);
     }
     console.info(`[process_message] filtered utterances list size: ${utterance_list.length}`);
-    const html_part_text = await get_utterances_html(greeting_text, utterance_list, count);
+    console.debug(`[process_message] filtered utterances: ${JSON.stringify(utterance_list)}`);
+    const html_part_text = await get_utterances_html(greeting_text, utterance_list);
     await irs_send_email(user_email, sub_text, body_part_text, html_part_text);
 }
 

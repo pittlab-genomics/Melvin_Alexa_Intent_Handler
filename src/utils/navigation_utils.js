@@ -84,12 +84,13 @@ const resolve_oov_entity = async function (handlerInput, query) {
     const t0 = performance.now();
     const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
     const mapping_preference = _.has(preferences, "CUSTOM_MAPPINGS") ? preferences["CUSTOM_MAPPINGS"] : false;
-    if (mapping_preference) {
+    const user_email = _.has(preferences, "email") ? preferences["email"] : false;
+    if (mapping_preference && user_email) {
         console.info("[resolve_oov_entity] Looking up custom mappings...");
-        let result = await voicerecords_doc.getOOVMappingForQuery(query);
-        if (result != null) {
-            console.debug(`[resolve_oov_entity] response: ${JSON.stringify(result)}`);
-            return { "data": result[0]["entity_data"] };
+        const vrec_result = await voicerecords_doc.getOOVMappingForQuery(query, user_email);
+        if (vrec_result.length > 0) {
+            console.debug(`[resolve_oov_entity] recorded mapping response: ${JSON.stringify(vrec_result)}`);
+            return { "data": vrec_result[0]["entity_data"] };
         }
     }
     const request_id = _.get(handlerInput, "requestEnvelope.request.requestId");

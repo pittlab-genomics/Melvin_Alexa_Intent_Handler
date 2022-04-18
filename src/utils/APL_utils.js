@@ -173,7 +173,7 @@ const add_to_APL_text_pager = function (handlerInput, text) {
     }
 };
 
-const add_to_APL_image_pager = function (handlerInput, url_list) {
+const add_to_APL_image_pager = async function (handlerInput, url_list) {
     if (!Array.isArray(url_list) || url_list.length == 0) {
         add_to_APL_text_pager(handlerInput, "");
         return;
@@ -182,11 +182,11 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
     // add context information to image URLs and populate pre-signed URLs
     add_context_to_urls(handlerInput, url_list);
     const signed_url_list = [];
-    url_list.forEach(function (url) {
-        const signed_req = sign_request(url, MELVIN_EXPLORER_REGION, handlerInput, true);
+    for (let item of url_list) {
+        const signed_req = await sign_request(item, MELVIN_EXPLORER_REGION, handlerInput, true);
         const presigned_url = build_presigned_url(signed_req);
         signed_url_list.push(presigned_url);
-    });
+    }
 
     if (supportsAPL(handlerInput)) {
         const image_pager_doc = APLDocs.image_pager;
@@ -213,7 +213,7 @@ const add_to_APL_image_pager = function (handlerInput, url_list) {
                     "commands": [
                         {
                             "type":  "Idle",
-                            "delay": 3000
+                            "delay": 100
                         },
                         {
                             "type":        "AutoPage",

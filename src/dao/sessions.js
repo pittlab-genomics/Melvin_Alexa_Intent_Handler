@@ -1,7 +1,9 @@
 var AWS = require("aws-sdk");
 const moment = require("moment");
 
-const { scanEntireTable } = require("./dao_utils.js");
+const {
+    scanEntireTable, queryEntireTable 
+} = require("./dao_utils.js");
 
 AWS.config.update({ region: process.env.REGION });
 var docClient = new AWS.DynamoDB.DocumentClient();
@@ -39,7 +41,8 @@ sessions_doc.prototype.getMostRecentSession = async (user_id) => {
     };
 
     // Although there is no filter expression, we need to read session records before current session
-    session_list = await docClient.query(query_params).promise();
+    const min_session_count = 2;
+    session_list = await queryEntireTable(docClient, query_params, min_session_count);
     console.info(`[sessions_doc] session_list: ${JSON.stringify(session_list)}`);
     return session_list;
 };

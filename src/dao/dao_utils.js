@@ -17,7 +17,7 @@ const queryEntireTable = async function (docClient, query_params, limit = 0) {
         } else {
             hasMorePages = false;
         }
-        if (limit != 0 && result.length >= limit) {
+        if (hasMorePages && limit != 0 && result.length >= limit) {
             hasMorePages = false;
         }
     } while (hasMorePages);
@@ -41,7 +41,7 @@ const scanEntireTable = async function (docClient, scan_params, limit = 0) {
         } else {
             hasMorePages = false;
         }
-        if (limit != 0 && result.length >= limit) {
+        if (hasMorePages && limit != 0 && result.length >= limit) {
             hasMorePages = false;
         }
     } while (hasMorePages);

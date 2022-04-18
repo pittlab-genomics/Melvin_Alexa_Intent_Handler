@@ -1,9 +1,10 @@
-const _ = require("lodash");
 const Alexa = require("ask-sdk-core");
 const ddbAdapter = require("ask-sdk-dynamodb-persistence-adapter");
-var AWS = require("aws-sdk");
+const AWS = require("aws-sdk");
 
-const { MelvinEventTypes } = require("./common.js");
+const {
+    MelvinEventTypes, GOODBYE_SPEECH
+} = require("./common.js");
 const { add_event_configuration } = require("./utils/handler_configuration.js");
 
 const {
@@ -28,7 +29,7 @@ const {
 } = require("./skill_handlers/navigation_handler.js");
 
 const {
-    build_ssml_response_from_nunjucks, build_melvin_voice_response 
+    build_ssml_response_from_nunjucks, build_melvin_voice_response
 } = require("./utils/response_builder_utils.js");
 
 const { LaunchRequestHandler } = require("./skill_handlers/launch_handler.js");
@@ -40,6 +41,10 @@ const {
 const { NavigateEmailIntentHandler } = require("./skill_handlers/email_handler.js");
 const { add_to_APL_text_pager } = require("./utils/APL_utils.js");
 
+const dynamoDBClient = new AWS.DynamoDB({
+    apiVersion: "latest", region: process.env.REGION
+});
+
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === "IntentRequest"
@@ -50,7 +55,7 @@ const HelpIntentHandler = {
             build_ssml_response_from_nunjucks("system/help.njk"));
         const reprompt_text = build_melvin_voice_response(
             build_ssml_response_from_nunjucks("system/help_reprompt.njk"));
-        add_to_APL_text_pager(handlerInput, 
+        add_to_APL_text_pager(handlerInput,
             "Check out our videos and sample conversations at https://pittgenomics.gitlab.io/melvin_docs");
         return handlerInput.responseBuilder
             .speak(speech_text)
@@ -67,7 +72,7 @@ const CancelAndStopIntentHandler = {
                 || handlerInput.requestEnvelope.request.intent.name === "AMAZON.StopIntent");
     },
     handle(handlerInput) {
-        const speech_text = build_melvin_voice_response("Goodbye!");
+        const speech_text = build_melvin_voice_response(GOODBYE_SPEECH);
         return handlerInput.responseBuilder
             .speak(speech_text)
             .withShouldEndSession(true)
@@ -126,9 +131,9 @@ const ErrorHandler = {
     handle(handlerInput, error) {
         console.error(`[ErrorHandler] ${error.message}`, error);
         const speech_text = build_melvin_voice_response(
-            build_ssml_response_from_nunjucks("system/error_handler.njk"));
+            build_ssml_response_from_nunjucks("error/error_handler.njk"));
         const reprompt_text = build_melvin_voice_response(
-            build_ssml_response_from_nunjucks("system/error_handler_reprompt.njk"));
+            build_ssml_response_from_nunjucks("error/error_handler_reprompt.njk"));
 
         return handlerInput.responseBuilder
             .speak(speech_text)
@@ -196,9 +201,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         new ddbAdapter.DynamoDbPersistenceAdapter({
             tableName:      process.env.DYNAMODB_TABLE_USER_PREFERENCE,
             createTable:    false,
-            dynamoDBClient: new AWS.DynamoDB({
-                apiVersion: "latest", region: process.env.REGION
-            })
+            dynamoDBClient: dynamoDBClient
         })
     )
     .lambda();

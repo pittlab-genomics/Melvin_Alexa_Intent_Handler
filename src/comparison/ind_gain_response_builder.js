@@ -23,7 +23,7 @@ async function build_ind_gain_compare_tcga_response(handlerInput, melvin_state, 
         response:     response
     };
     add_ind_gain_tcga_plot(image_list, melvin_state);
-    add_to_APL_image_pager(handlerInput, image_list);
+    await add_to_APL_image_pager(handlerInput, image_list);
     return build_ssml_response_from_nunjucks("dtype_compare/ind_gain.njk", nunjucks_context, opts);
 }
 

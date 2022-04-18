@@ -7,7 +7,7 @@ environment:
   DYNAMODB_TABLE_USER_UTTERANCE: melvin-user-utterance-${self:provider.stage}
   DYNAMODB_TABLE_USER_SESSION: melvin-user-session-${self:provider.stage}
   DYNAMODB_TABLE_USER_PREFERENCE: melvin-user-preference-${self:provider.stage}
-  DYNAMODB_TABLE_VOICE_RECORDER: melvin-voice-recorder
+  DYNAMODB_TABLE_VOICE_RECORDER: melvin-recorder-utterance-${self:provider.stage}
   SQS_IRS: 073302257160:melvin-sqs-irs-${self:provider.stage}
   SQS_WARMUP: 073302257160:melvin-sqs-warmup-${self:provider.stage}
   MELVIN_EXPLORER_ENDPOINT: "https://api.uat.melvin.pittlabgenomics.com/v0.1"
@@ -18,6 +18,6 @@ environment:
   PROFILE_INFO_ENDPOINT: "https://api.amazon.com/user/profile"
   WARMUP_SERVICE_ENABLED: true
   WARMUP_EVENT_SCHEDULE_RATE: 1 minute
-  WARMUP_EVENT_COUNT: 3
+  WARMUP_EVENT_COUNT: 5
 alexa:
   appId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d
