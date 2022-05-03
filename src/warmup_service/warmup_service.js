@@ -545,42 +545,42 @@ const send_parallel_requests = async function (request_id, options = {}) {
         const req_promises1 = [];
         if (options.mapper_enabled) {
             for (let cat_item in oov_mapper_ep_path_dict) {
-                const cat_url_list = generate_urls_from_paths(OOV_MAPPER_ENDPOINT, oov_mapper_ep_path_dict[cat_item]
-                    , OOV_MAPPER_REGION, creds_data);
-                cat_url_list.map((url) => req_promises1.push(request_async(url, options.mapper_timeout)));
+                const cat_url_list = await generate_urls_from_paths(OOV_MAPPER_ENDPOINT,
+                    oov_mapper_ep_path_dict[cat_item], OOV_MAPPER_REGION, creds_data);
+                cat_url_list.forEach((url) => req_promises1.push(request_async(url, options.mapper_timeout)));
             }
         }
 
         if (options.stats_enabled) {
             for (let cat_item in stats_ep_path_dict) {
-                const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, stats_ep_path_dict[cat_item]
-                    , MELVIN_EXPLORER_REGION, creds_data);
-                cat_url_list.map((url) => req_promises1.push(request_async(url, options.stats_timeout)));
+                const cat_url_list = await generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT,
+                    stats_ep_path_dict[cat_item], MELVIN_EXPLORER_REGION, creds_data);
+                cat_url_list.forEach((url) => req_promises1.push(request_async(url, options.stats_timeout)));
             }
         }
 
         if (options.plots_enabled) {
             for (let cat_item in plots_ep_path_dict) {
-                const cat_url_list = generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT, plots_ep_path_dict[cat_item]
-                    , MELVIN_EXPLORER_REGION, creds_data);
-                cat_url_list.map((url) => req_promises1.push(request_async(url, options.plots_timeout)));
+                const cat_url_list = await generate_urls_from_paths(MELVIN_EXPLORER_ENDPOINT,
+                    plots_ep_path_dict[cat_item], MELVIN_EXPLORER_REGION, creds_data);
+                cat_url_list.forEach((url) => req_promises1.push(request_async(url, options.plots_timeout)));
             }
         }
         results["results_part1"] = await allSettled(req_promises1);
 
         if (options.splitby_enabled) {
             const req_promises2 = [];
-            const splitby_stats_urls = get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT,
+            const splitby_stats_urls = await get_melvin_splitby_stats_urls(MELVIN_EXPLORER_ENDPOINT,
                 MELVIN_EXPLORER_REGION, creds_data);
             console.info(`splitby_stats_urls: ${JSON.stringify(splitby_stats_urls)}`);
-            splitby_stats_urls.forEach(async function (url_item) {
+            splitby_stats_urls.forEach(function (url_item) {
                 const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
                 repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
             });
 
-            const splitby_plot_urls = get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT,
+            const splitby_plot_urls = await get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT,
                 MELVIN_EXPLORER_REGION, creds_data);
-            splitby_plot_urls.forEach(async function (url_item) {
+            splitby_plot_urls.forEach(function (url_item) {
                 const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
                 repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
             });
@@ -590,7 +590,7 @@ const send_parallel_requests = async function (request_id, options = {}) {
 
         if (options.verbose) {
             response["data"] = results;
-        }        
+        }
     } catch (err) {
         response["error"] = err;
         console.error(`[send_parallel_requests] error: ${JSON.stringify(err)}`, err);
@@ -637,8 +637,8 @@ async function publish_warmup_events() {
     }
 
     await sqs.sendMessageBatch(params, (err, data) => {
-        console.info(`[warmup_handler] batch request callback data: ${JSON.stringify(data)}, ` + 
-        `error: ${JSON.stringify(err)}`);
+        console.info(`[warmup_handler] batch request callback data: ${JSON.stringify(data)}, ` +
+            `error: ${JSON.stringify(err)}`);
     }).promise();
 
 }

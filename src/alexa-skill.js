@@ -28,6 +28,8 @@ const {
     NavigateRepeatIntentHandler
 } = require("./skill_handlers/navigation_handler.js");
 
+const { NavigateMutationsIntentHandler } = require("./skill_handlers/mutations_handler.js");
+
 const {
     build_ssml_response_from_nunjucks, build_melvin_voice_response
 } = require("./utils/response_builder_utils.js");
@@ -192,6 +194,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         NavigateCompareIntentHandler,
         NavigateSplitbyIntentHandler,
         NavigateEmailIntentHandler,
+        NavigateMutationsIntentHandler,
 
         // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
         IntentReflectorHandler)

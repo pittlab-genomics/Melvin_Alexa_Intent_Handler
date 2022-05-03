@@ -1,7 +1,9 @@
 {
     "type": "APL",
     "version": "1.9",
-    "settings": {},
+    "settings": {
+        "idleTimeout": 120000
+    },
     "theme": "dark",
     "import": [
         {

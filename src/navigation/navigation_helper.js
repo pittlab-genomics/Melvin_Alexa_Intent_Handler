@@ -17,7 +17,7 @@ const {
 } = require("../utils/navigation_utils.js");
 
 const {
-    get_state_change_diff, build_text_speech_and_reprompt_response 
+    get_state_change_diff, build_text_speech_and_reprompt_response
 } = require("../utils/response_builder_utils.js");
 
 const {
@@ -31,12 +31,13 @@ const {
 } = require("../cna/loss_response_builder.js");
 
 const {
-    build_gene_definition_response, build_gene_target_response 
+    build_gene_definition_response, build_gene_target_response
 } = require("../gene/gene_response_builder.js");
 const { build_sv_response } = require("../structural_variants/sv_helper.js");
 const {
-    build_gene_expression_response, build_gene_expression_compare_response 
+    build_gene_expression_response, build_gene_expression_compare_response
 } = require("../gene_expression/response_builder.js");
+const { build_hrd_response } = require("../hrd/hrd_response_builder.js");
 const { build_mut_cna_compare_response } = require("../comparison/mut_cna_response_builder.js");
 const { build_mut_gain_compare_response } = require("../comparison/mut_gain_response_builder.js");
 const { build_mut_loss_compare_response } = require("../comparison/mut_loss_response_builder.js");
@@ -59,7 +60,7 @@ const {
     build_indels_compare_response
 } = require("../mutations/indels_response_builder.js");
 const {
-    build_snvs_response, 
+    build_snvs_response,
     build_snv_domains_response,
     build_snvs_compare_response
 } = require("../mutations/snvs_response_builder.js");
@@ -95,7 +96,7 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
     const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
     const opts = {
         "BRIEF_MODE":         brief_mode_preference,
-        "ENABLE_VOICE_STYLE": true 
+        "ENABLE_VOICE_STYLE": true
     };
     let response = {};
     console.log(`[build_compare_response] melvin_state: ${JSON.stringify(melvin_state)}, `
@@ -184,13 +185,13 @@ const build_compare_response = async function (handlerInput, melvin_state, compa
             response = await build_snvs_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
-            response = 
+            response =
                 await build_gene_expression_compare_response(handlerInput, melvin_state, compare_state, state_diff);
 
-        }else {
+        } else {
             throw melvin_error(
-                `Error while building compare reponse: melvin_state: ${melvin_state}, ` + 
-                    `compare_state: ${compare_state}`,
+                `Error while building compare reponse: melvin_state: ${melvin_state}, ` +
+                `compare_state: ${compare_state}`,
                 MelvinIntentErrors.INVALID_STATE,
                 "The data type is missing for comparison."
             );
@@ -207,10 +208,10 @@ const build_navigation_response = async function (handlerInput, state_change) {
     const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
     const opts = {
         "BRIEF_MODE":         brief_mode_preference,
-        "ENABLE_VOICE_STYLE": true 
+        "ENABLE_VOICE_STYLE": true
     };
     console.info(`[build_navigation_response] state_change: ${JSON.stringify(state_change)}, ` +
-    `attr_count: ${attr_count}, opts: ${JSON.stringify(opts)}`);
+        `attr_count: ${attr_count}, opts: ${JSON.stringify(opts)}`);
 
     let response = "";
     if (attr_count <= FOLLOW_UP_TEXT_THRESHOLD || _.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
@@ -234,10 +235,10 @@ const build_navigation_response = async function (handlerInput, state_change) {
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.IND_DOMAINS) {
             response = await build_indels_domain_response(handlerInput, melvin_state, opts);
 
-        } else if(melvin_state[MelvinAttributes.DTYPE] === DataTypes.SNV_DOMAINS) {
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.SNV_DOMAINS) {
             response = await build_snv_domains_response(handlerInput, melvin_state, opts);
 
-        } else if(melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUT_DOMAINS){
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.MUT_DOMAINS) {
             response = await build_mutations_domain_response(handlerInput, melvin_state, opts);
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.INDELS) {
@@ -257,9 +258,12 @@ const build_navigation_response = async function (handlerInput, state_change) {
 
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.STRUCTURAL_VARIANTS) {
             response = await build_sv_response(handlerInput, melvin_state, opts);
- 
+
         } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.GENE_EXPRESSION) {
             response = await build_gene_expression_response(handlerInput, melvin_state, opts);
+
+        } else if (melvin_state[MelvinAttributes.DTYPE] === DataTypes.HRD) {
+            response = await build_hrd_response(handlerInput, melvin_state, opts);
 
         } else {
             throw melvin_error(`Unknown data_type found in melvin_state: ${JSON.stringify(melvin_state)}`,
@@ -275,4 +279,3 @@ module.exports = {
     build_compare_response,
     ack_attribute_change
 };
-

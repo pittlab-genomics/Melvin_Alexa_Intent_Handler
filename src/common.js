@@ -84,7 +84,8 @@ const DataTypes = {
     LOSS:                "LOSS",
     STRUCTURAL_VARIANTS: "STRUCTURAL_VARIANTS",
     INDELS:              "INDELS",
-    SNV:                 "SNV"
+    SNV:                 "SNV",
+    HRD:                 "HRD"
 };
 
 const DataSources = {

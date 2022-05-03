@@ -209,8 +209,9 @@ const add_to_APL_image_pager = async function (handlerInput, url_list) {
             "token":    "pagerToken",
             "commands": [
                 {
-                    "type":     "Parallel",
-                    "commands": [
+                    "type":      "Parallel",
+                    "sequencer": "MelvinSequencer",
+                    "commands":  [
                         {
                             "type":  "Idle",
                             "delay": 100

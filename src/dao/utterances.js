@@ -109,7 +109,7 @@ utterances_doc.prototype.get_events_for_period = async function (
         + `s_time: ${s_time}, limit: ${limit}`);
     let filter_exp = "#event_type = :event_type AND #time > :s_time";
     if (event_type === MelvinEventTypes.ANALYSIS_EVENT) {
-        filter_exp = "#event_type = :event_type AND #time > :s_time " + 
+        filter_exp = "#event_type = :event_type AND #time > :s_time " +
             "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
     }
     let query_params = {

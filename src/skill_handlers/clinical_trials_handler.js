@@ -29,7 +29,7 @@ function build_clinical_trials_error_speech(params, response, speech) {
     }
 }
 
-function add_clinical_trials_map_plot(handlerInput, params) {
+async function add_clinical_trials_map_plot(handlerInput, params) {
     let image_list = [];
     const clinical_trial_map_url = new URL(`${MELVIN_EXPLORER_ENDPOINT}/clinical_trials/map_plot`);
     add_query_list_params(clinical_trial_map_url, params, ["location", "distance", "study"]);
@@ -69,7 +69,7 @@ const ClinicalTrialsNearbyIntentHandler = {
                         speech.say(`There are ${record_count} clinical trials near ${location}.`);
                     }
                     speech.say(`The closest one is at ${response["data"][0]["facility_name"]}`);
-                    add_clinical_trials_map_plot(handlerInput, params);
+                    await add_clinical_trials_map_plot(handlerInput, params);
 
                 } else {
                     speech.say("Sorry, I could not find any clinical trials matching your description.");
@@ -137,7 +137,7 @@ const ClinicalTrialsWithinIntentHandler = {
                             ` kilometres of ${location}.`);
                     }
                     speech.say(`The closest one is at ${response["data"][0]["facility_name"]}`);
-                    add_clinical_trials_map_plot(handlerInput, params);
+                    await add_clinical_trials_map_plot(handlerInput, params);
 
                 } else {
                     speech.say("Sorry, I could not find any clinical trials matching your description.");
@@ -201,7 +201,7 @@ const ClinicalTrialClosestIntentHandler = {
                             speech.say(`, ${trial_item["country"]}`);
                         }
                     }
-                    add_clinical_trials_map_plot(handlerInput, params);
+                    await add_clinical_trials_map_plot(handlerInput, params);
 
                 } else {
                     speech.say("Sorry, I could not find any clinical trials matching your description.");

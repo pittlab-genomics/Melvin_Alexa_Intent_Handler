@@ -16,6 +16,9 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateM
 
 serverless invoke local --function alexa-skill -p ./test/examples/clinvar/NavigateMutationsIntent_GS.json
 
+### HRD
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_HRD_BRCA2.json
+
 
 ### Mutation Domains
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateMutationDomains_G.json
@@ -47,6 +50,8 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateC
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_cna_S_vs_S.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_cna_GS_vs_G.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCompareIntent_cna_GS_vs_S.json
+
+serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_TP53_BRCA_CNA.json
 
 
 ### Compare GAIN
