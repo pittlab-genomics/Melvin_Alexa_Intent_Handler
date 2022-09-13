@@ -179,6 +179,11 @@ const add_to_APL_image_pager = async function (handlerInput, url_list) {
         return;
     }
 
+    // store image urls in a request attribute, we add this to utterance record when writing to utterences database
+    const reqAttributes = handlerInput.attributesManager.getRequestAttributes();
+    reqAttributes["APL_IMAGE_URL_LIST"] = url_list;
+    handlerInput.attributesManager.setRequestAttributes(reqAttributes);
+
     // add context information to image URLs and populate pre-signed URLs
     add_context_to_urls(handlerInput, url_list);
     const signed_url_list = [];

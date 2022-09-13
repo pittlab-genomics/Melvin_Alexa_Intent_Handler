@@ -17,13 +17,12 @@ utterances_doc.prototype.addUserUtterance = async (record) => {
     };
 
     try {
-        const data = await docClient.put(params).promise();
-        console.log(`[utterances_doc] saved user utterance: ${JSON.stringify(data)} | `
+        await docClient.put(params).promise();
+        console.log(`[utterances_doc] saved user utterance | params: ${JSON.stringify(params)} | `
             + `TableName: ${process.env.DYNAMODB_TABLE_USER_UTTERANCE}`);
-        return data;
 
     } catch (error) {
-        console.log(`Unable to insert user utterance => ${JSON.stringify(params)}`, error);
+        console.log(`Unable to insert user utterance| params: ${JSON.stringify(params)}`, error);
     }
 };
 
@@ -64,7 +63,7 @@ utterances_doc.prototype.get_events_for_count = async function (
     }
     let query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type",
+        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type, apl_image_urls",
         KeyConditionExpression:   "#user_id = :uid AND begins_with(#utterance_id, :sid)",
         FilterExpression:         filter_exp,
         ExpressionAttributeNames: {
@@ -114,7 +113,7 @@ utterances_doc.prototype.get_events_for_period = async function (
     }
     let query_params = {
         TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type",
+        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type, apl_image_urls",
         KeyConditionExpression:   "#user_id = :uid",
         FilterExpression:         filter_exp,
         ExpressionAttributeNames: {

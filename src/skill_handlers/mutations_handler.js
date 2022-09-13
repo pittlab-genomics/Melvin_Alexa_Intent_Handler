@@ -12,7 +12,7 @@ const {
 } = require("../utils/navigation_utils.js");
 
 const {
-    build_melvin_voice_response, build_text_speech_and_reprompt_response 
+    build_melvin_voice_response, build_text_speech_and_reprompt_response
 } = require("../utils/response_builder_utils.js");
 
 const { add_to_APL_text_pager } = require("../utils/APL_utils.js");
@@ -44,13 +44,15 @@ const NavigateMutationsIntentHandler = {
         try {
             const state_change = await update_melvin_state(handlerInput);
             const melvin_state = validate_action_intent_state(handlerInput, state_change, DataTypes.MUTATIONS);
-            let response = await build_mutations_response(handlerInput, melvin_state);
             const preferences = await handlerInput.attributesManager.getPersistentAttributes(true, {});
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
+            console.info(`[NavigateMutationsIntentHandler] state_change: ${JSON.stringify(state_change)},` +
+                `opts: ${JSON.stringify(opts)} || ${brief_mode_preference}`);
+            let response = await build_mutations_response(handlerInput, melvin_state, opts);
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
             reprompt_text = response["reprompt_text"];
@@ -86,7 +88,7 @@ const NavigateMutationDomainsIntentHandler = {
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
@@ -123,7 +125,7 @@ const NavigateIndelsIntentHandler = {
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
@@ -160,7 +162,7 @@ const NavigateIndelDomainsIntentHandler = {
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
@@ -197,7 +199,7 @@ const NavigateSNVsIntentHandler = {
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];
@@ -234,7 +236,7 @@ const NavigateSNVDomainsIntentHandler = {
             const brief_mode_preference = _.has(preferences, "BRIEF_MODE") ? preferences["BRIEF_MODE"] : false;
             const opts = {
                 "BRIEF_MODE":         brief_mode_preference,
-                "ENABLE_VOICE_STYLE": true 
+                "ENABLE_VOICE_STYLE": true
             };
             response = build_text_speech_and_reprompt_response(response, opts);
             speech_text = response["speech_text"];

@@ -1,0 +1,30 @@
+{
+    "Records": [
+        {
+            "messageId": "116ef047-8a33-49de-bf94-284652c3865f",
+            "receiptHandle": "AQEBoR0NLbgODA+A9pnqx6RVvrqKbIa8zn5Zi6YDT901GzSaui0ljz4PymEBXTag+/sp2zUnGKZjTBLTJuJ19O0isA98wPis2boY0x1WsofPuuiek3B7uKo74Vm/yFz77aKABXTDHlqWtgyIiVBez8KoAdJVJWf7tW2yVQB3Jph/n50X806tCZdVvEoMOOrjJYm4oNJR4G4iZhSwxS4wWO98zbEdL3Tz9dd+ALpRcW3XQKhfmAQdrbWgp8yXRbZtoh/sHrIyMZI2mdxU8gFEwi6PyX7Vef/r5SgFdJAEG6embF6y4/YK2UUUCuiPRN8DLc6edXnmpedjlI62gwibHDjGIH2ec15EEAYJRdubVcaR+P5Ly2xg6f10vAio49kI/tgDmoiHMsfqt83VUUnlsrn7/A==",
+            "body": "{\"irs_channel\":\"EMAIL\",\"timestamp\":1655799190314,\"user_id\":\"amzn1.ask.account.AEMKNTNEIRNG72EAFBLWHCX6ZOKB4H4F7PMGPDYPCPDTWYLJIYUATVAMCJDMKKGNXLWBIU7FF4WO7EXLPIICYWVJTFT76WKPDNKJJWTZKRQ24O2W6S4C43UHMLPTCFPD2VJ7NVOCPXUDGRG5C75MI2B55RGTDEJQ3W6JBY57PCNHNYV7ZOJG6V2JTD6PCK3OJO6PKBK24A4IB2Y\",\"session_id\":\"amzn1.echo-api.session.51fbfbdd-4d8e-4b88-b1ee-24082350b6e6\",\"user_email\":\"ravihansa3000@gmail.com\",\"irs_results_count\":\"2\"}",
+            "attributes": {
+                "ApproximateReceiveCount": "1",
+                "SentTimestamp": "1655799190346",
+                "SenderId": "AROARCEJHVYEG7KQSEXJB:melvin-alexa-intent-handlers-uat-alexa-skill",
+                "ApproximateFirstReceiveTimestamp": "1655799190360"
+            },
+            "messageAttributes": {},
+            "md5OfBody": "fc22618cc525eb0077a37add761b8e1e",
+            "eventSource": "aws:sqs",
+            "eventSourceARN": "arn:aws:sqs:eu-west-1:073302257160:melvin-sqs-irs-uat",
+            "awsRegion": "eu-west-1"
+        }
+    ],
+    "context": {
+        "callbackWaitsForEmptyEventLoop": true,
+        "functionVersion": "$LATEST",
+        "functionName": "melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "memoryLimitInMB": "3008",
+        "logGroupName": "/aws/lambda/melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "logStreamName": "2022/06/21/[$LATEST]b654a30d91594cd4987687dc61df9764",
+        "invokedFunctionArn": "arn:aws:lambda:eu-west-1:073302257160:function:melvin-alexa-intent-handlers-uat-sqs_irs_subscriber",
+        "awsRequestId": "5a503b8c-25f5-5cc5-9f6f-60a75a3e1c63"
+    }
+}

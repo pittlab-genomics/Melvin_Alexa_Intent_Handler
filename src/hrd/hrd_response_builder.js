@@ -11,7 +11,7 @@ async function build_hrd_response(handlerInput, melvin_state) {
     const image_list = [];
     const speech = new Speech();
     speech.say("In breast invasive carcinoma, homologous recombination deficiency scores show " +
-        "differential activity between braca one mutant and wild type samples " +
+        "differential activity between braca two mutant and wild type samples " +
         "with a Mann Whitney P value of 0.01.");
     add_hrd_plot(image_list, melvin_state);
     await add_to_APL_image_pager(handlerInput, image_list);

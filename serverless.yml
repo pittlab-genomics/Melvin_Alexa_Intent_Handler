@@ -17,7 +17,7 @@ provider:
     - Effect: Allow
       Action:
         - ssm:GetParameter
-      Resource: "arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/${self:service}/{self:provider.stage}/*"
+      Resource: arn:aws:ssm:${self:provider.region}:${aws:accountId}:parameter/${self:service}/{self:provider.stage}/*
 
     - Effect: Allow
       Action:
@@ -25,7 +25,7 @@ provider:
         - dynamodb:Query
         - dynamodb:Scan
         - dynamodb:GetItem
-      Resource: "arn:aws:dynamodb:ap-southeast-1:*:table/${self:provider.environment.DYNAMODB_TABLE_VOICE_RECORDER}"
+      Resource: arn:aws:dynamodb:ap-southeast-1:${aws:accountId}:table/${self:provider.environment.DYNAMODB_TABLE_VOICE_RECORDER}
 
     - Effect: Allow
       Action:
@@ -37,7 +37,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
         - dynamodb:CreateTable
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_USER_PREFERENCE}"
+      Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.DYNAMODB_TABLE_USER_PREFERENCE}
 
     - Effect: Allow
       Action:
@@ -48,7 +48,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_USER_UTTERANCE}"
+      Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.DYNAMODB_TABLE_USER_UTTERANCE}
 
     - Effect: Allow
       Action:
@@ -59,35 +59,36 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE_USER_SESSION}"
+      Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:provider.environment.DYNAMODB_TABLE_USER_SESSION}
+
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+        - ses:SendRawEmail
+      Resource: arn:aws:ses:${self:provider.region}:${aws:accountId}:${self:provider.environment.SES_IDENTITY}
 
     - Effect: Allow
       Action:
         - sqs:SendMessage
         - sqs:ReceiveMessage
-      Resource: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+      Resource: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:provider.environment.SQS_IRS}
 
     - Effect: Allow
       Action:
         - sqs:SendMessage
         - sqs:SendMessageBatch
-      Resource: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_WARMUP}
-
-    - Effect: Allow
-      Action:
-        - ses:SendEmail
-      Resource: "*"
+      Resource: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:provider.environment.SQS_WARMUP}
 
     - Effect: Allow
       Action:
         - events:describeRule
         - events:putRule
-      Resource: "arn:aws:events:${self:provider.region}:${aws:accountId}:rule/melvin-warmup-event-rule-${self:provider.stage}"
+      Resource: arn:aws:events:${self:provider.region}:${aws:accountId}:rule/melvin-warmup-event-rule-${self:provider.stage}
 
     - Effect: Allow
       Action:
         - sts:AssumeRole
-      Resource: "arn:aws:iam::${aws:accountId}:role/melvin-${self:provider.stage}-skill-intent-handler-role"
+      Resource: arn:aws:iam::${aws:accountId}:role/melvin-${self:provider.stage}-skill-intent-handler-role
 
 functions:
   alexa-skill:
@@ -103,12 +104,12 @@ functions:
 
   sqs_irs_subscriber:
     handler: src/sqs/irs_subscriber.handler
-    timeout: 300
+    timeout: 900
     reservedConcurrency: 10
     memorySize: 3008
     events:
       - sqs: 
-          arn: arn:aws:sqs:${self:provider.region}:${self:provider.environment.SQS_IRS}
+          arn: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:provider.environment.SQS_IRS}
           enabled: true
           batchSize: 1
 

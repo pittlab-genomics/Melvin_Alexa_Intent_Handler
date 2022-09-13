@@ -195,7 +195,6 @@ const update_melvin_history = async function (handlerInput) {
 
     // store utterance as a session attribute for faster navigation
     let melvin_history = get_melvin_history(handlerInput);
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const intent_name = _.get(handlerInput, "requestEnvelope.request.intent.name", "UNKNOWN_INTENT");
     const history_event = {
         melvin_state,
@@ -206,27 +205,42 @@ const update_melvin_history = async function (handlerInput) {
     if (melvin_history.length > MELVIN_MAX_HISTORY_ITEMS) {
         melvin_history = new Array(melvin_history.pop());
     }
+
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     sessionAttributes["MELVIN.HISTORY"] = melvin_history;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+    // get image urls from request attributes
+    const reqAttributes = handlerInput.attributesManager.getRequestAttributes();
+    const apl_image_url_list = reqAttributes["APL_IMAGE_URL_LIST"];
+    const apl_image_url_href_list = [];
+    if (apl_image_url_list) {
+        apl_image_url_list.forEach(function (url) {
+            apl_image_url_href_list.push(url.href);
+        });
+    }
+    console.info(`[update_melvin_history] APL images: ${JSON.stringify(apl_image_url_href_list)}`);
+    
+
     const melvin_response = handlerInput.responseBuilder.getResponse();
     const new_utterance_rec = {
-        user_id:   handlerInput.requestEnvelope.session.user.userId,
+        user_id:        handlerInput.requestEnvelope.session.user.userId,
         utterance_id,
-        createdAt: timestamp,
-        request:   handlerInput.requestEnvelope.request,
-        device:    handlerInput.requestEnvelope.context.System.device,
+        createdAt:      timestamp,
+        request:        handlerInput.requestEnvelope.request,
+        device:         handlerInput.requestEnvelope.context.System.device,
+        apl_image_urls: apl_image_url_href_list,
         melvin_state,
-        intent:    intent_name,
+        intent:         intent_name,
         event_type,
         melvin_history,
-        melvin_response,
+        melvin_response
     };
     await utterances_doc.addUserUtterance(new_utterance_rec);
 };
 
 const validate_required_attributes = function (melvin_state) {
-    console.log(`[validate_required_attributes] melvin_state: ${JSON.stringify(melvin_state)}`);
+    console.log(`[update_melvin_history] melvin_state: ${JSON.stringify(melvin_state)}`);
     if (_.isEmpty(melvin_state[MelvinAttributes.DTYPE])) {
         return;
     }
@@ -234,7 +248,7 @@ const validate_required_attributes = function (melvin_state) {
     const data_type_val = melvin_state[MelvinAttributes.DTYPE];
     if (!(data_type_val in DataTypes)) {
         throw melvin_error(
-            "[validate_required_attributes] error while validating required attributes | " +
+            "[update_melvin_history] error while validating required attributes | " +
             `data_type_val: ${data_type_val}, melvin_state: ${JSON.stringify(melvin_state)}`,
             MelvinIntentErrors.INVALID_DATA_TYPE,
             "I could not understand that data type. Please try again."
@@ -268,7 +282,7 @@ const validate_required_attributes = function (melvin_state) {
         code += 1;
     }
     const is_valid = required_attributes.includes(code);
-    console.debug(`[validate_required_attributes] required_attributes: ${JSON.stringify(required_attributes)}, `
+    console.debug(`[update_melvin_history] required_attributes: ${JSON.stringify(required_attributes)}, `
         + `code: ${JSON.stringify(code)}`);
 
     if (!is_valid && !has_gene) {

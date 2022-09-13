@@ -24,9 +24,12 @@ const NavigateEmailIntentHandler = {
             && handlerInput.requestEnvelope.request.intent.name === "NavigateEmailIntent";
     },
     async handle(handlerInput) {
+        const DEFAULT_RESULT_COUNT = 1;
+        const queue_url = get_irs_queue_url();
+
         let speech_text = "";
         let reprompt_text = "";
-        const DEFAULT_RESULT_COUNT = 1;
+        let msg_data = null;
 
         try {
             let user_email = "";
@@ -35,13 +38,13 @@ const NavigateEmailIntentHandler = {
             } else {
                 user_email = await handlerInput.serviceClientFactory.getUpsServiceClient().getProfileEmail();
             }
-            const queue_url = get_irs_queue_url();
+            
             const timestamp = moment().valueOf();
             const user_id = _.get(handlerInput, "requestEnvelope.session.user.userId");
             const session_id = _.get(handlerInput, "requestEnvelope.session.sessionId");
 
             // AWS SQS message data
-            const msg_data = {
+            msg_data = {
                 "irs_channel": "EMAIL",
                 "timestamp":   timestamp,
                 "user_id":     user_id,
@@ -66,10 +69,6 @@ const NavigateEmailIntentHandler = {
                 speech_text = build_melvin_voice_response(EMAIL_SUCCESS_COUNT);
             }
             reprompt_text = build_melvin_voice_response(EMAIL_SUCCESS_REPROMPT);
-
-            // publish IRS message to AWS SQS
-            await publish_irs_message(JSON.stringify(msg_data), queue_url);
-
         } catch (error) {
             if (error.statusCode === 403) {
                 speech_text = build_melvin_voice_response(EMAIL_PERMISSION_ERROR);
@@ -86,6 +85,12 @@ const NavigateEmailIntentHandler = {
                 console.error(`[NavigateEmailIntentHandler] error: ${error.message}`, error);
             }
         }
+
+        // publish IRS message to AWS SQS
+        if (msg_data != null) {
+            await publish_irs_message(JSON.stringify(msg_data), queue_url);
+        }
+
         return handlerInput.responseBuilder
             .speak(speech_text)
             .reprompt(reprompt_text)
@@ -95,10 +100,10 @@ const NavigateEmailIntentHandler = {
 };
 
 function get_irs_queue_url() {
-    const sqs_irs_ep = process.env.SQS_IRS.split(":");
-    const account_id = sqs_irs_ep[0];
-    const service_name = sqs_irs_ep[1];
-    const queue_url = `https://sqs.${process.env.REGION}.amazonaws.com/${account_id}/${service_name}`;
+    const aws_region = process.env.REGION;
+    const aws_account_id = process.env.AWS_ACCOUNT_ID;
+    const service_name = process.env.SQS_IRS;
+    const queue_url = `https://sqs.${aws_region}.amazonaws.com/${aws_account_id}/${service_name}`;
     return queue_url;
 }
 

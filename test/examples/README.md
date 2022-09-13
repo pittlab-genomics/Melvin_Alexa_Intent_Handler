@@ -143,6 +143,7 @@ serverless invoke local --function alexa-skill -p ./test/examples/irs/email_coun
 serverless invoke local --function alexa-skill -p ./test/examples/irs/email_duration.json
 serverless invoke local --function sqs_irs_subscriber --path ./test/examples/irs/ses_payload_1.json
 serverless invoke local --function sqs_irs_subscriber --path ./test/examples/irs/ses_payload_2.json
+serverless invoke local --function sqs_irs_subscriber --path ./test/examples/irs/ses_payload_3.json
 
 ### Warmup service
 serverless invoke local --function warmup_service

@@ -91,6 +91,44 @@ async function sign_request(url, region, creds_provider, presigned = false, meth
     }
 }
 
+async function sign_request_with_creds(url, region, cred_data, presigned = false, method = "GET", 
+    expiry_timeout = 43200) {
+    if (cred_data.Credentials) {
+        const creds = {
+            accessKeyId:     cred_data.Credentials.AccessKeyId,
+            secretAccessKey: cred_data.Credentials.SecretAccessKey,
+            sessionToken:    cred_data.Credentials.SessionToken
+        };
+        const signer = new SignatureV4({
+            credentials: creds,
+            region:      region,
+            service:     "execute-api",
+            sha256:      Sha256
+        });
+        const headers = {
+            "host":          url.host,
+            [X_AMZ_EXPIRES]: String(expiry_timeout)
+        };
+        const request = new HttpRequest({
+            headers:  headers,
+            hostname: url.host,
+            method:   method,
+            path:     url.pathname,
+            query:    paramsToObject(url.searchParams.entries())
+        });
+        let signed_req = {};
+        if (presigned) {
+            signed_req = await signer.presign(request, { expiresIn: expiry_timeout });
+        } else {
+            signed_req = await signer.sign(request);
+        }
+        return signed_req;
+    } else {
+        throw melvin_error(
+            "[sigv4_utils] credentials missing", MelvinIntentErrors.AUTH_ERROR, DEFAULT_GENERIC_ERROR_SPEECH_TEXT);
+    }
+}
+
 function build_presigned_url(signed_req) {
     const url = new URL(signed_req.protocol + signed_req.hostname + signed_req.path);
     for (const [key, value] of Object.entries(signed_req.query)) {
@@ -123,5 +161,5 @@ function has_creds_expired(credentials) {
 
 
 module.exports = {
-    sign_request, assume_role, build_presigned_url, has_creds_expired
+    sign_request, sign_request_with_creds, assume_role, build_presigned_url, has_creds_expired
 };
