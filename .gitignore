@@ -4,6 +4,9 @@
 # Visual Studio Code project files
 .vscode
 
+# IntelliJ Idea
+.idea
+
 # npm package files
 node_modules
 package-lock.json

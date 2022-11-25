@@ -61,7 +61,7 @@ const send_request_async = function (url, headers, handlerInput) {
         if (response.ok) {
             return response.json();
         } else {
-            throw await response.json();
+            throw await response.text();
         }
     }).catch((err) => {
         throw melvin_error(
@@ -92,7 +92,7 @@ const process_repeat_requests = async function (handlerInput, url, headers) {
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
             } else {
-                console.log(`${JSON.stringify(response)}`);
+                console.error(`[melvin_explorer_client] AE data error: ${JSON.stringify(response)}`);
                 throw melvin_error(
                     `[melvin_explorer_client] AE response contains error | ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPONSE,
@@ -100,7 +100,7 @@ const process_repeat_requests = async function (handlerInput, url, headers) {
                 );
             }
         } else {
-            console.log(`${JSON.stringify(response)}`);
+            console.error(`[melvin_explorer_client] AE general error: ${JSON.stringify(response)}`);
             throw melvin_error(
                 `[melvin_explorer_client] AE response does not contain data | ${JSON.stringify(response)}`,
                 MelvinIntentErrors.INVALID_API_RESPONSE,
