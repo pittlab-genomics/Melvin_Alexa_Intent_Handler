@@ -19,12 +19,12 @@ const { build_melvin_voice_response } = require("../utils/response_builder_utils
 const { call_directive_service } = require("../utils/response_builder_utils.js");
 
 const agent = new https.Agent({ maxSockets: 100 });
-AWS.config.update({ httpOptions: { agent: agent }});
+AWS.config.update({ httpOptions: { agent: agent } });
 
-const OOV_DEFAULT_MAX_DURATION = 4000;
-const OOV_DEFAULT_SOCKET_TIMEOUT = 1200;
+const OOV_DEFAULT_MAX_DURATION = 6000;
+const OOV_DEFAULT_SOCKET_TIMEOUT = 3000;
 const OOV_DEFAULT_INITIAL_DELAY = 200;
-const OOV_PR_DELAY = 2000;
+const OOV_PR_DELAY = 3500;
 
 const send_request_async = function (url, headers) {
     console.info(`[oov_mapper_client] oov url: ${url.href}`);

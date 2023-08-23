@@ -3,6 +3,8 @@
 ### Gene Definition
 serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_HIF1A_payload.json
 serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_BRCA1_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_RET_payload.json
+serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneDefinition_KAT7_payload.json
 
 ### Gene Target
 serverless invoke local --function alexa-skill -p ./test/examples/other/NavigateGeneTarget_PIK3CA_payload.json
@@ -16,9 +18,6 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateM
 
 serverless invoke local --function alexa-skill -p ./test/examples/clinvar/NavigateMutationsIntent_GS.json
 
-### HRD
-serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateJoinFilterIntent_HRD_BRCA2.json
-
 
 ### Mutation Domains
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateMutationDomains_G.json
@@ -28,6 +27,7 @@ serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateM
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateIndelsIntent_G.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateIndelsIntent_S.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateIndelsIntent_GS.json
+
 ### CNA
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCNAIntent_G.json
 serverless invoke local --function alexa-skill -p ./test/examples/tcga/NavigateCNAIntent_S.json

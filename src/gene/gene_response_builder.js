@@ -19,7 +19,7 @@ const build_gene_definition_response = async function (handlerInput, params) {
     let regex = new RegExp(/\S.*?\."?(?=\s|$)/g);
 
     if (response.data.summary.match(regex)) {
-        const sentence_sum = response.data.summary.match(regex)[0];
+        const sentence_sum = response.data.summary.match(regex).slice(0, 3).join(" ");
         const location = response.data.location;
         if (!_.isEmpty(location) && location !== "N/A") {
             speech

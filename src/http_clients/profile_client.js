@@ -7,9 +7,9 @@ const {
     melvin_error
 } = require("../common.js");
 
-const PREF_DEFAULT_MAX_DURATION = 3000;
-const PREF_DEFAULT_INITIAL_DELAY = 500;
-const PREF_DEFAULT_SOCKET_TIMEOUT = 1200;
+const PREF_DEFAULT_MAX_DURATION = 6000;
+const PREF_DEFAULT_INITIAL_DELAY = 100;
+const PREF_DEFAULT_SOCKET_TIMEOUT = 3000;
 
 async function get_profile_info(access_token) {
     const profile_url = new URL(PROFILE_INFO_ENDPOINT);

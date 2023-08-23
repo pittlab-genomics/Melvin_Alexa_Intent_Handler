@@ -10,12 +10,15 @@ const mimemessage = require("mimemessage");
 
 const {
     MelvinEventTypes,
+    MelvinAttributes,
+    DataTypesDisplayNames,
     MAX_EMAIL_RESULT_COUNT,
     MAX_EMAIL_DURATION,
     MIN_EMAIL_RESULT_COUNT,
     MELVIN_EXPLORER_REGION,
     MELVIN_API_INVOKE_ROLE
 } = require("../common.js");
+const { CANCER_TYPES } = require("../utils/cancer_types.js");
 const utterances_doc = require("../dao/utterances.js");
 const {
     sign_request_with_creds, build_presigned_url, assume_role
@@ -50,7 +53,8 @@ async function process_message(msg_data) {
     const date_str = moment(timestamp).format("YYYY-MM-DD HH:mm Z");
     const sub_text = `Melvin results export on ${date_str}`;
     const body_part_text = "Hi,\r\nPlease find the results of your Melvin Genomics analyses below.\r\n\r\n";
-    const greeting_text = "Hi, <br/><br/>Please find the results of your Melvin Genomics analyses below.<br/><br/>";
+    const greeting_text = "<div style=\"padding: 20px 10px 30px 10px;\">Hi, <br/><br/>" +
+        "Please find the results of your Melvin Genomics analyses below.<br/><br/></div>";
     const user_email = msg_data["user_email"];
     const creds = await assume_role(MELVIN_API_INVOKE_ROLE, user_email);
 
@@ -84,7 +88,7 @@ async function process_message(msg_data) {
 
 async function get_utterances_html(greeting_text, utterance_list, creds) {
     const attachments = [];
-    if (utterance_list.length == 0) {
+    if (utterance_list.length === 0) {
         return {
             "html_part_text": "Sorry, I could not find any analyses performed for the given period.",
             "attachments":    attachments
@@ -99,16 +103,52 @@ async function get_utterances_html(greeting_text, utterance_list, creds) {
     for (const [utt_index, item] of Object.entries(utterance_list)) {
         let apl_image_urls = item["apl_image_urls"];
         if (!(apl_image_urls instanceof Array)) {
-            continue;
+            apl_image_urls = [];
         }
 
+        let seq_num = parseInt(utt_index) + 1;
         let melvin_response = item["melvin_response"];
+        let intent = item["intent"];
         let ssml_text = JSON.stringify(melvin_response["outputSpeech"]["ssml"]);
         let response_text = ssml_text.replace(ssml_regex, "");
-        let params_text = JSON.stringify(item["melvin_state"]);
+        let melvin_state = item["melvin_state"];
+        let melvin_aux_state = item["melvin_aux_state"];
+        console.info(`[sqs_irs_handler] seq_num: ${seq_num}, melvin_state: ${JSON.stringify(melvin_state)}, ` +
+            `melvin_aux_state: ${JSON.stringify(melvin_aux_state)}`);
+        let dtype = melvin_state[MelvinAttributes.DTYPE];
+        let study = melvin_state[MelvinAttributes.STUDY_ABBRV];
+        let gene = melvin_state[MelvinAttributes.GENE_NAME];
+        let dsource = melvin_state[MelvinAttributes.DSOURCE];
+        let response_title = _.get(DataTypesDisplayNames, dtype, dtype);
 
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${utt_index + 1}. ${params_text}</td></tr>\n`;
-        results_table_html += `<tr><td style="padding: 20px 0 30px 0;">${response_text}</td></tr>\n`;
+        let aux_dtype = melvin_state[MelvinAttributes.DTYPE];
+        let aux_study = melvin_state[MelvinAttributes.STUDY_ABBRV];
+        let aux_gene = melvin_state[MelvinAttributes.GENE_NAME];
+
+        if (!_.isNil(study)) {
+            response_title += ` in ${_.get(CANCER_TYPES, study, study)}`;
+        }
+        if (!_.isNil(gene)) {
+            response_title += ` for ${gene}`;
+        }
+
+        if (intent === "NavigateCompareIntent") {
+            response_title += ` compare with ${_.get(DataTypesDisplayNames, aux_dtype, aux_dtype)}`;
+        } else if (intent === "NavigateSplitbyIntent") {
+            response_title += ` split-by ${_.get(DataTypesDisplayNames, aux_dtype, aux_dtype)}`;
+        }
+        if (!_.isNil(aux_study)) {
+            response_title += ` in ${_.get(CANCER_TYPES, aux_study, aux_study)}`;
+        }
+        if (!_.isNil(aux_gene)) {
+            response_title += ` for ${aux_gene}`;
+        }
+
+
+        response_title += ` | project: ${dsource}`;
+
+        results_table_html += `<tr><td style="padding: 20px 10px 30px 10px;">${seq_num}. ${response_title}</td></tr>`;
+        results_table_html += `<tr><td style="padding: 20px 10px 30px 10px;">${response_text}</td></tr>\n`;
 
         for (const [utt_img_index, image_url_str] of Object.entries(apl_image_urls)) {
             let image_url = new URL(image_url_str);
@@ -117,10 +157,10 @@ async function get_utterances_html(greeting_text, utterance_list, creds) {
 
             let response = await fetch(presigned_url);
             let img_buffer = await response.arrayBuffer();
-            let enccoded_img_data = Buffer.from(img_buffer).toString("base64");
+            let encoded_img_data = Buffer.from(img_buffer).toString("base64");
             attachments.push({
-                "filename":      `${utt_index}_${utt_img_index}.png`,
-                "content":       enccoded_img_data,
+                "filename":      `${utt_index}_${dtype}_${utt_img_index}.png`,
+                "content":       encoded_img_data,
                 "presigned_url": presigned_url
             });
 
@@ -134,7 +174,9 @@ async function get_utterances_html(greeting_text, utterance_list, creds) {
     results_table_html += "<tr><td style=\"padding: 20px 0 30px 0;\"><hr/></td></tr>\n";
 
     const html_data = html_template_content.toString().replace("_TEMPLATE_PLACEHOLDER_", results_table_html);
-    const attachments_logs = attachments.map(e => { e.filename, e.presigned_url; });
+    const attachments_logs = attachments.map(e => {
+        e.filename, e.presigned_url;
+    });
     console.info(`[sqs_irs_handler] html_data: ${html_data}, attachments: ${JSON.stringify(attachments_logs)}`);
     return {
         "html_part_text": html_data,
@@ -180,7 +222,7 @@ async function irs_send_email(user_email, subjectText, bodyText, bodyHTML, attac
     const mail_content = Buffer.from(mailContent.toString());
     console.info(`[irs_send_email] sending mail_content: ${mail_content}`);
     try {
-        const ses_result = await ses.sendRawEmail({ RawMessage: { Data: mail_content }}).promise();
+        const ses_result = await ses.sendRawEmail({ RawMessage: { Data: mail_content } }).promise();
         console.info(`[irs_send_email] email sent | response: ${JSON.stringify(ses_result)}`);
     } catch (error) {
         console.error("[irs_send_email] failed to send email", error);

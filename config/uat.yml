@@ -20,6 +20,8 @@ environment:
   PROFILE_INFO_ENDPOINT: "https://api.amazon.com/user/profile"
   WARMUP_SERVICE_ENABLED: true
   WARMUP_EVENT_SCHEDULE_RATE: 1 minute
-  WARMUP_EVENT_COUNT: 5
+  WARMUP_EVENT_DELAY_MAX: 60
+  WARMUP_EVENT_COUNT: 1
+  WARMUP_PARALLEL_REQUEST_COUNT: 6
 alexa:
   appId: amzn1.ask.skill.b4093683-e7de-4469-8fa4-453711c5ee2d

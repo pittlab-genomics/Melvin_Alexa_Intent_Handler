@@ -82,6 +82,7 @@ const process_repeat_requests = async function (handlerInput, url, headers) {
         if (_.has(response, "data")) {
             return response;
         } else if (_.has(response, "error")) {
+            console.error(`[melvin_explorer_client] AE data error: ${JSON.stringify(response)}`);
             if (response["error"] === MelvinExplorerErrors.DATA_IS_ZERO) {
                 let description = "There is no data in the database.";
                 if (response.description != null) {
@@ -92,7 +93,6 @@ const process_repeat_requests = async function (handlerInput, url, headers) {
                     MelvinExplorerErrors.DATA_IS_ZERO,
                     description);
             } else {
-                console.error(`[melvin_explorer_client] AE data error: ${JSON.stringify(response)}`);
                 throw melvin_error(
                     `[melvin_explorer_client] AE response contains error | ${JSON.stringify(response)}`,
                     MelvinIntentErrors.INVALID_API_RESPONSE,

@@ -8,7 +8,8 @@ const { queryEntireTable } = require("./dao_utils.js");
 
 AWS.config.update({ region: process.env.REGION });
 const docClient = new AWS.DynamoDB.DocumentClient();
-const utterances_doc = function () { };
+const utterances_doc = function () {
+};
 
 utterances_doc.prototype.addUserUtterance = async (record) => {
     const params = {
@@ -30,11 +31,11 @@ utterances_doc.prototype.getUtteranceByTimestamp = async function (user_id, time
     let utterance_list = [];
 
     console.log(`[utterances_doc] querying utterance for user_id: ${user_id}, timestamp: ${timestamp}`);
-    var query_params = {
-        TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "utterance_id, melvin_history, melvin_state",
-        KeyConditionExpression:   "#user_id = :uid AND contains(#utterance_id, :timestamp)",
-        ExpressionAttributeNames: {
+    const query_params = {
+        TableName:                 process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression:      "utterance_id, melvin_history, melvin_state",
+        KeyConditionExpression:    "#user_id = :uid AND contains(#utterance_id, :timestamp)",
+        ExpressionAttributeNames:  {
             "#user_id":      "user_id",
             "#utterance_id": "utterance_id"
         },
@@ -42,8 +43,8 @@ utterances_doc.prototype.getUtteranceByTimestamp = async function (user_id, time
             ":uid":       user_id,
             ":timestamp": `_${timestamp}`
         },
-        ScanIndexForward: false,
-        Limit:            10
+        ScanIndexForward:          false,
+        Limit:                     10
     };
 
     // since there is no filter expression, we can query the table once with a limit of 1.
@@ -58,15 +59,16 @@ utterances_doc.prototype.get_events_for_count = async function (
         + `count: ${count}`);
     let filter_exp = "#event_type = :event_type";
     if (event_type === MelvinEventTypes.ANALYSIS_EVENT) {
-        filter_exp = "#event_type = :event_type " + 
-        "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
+        filter_exp = "#event_type = :event_type " +
+            "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
     }
     let query_params = {
-        TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type, apl_image_urls",
-        KeyConditionExpression:   "#user_id = :uid AND begins_with(#utterance_id, :sid)",
-        FilterExpression:         filter_exp,
-        ExpressionAttributeNames: {
+        TableName:                 process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression:      "createdAt, utterance_id, melvin_state, melvin_aux_state, melvin_response, " +
+                                       "event_type, intent, apl_image_urls",
+        KeyConditionExpression:    "#user_id = :uid AND begins_with(#utterance_id, :sid)",
+        FilterExpression:          filter_exp,
+        ExpressionAttributeNames:  {
             "#user_id":      "user_id",
             "#utterance_id": "utterance_id",
             "#event_type":   "event_type",
@@ -79,8 +81,8 @@ utterances_doc.prototype.get_events_for_count = async function (
             ":sid":        session_id,
             ":event_type": event_type
         },
-        ScanIndexForward: false,
-        Limit:            100
+        ScanIndexForward:          false,
+        Limit:                     100
     };
 
     let utterance_list = await queryEntireTable(docClient, query_params, count);
@@ -100,7 +102,7 @@ utterances_doc.prototype.get_events_for_count = async function (
 utterances_doc.prototype.get_events_for_period = async function (
     user_id, session_id, duration, event_type, limit = 0) {
     let s_time = 0;
-    if (duration != 0) {
+    if (duration !== 0) {
         s_time = moment().valueOf() - (duration * 1000);
     }
 
@@ -112,11 +114,12 @@ utterances_doc.prototype.get_events_for_period = async function (
             "AND (attribute_exists(#response.#card) OR attribute_exists(#response.#directives))";
     }
     let query_params = {
-        TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "createdAt, utterance_id, melvin_state, melvin_response, event_type, apl_image_urls",
-        KeyConditionExpression:   "#user_id = :uid",
-        FilterExpression:         filter_exp,
-        ExpressionAttributeNames: {
+        TableName:                 process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression:      "createdAt, utterance_id, melvin_state, melvin_aux_state, melvin_response, " +
+                                       "event_type, intent, apl_image_urls",
+        KeyConditionExpression:    "#user_id = :uid",
+        FilterExpression:          filter_exp,
+        ExpressionAttributeNames:  {
             "#user_id":    "user_id",
             "#event_type": "event_type",
             "#time":       "createdAt",
@@ -129,8 +132,8 @@ utterances_doc.prototype.get_events_for_period = async function (
             ":event_type": event_type,
             ":s_time":     s_time
         },
-        ScanIndexForward: true,
-        Limit:            100
+        ScanIndexForward:          true,
+        Limit:                     100
     };
 
     let utterance_list = await queryEntireTable(docClient, query_params, limit);
@@ -155,10 +158,10 @@ utterances_doc.prototype.getMostRecentUtterance = async function (user_id, sessi
 
     console.log(`[utterances_doc] querying most recent utterance for user_id: ${user_id}, session_id: ${session_id}`);
     var query_params = {
-        TableName:                process.env.DYNAMODB_TABLE_USER_UTTERANCE,
-        ProjectionExpression:     "utterance_id, melvin_history, melvin_state",
-        KeyConditionExpression:   "#user_id = :uid AND begins_with(#utterance_id, :sid)",
-        ExpressionAttributeNames: {
+        TableName:                 process.env.DYNAMODB_TABLE_USER_UTTERANCE,
+        ProjectionExpression:      "utterance_id, melvin_history, melvin_state",
+        KeyConditionExpression:    "#user_id = :uid AND begins_with(#utterance_id, :sid)",
+        ExpressionAttributeNames:  {
             "#user_id":      "user_id",
             "#utterance_id": "utterance_id"
         },
@@ -166,8 +169,8 @@ utterances_doc.prototype.getMostRecentUtterance = async function (user_id, sessi
             ":uid": user_id,
             ":sid": session_id
         },
-        ScanIndexForward: false,
-        Limit:            10
+        ScanIndexForward:          false,
+        Limit:                     10
     };
 
     // since there is no filter expression, we can query the table once with a limit of 1.

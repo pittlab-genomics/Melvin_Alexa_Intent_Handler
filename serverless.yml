@@ -94,7 +94,7 @@ functions:
   alexa-skill:
     handler: src/alexa-skill.handler
     timeout: 30
-    provisionedConcurrency: 1
+    provisionedConcurrency: 2
     reservedConcurrency: 10
     memorySize: 3008
     events:
@@ -127,6 +127,10 @@ functions:
           input:
             stage: ${self:provider.stage}
             water: true
+      - sqs:
+          arn: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:provider.environment.SQS_WARMUP}
+          enabled: true
+          batchSize: 1
 
 plugins:
   - serverless-prune-plugin

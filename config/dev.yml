@@ -20,6 +20,8 @@ environment:
   WARMUP_SERVICE_ENABLED: true
   WARMUP_EVENT_RULE_NAME: "melvin-warmup-event-rule-${self:provider.stage}"
   WARMUP_EVENT_SCHEDULE_RATE: 1 minute
-  WARMUP_EVENT_COUNT: 5
+  WARMUP_EVENT_DELAY_MAX: 60
+  WARMUP_EVENT_COUNT: 3
+  WARMUP_PARALLEL_REQUEST_COUNT: 6
 alexa:
   appId: amzn1.ask.skill.76bde827-301f-478d-af1a-c7241f046388

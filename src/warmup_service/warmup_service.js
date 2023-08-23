@@ -24,77 +24,76 @@ const {
 } = require("../common.js");
 
 const agent = new https.Agent({ maxSockets: 200 });
-AWS.config.update({ httpOptions: { agent: agent }});
+AWS.config.update({ httpOptions: { agent: agent } });
 
 const WARMUP_SESSION_TIMEOUT = 900; // disable warmup rule if there is no new user sessions after `timeout` seconds
-const WARMUP_EVENT_COUNT = process.env.WARMUP_EVENT_COUNT || 5;
+const WARMUP_EVENT_COUNT = process.env.WARMUP_EVENT_COUNT || 6;
 const WARMUP_EVENT_DELAY_BASE = 5;
-const WARMUP_EVENT_DELAY_OFFSET_MAX = 15;
-const WARMUP_EVENT_DELAY_MAX = 60;
+const WARMUP_EVENT_DELAY_MAX = process.env.WARMUP_EVENT_DELAY_MAX || 60;
 
 /*
     make sure to include at least N number of entries for each unique path 
     since Lambda functions will be provisioned for the speicified `reservedConcurrency` limit
 */
-const PARALLEL_REQUEST_COUNT = 3;
+const WARMUP_PARALLEL_REQUEST_COUNT = process.env.WARMUP_PARALLEL_REQUEST_COUNT || 6;
 
 const stats_ep_path_dict = {
-    "mutations": [
+    "mutations":               [
         "/analysis/mutations/tcga/MUT_stats?gene=TP53",
         "/analysis/mutations/tcga/MUT_stats?study=BRCA",
         "/analysis/mutations/tcga/MUT_stats?gene=TP53&study=BRCA"
     ],
-    "indels": [
+    "indels":                  [
         "/analysis/mutations/tcga/IND_stats?gene=TP53&study=BRCA",
         "/analysis/mutations/tcga/IND_stats?gene=CDH1",
         "/analysis/mutations/tcga/IND_stats?study=BRCA"
     ],
-    "snv": [
+    "snv":                     [
         "/analysis/mutations/tcga/SNV_stats?gene=TP53&study=BRCA",
         "/analysis/mutations/tcga/SNV_stats?gene=CDH1",
         "/analysis/mutations/tcga/SNV_stats?study=BRCA"
     ],
-    "cna": [
+    "cna":                     [
         "/analysis/cna/tcga/cna_stats?gene=cdh17&study=BRCA",
         "/analysis/cna/tcga/cna_stats?gene=TP53",
         "/analysis/cna/tcga/cna_stats?study=BRCA"
     ],
-    "gain": [
+    "gain":                    [
         "/analysis/cna/tcga/gain_stats?gene=cdh17&study=BRCA",
         "/analysis/cna/tcga/gain_stats?gene=TP53",
         "/analysis/cna/tcga/gain_stats?study=BRCA"
     ],
-    "loss": [
+    "loss":                    [
         "/analysis/cna/tcga/loss_stats?gene=cdh17&study=BRCA",
         "/analysis/cna/tcga/loss_stats?gene=TP53",
         "/analysis/cna/tcga/loss_stats?study=BRCA"
     ],
-    "genes": [
+    "genes":                   [
         "/genes/TP53",
         "/genes/BRCA1",
         "/genes/BRCA2"
     ],
-    "gene_targets": [
+    "gene_targets":            [
         "/gene_targets/TP53",
         "/gene_targets/BRCA1",
         "/gene_targets/BRCA2"
     ],
-    "gene_expression": [
+    "gene_expression":         [
         "/analysis/gene_expression/tcga/stats?gene=TP53&study=BRCA",
         "/analysis/gene_expression/tcga/stats?gene=BRCA1",
         "/analysis/gene_expression/tcga/stats?study=OV"
     ],
-    "mut_cna_compare_stats": [
+    "mut_cna_compare_stats":   [
         "/analysis/comparison/tcga/MUTvCNA_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_stats?study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_stats?gene=TP53"
     ],
-    "mut_gain_compare_stats": [
+    "mut_gain_compare_stats":  [
         "/analysis/comparison/tcga/MUTvGAIN_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvGAIN_stats?study=BRCA",
         "/analysis/comparison/tcga/MUTvGAIN_stats?gene=TP53"
     ],
-    "mut_loss_compare_stats": [
+    "mut_loss_compare_stats":  [
         "/analysis/comparison/tcga/MUTvLOSS_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvLOSS_stats?study=BRCA",
         "/analysis/comparison/tcga/MUTvLOSS_stats?gene=TP53"
@@ -104,32 +103,32 @@ const stats_ep_path_dict = {
         "/analysis/comparison/tcga/SNVvIND_stats?study=BRCA",
         "/analysis/comparison/tcga/SNVvIND_stats?gene=TP53"
     ],
-    "snv_cna_compare_stats": [
+    "snv_cna_compare_stats":   [
         "/analysis/comparison/tcga/SNVvCNA_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvCNA_stats?study=BRCA",
         "/analysis/comparison/tcga/SNVvCNA_stats?gene=TP53"
     ],
-    "snv_gain_compare_stats": [
+    "snv_gain_compare_stats":  [
         "/analysis/comparison/tcga/SNVvGAIN_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvGAIN_stats?study=BRCA",
         "/analysis/comparison/tcga/SNVvGAIN_stats?gene=TP53"
     ],
-    "snv_loss_compare_stats": [
+    "snv_loss_compare_stats":  [
         "/analysis/comparison/tcga/SNVvLOSS_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvLOSS_stats?study=BRCA",
         "/analysis/comparison/tcga/SNVvLOSS_stats?gene=TP53"
     ],
-    "ind_cna_compare_stats": [
+    "ind_cna_compare_stats":   [
         "/analysis/comparison/tcga/INDvCNA_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvCNA_stats?study=BRCA",
         "/analysis/comparison/tcga/INDvCNA_stats?gene=TP53"
     ],
-    "ind_gain_compare_stats": [
+    "ind_gain_compare_stats":  [
         "/analysis/comparison/tcga/INDvGAIN_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvGAIN_stats?study=BRCA",
         "/analysis/comparison/tcga/INDvGAIN_stats?gene=TP53"
     ],
-    "ind_loss_compare_stats": [
+    "ind_loss_compare_stats":  [
         "/analysis/comparison/tcga/INDvLOSS_stats?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvLOSS_stats?study=BRCA",
         "/analysis/comparison/tcga/INDvLOSS_stats?gene=TP53"
@@ -142,52 +141,52 @@ const stats_ep_path_dict = {
 };
 
 const plots_ep_path_dict = {
-    "MUT_plot": [
+    "MUT_plot":               [
         "/analysis/mutations/tcga/MUT_plot?gene=TP53&study=OV&style=domstack",
         "/analysis/mutations/tcga/MUT_plot?gene=BRCA1&style=bar",
         "/analysis/mutations/tcga/MUT_plot?study=BRCA&style=bar"
     ],
-    "IND_plot": [
+    "IND_plot":               [
         "/analysis/mutations/tcga/IND_plot?gene=BRCA1&study=OV&style=domstack",
         "/analysis/mutations/tcga/IND_plot?gene=BRCA1&style=bar",
         "/analysis/mutations/tcga/IND_plot?study=BRCA&style=bar"
     ],
-    "SNV_plot": [
+    "SNV_plot":               [
         "/analysis/mutations/tcga/SNV_plot?gene=TP53&study=BRCA&style=domstack",
         "/analysis/mutations/tcga/SNV_plot?gene=HIF1A&style=bar",
         "/analysis/mutations/tcga/SNV_plot?study=BRCA&style=bar"
     ],
-    "cna_plot": [
+    "cna_plot":               [
         "/analysis/cna/tcga/cna_plot?gene=CDH17&study=BRCA",
         "/analysis/cna/tcga/cna_plot?gene=TP53",
         "/analysis/cna/tcga/cna_plot?study=OV"
     ],
-    "gain_plot": [
+    "gain_plot":              [
         "/analysis/cna/tcga/gain_plot?gene=CDH17&study=BRCA",
         "/analysis/cna/tcga/gain_plot?gene=TP53",
         "/analysis/cna/tcga/gain_plot?study=OV"
     ],
-    "loss_plot": [
+    "loss_plot":              [
         "/analysis/cna/tcga/loss_plot?gene=CDH17&study=BRCA",
         "/analysis/cna/tcga/loss_plot?gene=TP53",
         "/analysis/cna/tcga/loss_plot?study=OV"
     ],
-    "gene_expression_plot": [
+    "gene_expression_plot":   [
         "/analysis/gene_expression/tcga/plot?gene=CDH1&study=OV",
         "/analysis/gene_expression/tcga/plot?gene=TP53",
         "/analysis/gene_expression/tcga/plot?study=BRCA"
     ],
-    "mut_cna_compare_plot": [
+    "mut_cna_compare_plot":   [
         "/analysis/comparison/tcga/MUTvCNA_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_plot?study=BRCA",
         "/analysis/comparison/tcga/MUTvCNA_plot?gene=TP53"
     ],
-    "mut_gain_compare_plot": [
+    "mut_gain_compare_plot":  [
         "/analysis/comparison/tcga/MUTvGAIN_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvGAIN_plot?study=BRCA",
         "/analysis/comparison/tcga/MUTvGAIN_plot?gene=TP53"
     ],
-    "mut_loss_compare_plot": [
+    "mut_loss_compare_plot":  [
         "/analysis/comparison/tcga/MUTvLOSS_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/MUTvLOSS_plot?study=BRCA",
         "/analysis/comparison/tcga/MUTvLOSS_plot?gene=TP53"
@@ -197,32 +196,32 @@ const plots_ep_path_dict = {
         "/analysis/comparison/tcga/SNVvIND_plot?study=BRCA",
         "/analysis/comparison/tcga/SNVvIND_plot?gene=TP53"
     ],
-    "snv_cna_compare_plot": [
+    "snv_cna_compare_plot":   [
         "/analysis/comparison/tcga/SNVvCNA_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvCNA_plot?study=BRCA",
         "/analysis/comparison/tcga/SNVvCNA_plot?gene=TP53"
     ],
-    "snv_gain_compare_plot": [
+    "snv_gain_compare_plot":  [
         "/analysis/comparison/tcga/SNVvGAIN_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvGAIN_plot?study=BRCA",
         "/analysis/comparison/tcga/SNVvGAIN_plot?gene=TP53"
     ],
-    "snv_loss_compare_plot": [
+    "snv_loss_compare_plot":  [
         "/analysis/comparison/tcga/SNVvLOSS_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/SNVvLOSS_plot?study=BRCA",
         "/analysis/comparison/tcga/SNVvLOSS_plot?gene=TP53"
     ],
-    "ind_cna_compare_plot": [
+    "ind_cna_compare_plot":   [
         "/analysis/comparison/tcga/INDvCNA_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvCNA_plot?study=BRCA",
         "/analysis/comparison/tcga/INDvCNA_plot?gene=TP53"
     ],
-    "ind_gain_compare_plot": [
+    "ind_gain_compare_plot":  [
         "/analysis/comparison/tcga/INDvGAIN_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvGAIN_plot?study=BRCA",
         "/analysis/comparison/tcga/INDvGAIN_plot?gene=TP53"
     ],
-    "ind_loss_compare_plot": [
+    "ind_loss_compare_plot":  [
         "/analysis/comparison/tcga/INDvLOSS_plot?gene=CDH17&study=BRCA",
         "/analysis/comparison/tcga/INDvLOSS_plot?study=BRCA",
         "/analysis/comparison/tcga/INDvLOSS_plot?gene=TP53"
@@ -234,11 +233,13 @@ const plots_ep_path_dict = {
     ]
 };
 
-const oov_mapper_ep_path_dict = { "mapper_model": [
-    "/entity_mappings?query=press%20cancell",
-    "/entity_mappings?query=barack%20obama",
-    "/entity_mappings?query=domin",
-]};
+const oov_mapper_ep_path_dict = {
+    "mapper_model": [
+        "/entity_mappings?query=press%20cancell",
+        "/entity_mappings?query=barack%20obama",
+        "/entity_mappings?query=domin",
+    ]
+};
 
 const request_async = function (url, timeout) {
     const controller = new AbortController();
@@ -291,6 +292,10 @@ async function generate_urls_from_paths(endpoint, endpoint_paths, region, cred_d
         let ep_url = new URL(endpoint + ep_path);
         let signed_req = await sign_request(ep_url, region, cred_data, true);
         service_urls.push(build_presigned_url(signed_req));
+    }
+
+    while (service_urls.length < WARMUP_PARALLEL_REQUEST_COUNT) {
+        service_urls.push(endpoint_paths[0]);
     }
     return service_urls;
 }
@@ -508,9 +513,8 @@ async function get_melvin_splitby_plot_urls(endpoint, region, cred_data) {
 }
 
 function get_warmup_queue_url() {
-    const sqs_ep = process.env.SQS_WARMUP.split(":");
-    const account_id = sqs_ep[0];
-    const service_name = sqs_ep[1];
+    const account_id = process.env.AWS_ACCOUNT_ID;
+    const service_name = process.env.SQS_WARMUP;
     const queue_url = `https://sqs.${process.env.REGION}.amazonaws.com/${account_id}/${service_name}`;
     return queue_url;
 }
@@ -521,13 +525,13 @@ const send_parallel_requests = async function (request_id, options = {}) {
     _.defaults(options,
         { verbose: true },
         { mapper_enabled: true },
-        { mapper_timeout: 3000 },
+        { mapper_timeout: 10000 },
         { stats_enabled: true },
-        { stats_timeout: 8000 },
+        { stats_timeout: 10000 },
         { plots_enabled: true },
-        { plots_timeout: 15000 },
+        { plots_timeout: 20000 },
         { splitby_enabled: true },
-        { splitby_timeout: 15000 }
+        { splitby_timeout: 20000 }
     );
 
     try {
@@ -574,14 +578,14 @@ const send_parallel_requests = async function (request_id, options = {}) {
                 MELVIN_EXPLORER_REGION, creds_data);
             console.info(`splitby_stats_urls: ${JSON.stringify(splitby_stats_urls)}`);
             splitby_stats_urls.forEach(function (url_item) {
-                const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
+                const repeat_url_items = Array(WARMUP_PARALLEL_REQUEST_COUNT).fill(url_item);
                 repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
             });
 
             const splitby_plot_urls = await get_melvin_splitby_plot_urls(MELVIN_EXPLORER_ENDPOINT,
                 MELVIN_EXPLORER_REGION, creds_data);
             splitby_plot_urls.forEach(function (url_item) {
-                const repeat_url_items = Array(PARALLEL_REQUEST_COUNT).fill(url_item);
+                const repeat_url_items = Array(WARMUP_PARALLEL_REQUEST_COUNT).fill(url_item);
                 repeat_url_items.map((data) => req_promises2.push(request_async(data, options.splitby_timeout)));
             });
 
@@ -626,9 +630,9 @@ async function publish_warmup_events() {
         QueueUrl: queue_url,
         Entries:  []
     };
-    for (var i = 0; i < WARMUP_EVENT_COUNT; i++) {
-        let event_delay_offset = Math.floor(Math.random() * WARMUP_EVENT_DELAY_OFFSET_MAX);
-        let delay = ((WARMUP_EVENT_DELAY_BASE + event_delay_offset) * WARMUP_EVENT_COUNT) % WARMUP_EVENT_DELAY_MAX;
+    for (let i = 0; i < WARMUP_EVENT_COUNT; i++) {
+        let event_delay_offset = WARMUP_EVENT_DELAY_BASE + Math.floor(Math.random() * WARMUP_EVENT_DELAY_MAX);
+        let delay = event_delay_offset % WARMUP_EVENT_DELAY_MAX;
         params.Entries.push({
             Id:           i.toString(),
             MessageBody:  JSON.stringify({ stage: process.env.STAGE }),
@@ -644,14 +648,14 @@ async function publish_warmup_events() {
 }
 
 const handler = async function (event, context, callback) {
-    console.info(`[warmup_handler] event: ${JSON.stringify(event)}, context: ${JSON.stringify(context)}`);
+    console.info(`[warmup_handler] warming up for event: ${JSON.stringify(event)}, context: ${JSON.stringify(context)}`);
     let response = {};
     let warmup_result = {};
     if (WARMUP_SERVICE_ENABLED) {
         warmup_result = await send_parallel_requests(context.awsRequestId);
         try {
             let recent_sessions = await sessions_doc.getRecentSessions(WARMUP_SESSION_TIMEOUT);
-            if (recent_sessions.length == 0) {
+            if (recent_sessions.length === 0) {
                 console.info("[warmup_handler] No recent user sessions found, disabling rule...");
                 await disable_warmup_cloudwatch_rule();
             } else {

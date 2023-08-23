@@ -88,6 +88,24 @@ const DataTypes = {
     HRD:                 "HRD"
 };
 
+const DataTypesDisplayNames = {
+    "GENE_DEFINITION":     "Gene Definitions",
+    "GENE_TARGETS":        "Gene Targets",
+    "MUTATIONS":           "Mutations",
+    "PROTEIN_DOMAINS":     "Protein Domains",
+    "MUT_DOMAINS":         "Mutation Domains",
+    "IND_DOMAINS":         "Indel Domains",
+    "SNV_DOMAINS":         "Single Nucleotide Variants Domains",
+    "GENE_EXPRESSION":     "Gene Expression",
+    "CNA":                 "Copy Number Alterations",
+    "GAIN":                "Copy Number Gain",
+    "LOSS":                "Copy Number Loss",
+    "STRUCTURAL_VARIANTS": "Structural Variants",
+    "INDELS":              "Indels",
+    "SNV":                 "Single Nucleotide Variants",
+    "HRD":                 "Homologous Recombination Deficiency Score"
+};
+
 const DataSources = {
     TCGA:    "TCGA",
     CLINVAR: "CLINVAR"
@@ -213,23 +231,23 @@ const PREFERENCES_PROF_INFO_ERROR_RESPONSE = "Something went wrong while updatin
     "Please try again later.";
 const PREFERENCES_PROF_INFO_API_ERROR_RESPONSE = "Something went wrong while retrieving your profile information." +
     "Please try again later.";
-const PREFERENCES_PERMISSION_ERROR = "You must authenticate with your Amazon Account to use this feature." 
+const PREFERENCES_PERMISSION_ERROR = "You must authenticate with your Amazon Account to use this feature."
     + "Please go to the home screen in your Alexa app and follow the instructions. <break time=\"300ms\"/>What else?";
-    
+
 const DEFAULT_AE_ACCESS_ERROR_RESPONSE = "Sorry, I'm having trouble accessing the dataset. Please try again later.";
 const DEFAULT_AE_CONNECT_ERROR_RESPONSE = "Sorry, I'm having trouble connecting to the Melvin service. " +
     "Please try again later.";
 const EMAIL_ERROR = "Something went wrong while sending the results. Please try again later.";
-const EMAIL_SUCCESS_RANGE = "Ok, I'm emailing results during that period. " 
+const EMAIL_SUCCESS_RANGE = "Ok, I'm emailing results during that period. "
     + "Please check your inbox in a while. <break time=\"300ms\"/> What else?";
-const EMAIL_SUCCESS_COUNT = "Ok, I'm emailing that to you now. Please check your inbox in a while." 
+const EMAIL_SUCCESS_COUNT = "Ok, I'm emailing that to you now. Please check your inbox in a while."
     + "<break time=\"300ms\"/>What else?";
 const EMAIL_SUCCESS_REPROMPT = "Please check your inbox in a while. <break time=\"300ms\"/>What else?";
-const EMAIL_PERMISSION_ERROR = "In order to email, Melvin will need access to your email address. " 
+const EMAIL_PERMISSION_ERROR = "In order to email, Melvin will need access to your email address. "
     + "Go to the home screen in your Alexa app and grant me permissions.";
-const RESTORE_SESSION_NO_PREV = "I could not find any previous sessions. " 
+const RESTORE_SESSION_NO_PREV = "I could not find any previous sessions. "
     + "Please continue with current analysis.";
-const RESTORE_SESSION_NO_ANALYSIS = "I could not find any analysis performed in your previous session. " 
+const RESTORE_SESSION_NO_ANALYSIS = "I could not find any analysis performed in your previous session. "
     + "Please continue with current analysis.";
 const RESTORE_SESSION_ERROR = "Something went wrong while restoring the session. Please try again later.";
 const RESTORE_SESSION_SUCCESS = "Ok. Your last session was restored. You may continue from your last analysis now.";
@@ -342,6 +360,7 @@ module.exports = {
     filter_domains,
     OOVEntityTypes,
     DataTypes,
+    DataTypesDisplayNames,
     DataSources,
     CNATypes,
     melvin_error,

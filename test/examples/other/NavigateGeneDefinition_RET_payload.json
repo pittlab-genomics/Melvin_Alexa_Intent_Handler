@@ -8,13 +8,7 @@
         },
         "attributes": {
             "MELVIN.STATE": {
-                "gene_name": "PIK3CA",
-                "study_abbreviation": "BRCA",
-                "data_type": "GENE_EXPRESSION",
-                "data_source":"TCGA"
-            },
-            "MELVIN.AUX.STATE": {
-                "data_type": "MUTATIONS"
+                "gene_name": "RET"
             }
         },
         "user": {
@@ -81,17 +75,16 @@
     },
     "request": {
         "type": "IntentRequest",
-        "dialogState": "COMPLETED",
         "requestId": "amzn1.echo-api.request.8c4e505d-048b-4436-9a2c-04149ed8c5e2",
         "timestamp": "2019-10-09T00:34:12Z",
         "locale": "en-US",
         "intent": {
-            "name": "NavigateSplitbyIntent",
+            "name": "NavigateGeneDefinitionIntent",
             "confirmationStatus": "NONE",
             "slots": {
-                "gene_query": {
-                    "name": "gene_query",
-                    "value": "TP53",
+                "query": {
+                    "name": "query",
+                    "value": "RET",
                     "confirmationStatus": "NONE"
                 }
             }

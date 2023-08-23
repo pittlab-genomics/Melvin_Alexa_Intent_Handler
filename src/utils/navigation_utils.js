@@ -6,6 +6,7 @@ const { performance } = require("perf_hooks");
 const utterances_doc = require("../dao/utterances.js");
 const voicerecords_doc = require("../dao/voicerecords.js");
 const { get_oov_mapping_by_query, } = require("../http_clients/oov_mapper_client.js");
+const { match_entity_from_recorded_utterances } = require("./voice_recorder_utterance_matcher.js");
 const {
     MELVIN_MAX_HISTORY_ITEMS,
     DEFAULT_OOV_MAPPING_ERROR_RESPONSE,
@@ -87,7 +88,10 @@ const resolve_oov_entity = async function (handlerInput, query) {
     const user_email = _.has(preferences, "email") ? preferences["email"] : false;
     if (mapping_preference && user_email) {
         console.info("[resolve_oov_entity] Looking up custom mappings...");
-        const vrec_result = await voicerecords_doc.getOOVMappingForQuery(query, user_email);
+        let vrec_utterances = await voicerecords_doc.getOOVMappingForUser(user_email);
+        vrec_utterances = vrec_utterances.filter(item => item["status"] === true);
+        let vrec_result = match_entity_from_recorded_utterances(query, vrec_utterances);
+
         if (vrec_result.length > 0) {
             console.debug(`[resolve_oov_entity] recorded mapping response: ${JSON.stringify(vrec_result)}`);
             return { "data": vrec_result[0]["entity_data"] };
@@ -151,8 +155,7 @@ const update_melvin_state = async function (
                 else if (prev_datatype === DataTypes.INDELS) oov_entity[MelvinAttributes.DTYPE] = DataTypes.IND_DOMAINS;
                 else if (prev_datatype === DataTypes.SNV) oov_entity[MelvinAttributes.DTYPE] = DataTypes.SNV_DOMAINS;
                 else oov_entity[MelvinAttributes.DTYPE] = DataTypes.PROTEIN_DOMAINS;
-            }
-            else oov_entity[MelvinAttributes.DTYPE] = curr_datatype;
+            } else oov_entity[MelvinAttributes.DTYPE] = curr_datatype;
         } else if (query_response.data.type === OOVEntityTypes.DSOURCE) {
             oov_entity[MelvinAttributes.DSOURCE] = _.get(query_response, "data.val");
         }
@@ -192,12 +195,14 @@ const update_melvin_history = async function (handlerInput) {
     const timestamp = moment().valueOf();
     const utterance_id = `${handlerInput.requestEnvelope.session.sessionId}_${timestamp}`;
     const melvin_state = get_melvin_state(handlerInput);
+    const melvin_aux_state = get_melvin_aux_state(handlerInput);
 
     // store utterance as a session attribute for faster navigation
     let melvin_history = get_melvin_history(handlerInput);
     const intent_name = _.get(handlerInput, "requestEnvelope.request.intent.name", "UNKNOWN_INTENT");
     const history_event = {
         melvin_state,
+        melvin_aux_state,
         intent: intent_name,
         event_type,
     };
@@ -220,7 +225,7 @@ const update_melvin_history = async function (handlerInput) {
         });
     }
     console.info(`[update_melvin_history] APL images: ${JSON.stringify(apl_image_url_href_list)}`);
-    
+
 
     const melvin_response = handlerInput.responseBuilder.getResponse();
     const new_utterance_rec = {
@@ -231,6 +236,7 @@ const update_melvin_history = async function (handlerInput) {
         device:         handlerInput.requestEnvelope.context.System.device,
         apl_image_urls: apl_image_url_href_list,
         melvin_state,
+        melvin_aux_state,
         intent:         intent_name,
         event_type,
         melvin_history,
@@ -441,7 +447,7 @@ const elicit_splitby_slots = async function (handlerInput, melvin_aux_state) {
 const is_splitby_supported = function (query_dtypes) {
     for (var index = 0; index < SUPPORTED_SPLITBY_DTYPES.length; index++) {
         if ((query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][0]
-            && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][1])
+                && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][1])
             || (query_dtypes[0] === SUPPORTED_SPLITBY_DTYPES[index][1]
                 && query_dtypes[1] === SUPPORTED_SPLITBY_DTYPES[index][0])
         ) {

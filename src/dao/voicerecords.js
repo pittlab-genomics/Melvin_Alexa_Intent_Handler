@@ -5,25 +5,25 @@ const { queryEntireTable } = require("./dao_utils.js");
 
 AWS.config.update({ region: "ap-southeast-1" });
 const docClient = new AWS.DynamoDB.DocumentClient();
-const voicerecords_doc = function () { };
+const voicerecords_doc = function () {
+};
 
-voicerecords_doc.prototype.getOOVMappingForQuery = async (query, user_email) => {
-    console.log(`[voicerecords] querying custom recordings for query: ${query}`);
+voicerecords_doc.prototype.getOOVMappingForUser = async (user_email) => {
+    console.log(`[voicerecords] querying custom recordings for user: ${user_email}`);
     var query_params = {
-        TableName:                process.env.DYNAMODB_TABLE_VOICE_RECORDER,
-        ProjectionExpression:     "entity_data",
-        KeyConditionExpression:   "#user_id = :uid",
-        FilterExpression:         "#query = :utterance",
-        ExpressionAttributeNames: {
-            "#query":   "query",
-            "#user_id": "user_id", 
+        TableName:                 process.env.DYNAMODB_TABLE_VOICE_RECORDER,
+        ProjectionExpression:      "#query_utterance, entity_data, #query_enabled",
+        KeyConditionExpression:    "#user_id = :uid",
+        ExpressionAttributeNames:  {
+            "#query_utterance":   "query",
+            "#query_enabled":   "status",
+            "#user_id": "user_id"
         },
         ExpressionAttributeValues: {
-            ":utterance": query,
-            ":uid":       user_email 
+            ":uid": user_email
         },
-        ScanIndexForward: false,
-        Limit:            100
+        ScanIndexForward:          false,
+        Limit:                     100
     };
 
     const response = await queryEntireTable(docClient, query_params, 1);
